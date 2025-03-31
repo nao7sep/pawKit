@@ -1,9 +1,35 @@
 ﻿--------------------------------------------------------------------------------
+Simple Windows-Compatible Filename Creation
+--------------------------------------------------------------------------------
+
+Generate a filename from the given document title with the following requirements:
+1. Avoid characters not allowed in Windows filenames.
+2. Use only lowercase letters unless capitalization is strictly necessary (e.g., acronyms or proper names).
+3. Replace spaces and other separators with hyphens.
+4. Keep the filename as close to the original title as possible (no shortening or additional modifications beyond removing invalid characters).
+
+--------------------------------------------------------------------------------
 Document Header Insertion (UTC Timestamp)
 --------------------------------------------------------------------------------
 
-Please insert a header at the top of the document with the following format, using the current UTC time in ISO 8601 format.
+Insert a header at the very beginning of the document.
+The header must use the current UTC time in ISO 8601 format and follow this exact structure (replacing `YYYY-MM-DDTHH:MM:SSZ` with the actual timestamp):
+<!-- nao7sep | o3-mini-high | YYYY-MM-DDTHH:MM:SSZ -->
 
-For example, if the current UTC time is 2025-03-30T14:52:54Z, the header should be:
+--------------------------------------------------------------------------------
+Comprehensive C# Technology Document
+--------------------------------------------------------------------------------
 
-<!-- nao7sep | o3-mini-high | 2025-03-30T14:52:54Z -->
+Create a detailed document covering a specific technology or package, focusing on C# usage.
+Include thorough explanations, best practices, and illustrative sample C# code.
+
+1. Insert a UTC Timestamp Header: At the very top of the document, add a header in the following exact format (substitute YYYY-MM-DDTHH:MM:SSZ with the current UTC time in ISO 8601):
+<!-- nao7sep | o3-mini-high | YYYY-MM-DDTHH:MM:SSZ -->
+
+2. Generate a Windows-Compatible Filename: After writing the document, create a filename based on the document’s title by adhering to these rules:
+- Avoid any characters not permitted in Windows filenames.
+- Use only lowercase letters unless capitalization is strictly necessary (for example, acronyms or proper names).
+- Replace spaces and other separators with hyphens.
+- Keep the filename as close to the original title as possible (do not shorten or overly modify it).
+
+3. Save the Document: Conclude by saving the document under the generated filename.
