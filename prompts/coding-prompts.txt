@@ -3,5 +3,7 @@ Document Header Insertion (UTC Timestamp)
 --------------------------------------------------------------------------------
 
 Please insert a header at the top of the document with the following format, using the current UTC time in ISO 8601 format.
+
 For example, if the current UTC time is 2025-03-30T14:52:54Z, the header should be:
+
 <!-- nao7sep | o3-mini-high | 2025-03-30T14:52:54Z -->
