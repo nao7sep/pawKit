@@ -5,16 +5,16 @@ Simple Windows-Compatible Filename Creation
 Generate a filename from the given document title with the following requirements:
 1. Avoid characters not allowed in Windows filenames.
 2. Use only lowercase letters unless capitalization is strictly necessary (e.g., acronyms or proper names).
-3. Replace spaces and other separators with hyphens.
+3. Replace spaces, other separators, and special symbols with hyphens or appropriate textual equivalents (for example, convert 'C#' to 'csharp').
 4. Keep the filename as close to the original title as possible (no shortening or additional modifications beyond removing invalid characters).
 
 --------------------------------------------------------------------------------
 Document Header Insertion (UTC Timestamp)
 --------------------------------------------------------------------------------
 
-Insert a header at the very beginning of the document.
-The header must use the current UTC time in ISO 8601 format and follow this exact structure (replacing `YYYY-MM-DDTHH:MM:SSZ` with the actual timestamp):
-<!-- nao7sep | o3-mini-high | YYYY-MM-DDTHH:MM:SSZ -->
+Insert a header at the very beginning of the document, and ensure there is one empty line after the header before the document content begins.
+The header must be the current UTC timestamp in ISO 8601 format:
+<!-- YYYY-MM-DDTHH:MM:SSZ -->
 
 --------------------------------------------------------------------------------
 Comprehensive C# Technology Document
@@ -23,13 +23,15 @@ Comprehensive C# Technology Document
 Create a detailed document covering a specific technology or package, focusing on C# usage.
 Include thorough explanations, best practices, and illustrative sample C# code.
 
-1. Insert a UTC Timestamp Header: At the very top of the document, add a header in the following exact format (substitute YYYY-MM-DDTHH:MM:SSZ with the current UTC time in ISO 8601):
-<!-- nao7sep | o3-mini-high | YYYY-MM-DDTHH:MM:SSZ -->
+1. Insert a UTC Timestamp Header: At the very top of the document, add a header with the current UTC time in ISO 8601 format:
+<!-- YYYY-MM-DDTHH:MM:SSZ -->
 
 2. Generate a Windows-Compatible Filename: After writing the document, create a filename based on the document’s title by adhering to these rules:
 - Avoid any characters not permitted in Windows filenames.
 - Use only lowercase letters unless capitalization is strictly necessary (for example, acronyms or proper names).
 - Replace spaces and other separators with hyphens.
+- Also, replace special symbols with their textual equivalents (for example, C# should be converted to csharp).
 - Keep the filename as close to the original title as possible (do not shorten or overly modify it).
 
 3. Save the Document: Conclude by saving the document under the generated filename.
+Ensure the file ends with a newline.
