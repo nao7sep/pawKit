@@ -23,15 +23,18 @@ Comprehensive C# Technology Document
 Create a detailed document covering a specific technology or package, focusing on C# usage.
 Include thorough explanations, best practices, and illustrative sample C# code.
 
-1. Insert a UTC Timestamp Header: At the very top of the document, add a header with the current UTC time in ISO 8601 format:
-<!-- YYYY-MM-DDTHH:MM:SSZ -->
+1. Insert a UTC Timestamp Header:
+   At the very top of the document, add a header with the current UTC time in ISO 8601 format:
+   <!-- YYYY-MM-DDTHH:MM:SSZ -->
 
-2. Generate a Windows-Compatible Filename: After writing the document, create a filename based on the document’s title by adhering to these rules:
-- Avoid any characters not permitted in Windows filenames.
-- Use only lowercase letters unless capitalization is strictly necessary (for example, acronyms or proper names).
-- Replace spaces and other separators with hyphens.
-- Also, replace special symbols with their textual equivalents (for example, C# should be converted to csharp).
-- Keep the filename as close to the original title as possible (do not shorten or overly modify it).
+2. Generate a Windows-Compatible Filename:
+   After writing the document, create a filename based on the document’s title by adhering to these rules:
+   - Avoid any characters not permitted in Windows filenames.
+   - Use only lowercase letters unless capitalization is strictly necessary (for example, acronyms or proper names).
+   - Replace spaces and other separators with hyphens.
+   - Also, replace special symbols with their textual equivalents (for example, C# should be converted to csharp).
+   - Keep the filename as close to the original title as possible (do not shorten or overly modify it).
 
-3. Save the Document: Conclude by saving the document under the generated filename.
-Ensure the file ends with a newline.
+3. Save the Document:
+   Conclude by saving the document under the generated filename.
+   Ensure the file ends with a newline.
