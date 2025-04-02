@@ -1,4 +1,4 @@
-<!-- nao7sep | o3-mini-high | 2025-03-31T03:00:37Z -->
+<!-- 2025-03-31T03:00:37Z -->
 
 # NLog: Comprehensive Guide for C#
 

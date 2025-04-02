@@ -1,4 +1,4 @@
-<!-- nao7sep | o3-mini-high | 2025-04-01T01:27:08Z -->
+<!-- 2025-04-01T01:27:08Z -->
 
 # Comprehensive Guide to ServiceStack in C#
 

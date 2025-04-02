@@ -1,4 +1,4 @@
-<!-- nao7sep | o3-mini-high | 2025-04-01T01:29:19Z -->
+<!-- 2025-04-01T01:29:19Z -->
 
 # Comprehensive Guide to NSwag in C#
 

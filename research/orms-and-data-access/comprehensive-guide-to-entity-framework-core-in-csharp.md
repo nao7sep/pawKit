@@ -1,4 +1,4 @@
-<!-- nao7sep | o3-mini-high | 2025-03-31T02:53:55Z -->
+<!-- 2025-03-31T02:53:55Z -->
 
 # Comprehensive Guide to Entity Framework Core in C#
 

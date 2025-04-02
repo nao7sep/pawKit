@@ -1,4 +1,4 @@
-<!-- nao7sep | o3-mini-high | 2025-04-01T01:30:59Z -->
+<!-- 2025-04-01T01:30:59Z -->
 
 # A Comprehensive Guide to GraphQL in C#
 

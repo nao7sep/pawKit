@@ -1,4 +1,4 @@
-<!-- nao7sep | o3-mini-high | 2025-03-31T02:58:39Z -->
+<!-- 2025-03-31T02:58:39Z -->
 
 # Comprehensive Guide to xUnit in C#
 

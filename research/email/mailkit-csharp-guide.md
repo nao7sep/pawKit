@@ -1,4 +1,4 @@
-<!-- nao7sep | o3-mini-high | 2025-03-31T02:58:31Z -->
+<!-- 2025-03-31T02:58:31Z -->
 
 # MailKit C# Guide: Comprehensive Documentation and Best Practices
 

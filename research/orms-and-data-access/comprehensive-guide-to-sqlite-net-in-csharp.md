@@ -1,4 +1,4 @@
-<!-- nao7sep | o3-mini-high | 2025-03-31T02:55:57Z -->
+<!-- 2025-03-31T02:55:57Z -->
 
 # Comprehensive Guide to sqlite-net in C#
 

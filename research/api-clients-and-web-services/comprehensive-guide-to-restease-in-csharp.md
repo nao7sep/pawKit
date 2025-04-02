@@ -1,4 +1,4 @@
-<!-- nao7sep | o3-mini-high | 2025-04-01T01:26:12Z -->
+<!-- 2025-04-01T01:26:12Z -->
 
 # Comprehensive Guide to RestEase in C#
 

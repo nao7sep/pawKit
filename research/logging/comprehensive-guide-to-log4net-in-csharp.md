@@ -1,4 +1,4 @@
-<!-- nao7sep | o3-mini-high | 2025-03-31T03:01:44Z -->
+<!-- 2025-03-31T03:01:44Z -->
 
 # Comprehensive Guide to Log4net in C#
 

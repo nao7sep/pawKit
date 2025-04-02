@@ -1,4 +1,4 @@
-<!-- nao7sep | o3-mini-high | 2025-03-31T03:04:11Z -->
+<!-- 2025-03-31T03:04:11Z -->
 
 # Comprehensive Guide to ORMLite in C#
 

@@ -1,4 +1,4 @@
-<!-- nao7sep | o3-mini-high | 2025-03-31T02:47:50Z -->
+<!-- 2025-03-31T02:47:50Z -->
 
 # Comprehensive Guide to Serilog in C#
 

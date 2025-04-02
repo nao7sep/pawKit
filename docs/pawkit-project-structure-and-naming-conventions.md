@@ -1,4 +1,4 @@
-﻿<!-- nao7sep | o3-mini-high | 2025-03-30T14:52:54Z -->
+﻿<!-- 2025-03-30T14:52:54Z -->
 
 # pawKit Project Structure & Naming Conventions
 

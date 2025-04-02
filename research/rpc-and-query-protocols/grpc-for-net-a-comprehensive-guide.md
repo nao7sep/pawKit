@@ -1,4 +1,4 @@
-<!-- nao7sep | o3-mini-high | 2025-04-01T01:31:00Z -->
+<!-- 2025-04-01T01:31:00Z -->
 
 # gRPC for .NET: A Comprehensive Guide
 

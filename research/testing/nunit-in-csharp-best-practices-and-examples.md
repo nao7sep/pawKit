@@ -1,4 +1,4 @@
-<!-- nao7sep | o3-mini-high | 2025-03-31T03:03:28Z -->
+<!-- 2025-03-31T03:03:28Z -->
 
 # NUnit in C# - Best Practices and Examples
 

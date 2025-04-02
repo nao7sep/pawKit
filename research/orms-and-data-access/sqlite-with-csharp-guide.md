@@ -1,4 +1,4 @@
-<!-- nao7sep | o3-mini-high | 2025-03-31T02:55:49Z -->
+<!-- 2025-03-31T02:55:49Z -->
 
 # SQLite with C# Guide
 
