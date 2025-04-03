@@ -73,7 +73,7 @@ public static class PathOperations
             return string.Empty;
 
         if (Path.IsPathFullyQualified(path))
-            return Path.GetFullPath(path);
+            return DirectorySeparatorValues.NormalizeDirectorySeparators (Path.GetFullPath(path), type);
 
         // Normalize input by removing redundant separators and whitespace before processing
         string[] segments = path.Split(DirectorySeparatorValues.DirectorySeparators,
@@ -96,7 +96,7 @@ public static class PathOperations
                     resultSegments.RemoveAt(resultSegments.Count - 1);
                 else
                     // Prevent navigation above the root of a relative path - this maintains path integrity
-                    throw new InvalidOperationException("Cannot go up from the root directory.");
+                    throw new InvalidOperationException("Cannot navigate above the root of a relative path.");
             }
 
             else
