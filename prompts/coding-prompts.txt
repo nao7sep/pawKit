@@ -28,7 +28,7 @@ Include thorough explanations, best practices, and illustrative sample C# code.
    <!-- YYYY-MM-DDTHH:MM:SSZ -->
 
 2. Generate a Windows-Compatible Filename:
-   After writing the document, create a filename based on the document’s title by adhering to these rules:
+   After writing the document, create a filename based on the document's title by adhering to these rules:
    - Avoid any characters not permitted in Windows filenames.
    - Use only lowercase letters unless capitalization is strictly necessary (for example, acronyms or proper names).
    - Replace spaces and other separators with hyphens.
@@ -38,3 +38,19 @@ Include thorough explanations, best practices, and illustrative sample C# code.
 3. Save the Document:
    Conclude by saving the document under the generated filename.
    Ensure the file ends with a newline.
+
+--------------------------------------------------------------------------------
+Purposeful Code Commenting
+--------------------------------------------------------------------------------
+
+When reviewing or writing code, apply these commenting principles:
+
+1. Add comments only when the code could be confusing or misleading without explanation.
+2. Avoid redundant comments that merely restate what the code already clearly expresses.
+3. All sentence-type comments must end with an appropriate punctuation symbol (period, question mark, or exclamation point).
+4. Use comments to explain:
+   - Why a particular approach was chosen over alternatives
+   - Non-obvious edge cases or constraints
+   - Complex algorithms or business logic
+   - Temporary workarounds (with explanations of why they're needed)
+5. Keep comments concise and focused on clarifying intent rather than implementation details.
