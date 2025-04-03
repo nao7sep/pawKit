@@ -1,5 +1,7 @@
 namespace pawKit.Core.IO;
 
+using pawKit.Core.Platform;
+
 public static class PathOperations
 {
     /// <summary>

@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace pawKit.Core.Platform;
 
@@ -18,17 +19,29 @@ public static class OperatingSystemInfo
 
     public static bool IsUnixLike => IsLinux || IsMacOS || IsFreeBSD;
 
-    public static char DirectorySeparator => IsWindows ? '\\' : '/';
+    public const char WindowsDirectorySeparator = '\\';
 
-    public static char AltDirectorySeparator => IsWindows ? '/' : '\\';
+    public const char UnixLikeDirectorySeparator = '/';
+
+    public static char CurrentDirectorySeparator => IsWindows ? WindowsDirectorySeparator : UnixLikeDirectorySeparator;
+
+    public static char CurrentAltDirectorySeparator => IsWindows ? UnixLikeDirectorySeparator : WindowsDirectorySeparator;
+
+    public const char WindowsPathSeparator = ';';
+
+    public const char UnixLikePathSeparator = ':';
 
     /// <summary>
     /// Gets the path separator character for the current operating system.
     /// This is used to separate paths in environment variables like PATH.
     /// </summary>
-    public static char PathSeparator => IsWindows ? ';' : ':';
+    public static char CurrentPathSeparator => IsWindows ? WindowsPathSeparator : UnixLikePathSeparator;
 
-    public static string LineEnding => IsWindows ? "\r\n" : "\n";
+    public const string WindowsLineEnding = "\r\n";
+
+    public const string UnixLikeLineEnding = "\n";
+
+    public static string CurrentLineEnding => IsWindows ? WindowsLineEnding : UnixLikeLineEnding;
 
     private static OperatingSystemType DetectOperatingSystem()
     {
@@ -47,27 +60,65 @@ public static class OperatingSystemInfo
         return OperatingSystemType.Unknown;
     }
 
-    public static string NormalizePath(string path)
+    public static string NormalizeDirectorySeparators(string path)
     {
-        if (string.IsNullOrEmpty(path))
-            return path;
-
-        return path.Replace('/', DirectorySeparator).Replace('\\', DirectorySeparator);
+        return NormalizeDirectorySeparators(path, CurrentDirectorySeparator);
     }
 
-    public static string ToForwardSlashPath(string path)
+    public static string NormalizeDirectorySeparators(string path, char targetSeparator)
     {
-        if (string.IsNullOrEmpty(path))
+        if (string.IsNullOrWhiteSpace(path))
             return path;
 
-        return path.Replace('\\', '/');
+        return path.Replace(WindowsDirectorySeparator, targetSeparator)
+                   .Replace(UnixLikeDirectorySeparator, targetSeparator);
     }
 
-    public static string ToBackslashPath(string path)
+    public static string NormalizeToWindowsSeparators(string path)
     {
-        if (string.IsNullOrEmpty(path))
-            return path;
+        return NormalizeDirectorySeparators(path, WindowsDirectorySeparator);
+    }
 
-        return path.Replace('/', '\\');
+    public static string NormalizeToUnixLikeSeparators(string path)
+    {
+        return NormalizeDirectorySeparators(path, UnixLikeDirectorySeparator);
+    }
+
+    public static string NormalizeLineEndings(string text)
+    {
+        return NormalizeLineEndings(text, CurrentLineEnding);
+    }
+
+    public static string NormalizeLineEndings(string text, string targetLineEnding)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+            return text;
+
+        using var reader = new StringReader(text);
+        var builder = new StringBuilder();
+        string? line;
+        bool isFirstLine = true;
+
+        while ((line = reader.ReadLine()) != null)
+        {
+            if (!isFirstLine)
+                builder.Append(targetLineEnding);
+            else
+                isFirstLine = false;
+
+            builder.Append(line);
+        }
+
+        return builder.ToString();
+    }
+
+    public static string NormalizeToWindowsLineEndings(string text)
+    {
+        return NormalizeLineEndings(text, WindowsLineEnding);
+    }
+
+    public static string NormalizeToUnixLikeLineEndings(string text)
+    {
+        return NormalizeLineEndings(text, UnixLikeLineEnding);
     }
 }
