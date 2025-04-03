@@ -8,6 +8,8 @@ public static class DirectorySeparatorValues
 
     public const char UnixLikeDirectorySeparator = '/';
 
+    public static readonly char[] DirectorySeparators = [WindowsDirectorySeparator, UnixLikeDirectorySeparator];
+
     private static readonly Lazy<char> _defaultDirectorySeparator = new Lazy<char>(() =>
         OperatingSystemInfo.IsWindows ? WindowsDirectorySeparator : UnixLikeDirectorySeparator);
 
