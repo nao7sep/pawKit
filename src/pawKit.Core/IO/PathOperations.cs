@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using pawKit.Core.Platform;
+using pawKit.Core.Text;
 
 public static class PathOperations
 {
@@ -49,9 +50,9 @@ public static class PathOperations
         for (int index = 0; index < segments.Length; index++)
         {
             if (index == 0)
-                processedSegments.Add(segments[index].Trim().TrimEnd(DirectorySeparatorValues.DirectorySeparators));
+                processedSegments.Add(segments[index].TrimStart().TrimEndWhiteSpaceAnd(DirectorySeparatorValues.DirectorySeparators));
             else
-                processedSegments.Add(segments[index].Trim().Trim(DirectorySeparatorValues.DirectorySeparators));
+                processedSegments.Add(segments[index].TrimWhiteSpaceAnd(DirectorySeparatorValues.DirectorySeparators));
         }
 
         return string.Join(DirectorySeparatorValues.GetDirectorySeparator(type), processedSegments);
@@ -73,7 +74,7 @@ public static class PathOperations
             return string.Empty;
 
         if (Path.IsPathFullyQualified(path))
-            return DirectorySeparatorValues.NormalizeDirectorySeparators (Path.GetFullPath(path), type);
+            return DirectorySeparatorValues.NormalizeDirectorySeparators(Path.GetFullPath(path), type);
 
         // Normalize input by removing redundant separators and whitespace before processing
         string[] segments = path.Split(DirectorySeparatorValues.DirectorySeparators,
@@ -104,7 +105,7 @@ public static class PathOperations
         }
 
         char separator = DirectorySeparatorValues.GetDirectorySeparator(type);
-        return string.Join(separator, resultSegments);
+        return DirectorySeparatorValues.NormalizeDirectorySeparators(string.Join(separator, resultSegments), type);
     }
 
     /// <summary>
