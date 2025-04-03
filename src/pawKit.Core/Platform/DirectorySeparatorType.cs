@@ -1,4 +1,4 @@
-namespace pawKit.Core.IO;
+namespace pawKit.Core.Platform;
 
 public enum DirectorySeparatorType
 {

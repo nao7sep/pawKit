@@ -1,18 +1,22 @@
 namespace pawKit.Core.Platform;
 
-/// <summary>
-/// Provides methods for working with path separator characters.
-/// </summary>
-/// <remarks>
-/// Path separators are used to separate multiple complete file paths in environment variables,
-/// not to be confused with directory separators which separate directories within a single path.
-/// </remarks>
+using System;
+
 public static class PathSeparatorValues
 {
-    public static char GetSeparator(PathSeparatorType separatorType) => separatorType switch
+    public const char WindowsPathSeparator = ';';
+
+    public const char UnixLikePathSeparator = ':';
+
+    private static readonly Lazy<char> _defaultPathSeparator = new Lazy<char>(() =>
+        OperatingSystemInfo.IsWindows ? WindowsPathSeparator : UnixLikePathSeparator);
+
+    public static char DefaultPathSeparator => _defaultPathSeparator.Value;
+
+    public static char GetPathSeparator(PathSeparatorType type) => type switch
     {
-        PathSeparatorType.Windows => OperatingSystemInfo.WindowsPathSeparator,
-        PathSeparatorType.UnixLike => OperatingSystemInfo.UnixLikePathSeparator,
-        _ => OperatingSystemInfo.CurrentPathSeparator
+        PathSeparatorType.Windows => WindowsPathSeparator,
+        PathSeparatorType.UnixLike => UnixLikePathSeparator,
+        _ => DefaultPathSeparator
     };
 }
