@@ -67,7 +67,7 @@ public static class PathOperations
     /// - Throws an exception when attempting to navigate above the root of a relative path
     /// - If preserving ".." segments is required, combine with a base path before normalization
     /// </remarks>
-    public static string NormalizePath(string path, DirectorySeparatorType type = DirectorySeparatorType.Default)
+    public static string Normalize(string path, DirectorySeparatorType type = DirectorySeparatorType.Default)
     {
         if (string.IsNullOrWhiteSpace(path))
             return string.Empty;
@@ -105,5 +105,32 @@ public static class PathOperations
 
         char separator = DirectorySeparatorValues.GetDirectorySeparator(type);
         return string.Join(separator, resultSegments);
+    }
+
+    /// <summary>
+    /// Combines path segments requiring the first segment to be an absolute path, then normalizes the result.
+    /// </summary>
+    /// <remarks>
+    /// Use this method when working with absolute paths and you need to ensure the result is in canonical form.
+    /// This method will throw an exception if the first segment is not an absolute path.
+    /// </remarks>
+    public static string CombineAndNormalize(string[] segments, DirectorySeparatorType type = DirectorySeparatorType.Default)
+    {
+        string combinedPath = Combine(segments, type);
+        return Normalize(combinedPath, type);
+    }
+
+    /// <summary>
+    /// Joins path segments allowing the first segment to be relative, then normalizes the result.
+    /// </summary>
+    /// <remarks>
+    /// Use this method when working with relative paths or when you're not certain if the first segment
+    /// is absolute. This method is more flexible than CombineAndNormalize but may not enforce the same
+    /// path structure guarantees.
+    /// </remarks>
+    public static string JoinAndNormalize(string[] segments, DirectorySeparatorType type = DirectorySeparatorType.Default)
+    {
+        string joinedPath = Join(segments, type);
+        return Normalize(joinedPath, type);
     }
 }
