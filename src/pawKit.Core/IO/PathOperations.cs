@@ -23,12 +23,28 @@ public static class PathOperations
     }
 
     /// <summary>
+    /// Combines path segments requiring the first segment to be an absolute path.
+    /// </summary>
+    public static string Combine(params string[] segments)
+    {
+        return Combine(segments, DirectorySeparatorType.Default);
+    }
+
+    /// <summary>
     /// Joins path segments allowing the first segment to be relative, unlike Combine which requires an absolute path.
     /// </summary>
     public static string Join(string[] segments, DirectorySeparatorType type = DirectorySeparatorType.Default)
     {
         ValidateSegments(segments);
         return CombineSegments(segments, type);
+    }
+
+    /// <summary>
+    /// Joins path segments allowing the first segment to be relative, unlike Combine which requires an absolute path.
+    /// </summary>
+    public static string Join(params string[] segments)
+    {
+        return Join(segments, DirectorySeparatorType.Default);
     }
 
     private static void ValidateSegments(string[] segments)
@@ -122,6 +138,18 @@ public static class PathOperations
     }
 
     /// <summary>
+    /// Combines path segments requiring the first segment to be an absolute path, then normalizes the result.
+    /// </summary>
+    /// <remarks>
+    /// Use this method when working with absolute paths and you need to ensure the result is in canonical form.
+    /// This method will throw an exception if the first segment is not an absolute path.
+    /// </remarks>
+    public static string CombineAndNormalize(params string[] segments)
+    {
+        return CombineAndNormalize(segments, DirectorySeparatorType.Default);
+    }
+
+    /// <summary>
     /// Joins path segments allowing the first segment to be relative, then normalizes the result.
     /// </summary>
     /// <remarks>
@@ -133,5 +161,18 @@ public static class PathOperations
     {
         string joinedPath = Join(segments, type);
         return Normalize(joinedPath, type);
+    }
+
+    /// <summary>
+    /// Joins path segments allowing the first segment to be relative, then normalizes the result.
+    /// </summary>
+    /// <remarks>
+    /// Use this method when working with relative paths or when you're not certain if the first segment
+    /// is absolute. This method is more flexible than CombineAndNormalize but may not enforce the same
+    /// path structure guarantees.
+    /// </remarks>
+    public static string JoinAndNormalize(params string[] segments)
+    {
+        return JoinAndNormalize(segments, DirectorySeparatorType.Default);
     }
 }
