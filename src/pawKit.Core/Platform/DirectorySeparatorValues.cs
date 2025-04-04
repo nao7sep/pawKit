@@ -42,7 +42,7 @@ public static class DirectorySeparatorValues
         else if (targetType == DirectorySeparatorType.UnixLike)
             return path.Replace(WindowsDirectorySeparator, UnixLikeDirectorySeparator);
         else
-            throw new ArgumentOutOfRangeException(nameof(targetType), targetType, "Invalid directory separator type.");
+            return path.Replace(DefaultAltDirectorySeparator, DefaultDirectorySeparator);
     }
 
     public static string NormalizeToWindowsDirectorySeparators(string path)
