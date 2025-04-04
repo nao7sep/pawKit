@@ -12,7 +12,7 @@ public static class PathOperations
     /// <summary>
     /// Ensures a path is fully qualified, throwing an exception if it is not.
     /// </summary>
-    public static string EnsureFullyQualified(string path, string? paramName = null)
+    public static string EnsurePathIsFullyQualified(string path, string? paramName = null)
     {
         if (path == null)
             throw new ArgumentNullException(paramName ?? nameof(path));
@@ -29,7 +29,7 @@ public static class PathOperations
     /// <summary>
     /// Combines path segments requiring the first segment to be an absolute path.
     /// </summary>
-    public static string Combine(string[] segments, DirectorySeparatorType type = DirectorySeparatorType.Default)
+    public static string CombineAbsolutePath(string[] segments, DirectorySeparatorType type = DirectorySeparatorType.Default)
     {
         ValidateSegments(segments);
 
@@ -42,15 +42,15 @@ public static class PathOperations
     /// <summary>
     /// Combines path segments requiring the first segment to be an absolute path.
     /// </summary>
-    public static string Combine(params string[] segments)
+    public static string CombineAbsolutePath(params string[] segments)
     {
-        return Combine(segments, DirectorySeparatorType.Default);
+        return CombineAbsolutePath(segments, DirectorySeparatorType.Default);
     }
 
     /// <summary>
     /// Joins path segments allowing the first segment to be relative, unlike Combine which requires an absolute path.
     /// </summary>
-    public static string Join(string[] segments, DirectorySeparatorType type = DirectorySeparatorType.Default)
+    public static string JoinPathSegments(string[] segments, DirectorySeparatorType type = DirectorySeparatorType.Default)
     {
         ValidateSegments(segments);
         return CombineSegments(segments, type);
@@ -59,9 +59,9 @@ public static class PathOperations
     /// <summary>
     /// Joins path segments allowing the first segment to be relative, unlike Combine which requires an absolute path.
     /// </summary>
-    public static string Join(params string[] segments)
+    public static string JoinPathSegments(params string[] segments)
     {
-        return Join(segments, DirectorySeparatorType.Default);
+        return JoinPathSegments(segments, DirectorySeparatorType.Default);
     }
 
     private static void ValidateSegments(string[] segments)
@@ -101,7 +101,7 @@ public static class PathOperations
     /// - Throws an exception when attempting to navigate above the root of a relative path
     /// - If preserving ".." segments is required, combine with a base path before normalization
     /// </remarks>
-    public static string Normalize(string path, DirectorySeparatorType type = DirectorySeparatorType.Default)
+    public static string NormalizePath(string path, DirectorySeparatorType type = DirectorySeparatorType.Default)
     {
         if (string.IsNullOrWhiteSpace(path))
             return string.Empty;
@@ -148,10 +148,10 @@ public static class PathOperations
     /// Use this method when working with absolute paths and you need to ensure the result is in canonical form.
     /// This method will throw an exception if the first segment is not an absolute path.
     /// </remarks>
-    public static string CombineAndNormalize(string[] segments, DirectorySeparatorType type = DirectorySeparatorType.Default)
+    public static string CombineAndNormalizeAbsolutePath(string[] segments, DirectorySeparatorType type = DirectorySeparatorType.Default)
     {
-        string combinedPath = Combine(segments, type);
-        return Normalize(combinedPath, type);
+        string combinedPath = CombineAbsolutePath(segments, type);
+        return NormalizePath(combinedPath, type);
     }
 
     /// <summary>
@@ -161,9 +161,9 @@ public static class PathOperations
     /// Use this method when working with absolute paths and you need to ensure the result is in canonical form.
     /// This method will throw an exception if the first segment is not an absolute path.
     /// </remarks>
-    public static string CombineAndNormalize(params string[] segments)
+    public static string CombineAndNormalizeAbsolutePath(params string[] segments)
     {
-        return CombineAndNormalize(segments, DirectorySeparatorType.Default);
+        return CombineAndNormalizeAbsolutePath(segments, DirectorySeparatorType.Default);
     }
 
     /// <summary>
@@ -174,10 +174,10 @@ public static class PathOperations
     /// is absolute. This method is more flexible than CombineAndNormalize but may not enforce the same
     /// path structure guarantees.
     /// </remarks>
-    public static string JoinAndNormalize(string[] segments, DirectorySeparatorType type = DirectorySeparatorType.Default)
+    public static string JoinAndNormalizePathSegments(string[] segments, DirectorySeparatorType type = DirectorySeparatorType.Default)
     {
-        string joinedPath = Join(segments, type);
-        return Normalize(joinedPath, type);
+        string joinedPath = JoinPathSegments(segments, type);
+        return NormalizePath(joinedPath, type);
     }
 
     /// <summary>
@@ -188,8 +188,8 @@ public static class PathOperations
     /// is absolute. This method is more flexible than CombineAndNormalize but may not enforce the same
     /// path structure guarantees.
     /// </remarks>
-    public static string JoinAndNormalize(params string[] segments)
+    public static string JoinAndNormalizePathSegments(params string[] segments)
     {
-        return JoinAndNormalize(segments, DirectorySeparatorType.Default);
+        return JoinAndNormalizePathSegments(segments, DirectorySeparatorType.Default);
     }
 }
