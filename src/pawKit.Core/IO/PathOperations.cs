@@ -10,6 +10,23 @@ using pawKit.Core.Text;
 public static class PathOperations
 {
     /// <summary>
+    /// Ensures a path is fully qualified, throwing an exception if it is not.
+    /// </summary>
+    public static string EnsureFullyQualified(string path, string? paramName = null)
+    {
+        if (path == null)
+            throw new ArgumentNullException(paramName ?? nameof(path));
+
+        if (string.IsNullOrWhiteSpace(path))
+            throw new ArgumentException("Path cannot be empty or whitespace.", paramName ?? nameof(path));
+
+        if (!Path.IsPathFullyQualified(path))
+            throw new ArgumentException("Path must be fully qualified.", paramName ?? nameof(path));
+
+        return path;
+    }
+
+    /// <summary>
     /// Combines path segments requiring the first segment to be an absolute path.
     /// </summary>
     public static string Combine(string[] segments, DirectorySeparatorType type = DirectorySeparatorType.Default)
