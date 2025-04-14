@@ -8,7 +8,7 @@ public static class PathSeparatorValues
 
     public const char UnixLikePathSeparator = ':';
 
-    private static readonly Lazy<char> _defaultPathSeparator = new Lazy<char>(() =>
+    private static readonly Lazy<char> _defaultPathSeparator = new(() =>
         OperatingSystemInfo.IsWindows ? WindowsPathSeparator : UnixLikePathSeparator);
 
     public static char DefaultPathSeparator => _defaultPathSeparator.Value;

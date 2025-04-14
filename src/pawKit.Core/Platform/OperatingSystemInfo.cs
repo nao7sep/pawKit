@@ -4,7 +4,7 @@ namespace pawKit.Core.Platform;
 
 public static class OperatingSystemInfo
 {
-    private static readonly Lazy<OperatingSystemType> _currentOS = new(DetectOperatingSystem);
+    private static readonly Lazy<OperatingSystemType> _currentOS = new(() => DetectOperatingSystem());
 
     public static OperatingSystemType CurrentOS => _currentOS.Value;
 
