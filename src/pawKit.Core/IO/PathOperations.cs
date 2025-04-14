@@ -82,10 +82,19 @@ public static class PathOperations
 
         for (int index = 0; index < segments.Length; index++)
         {
-            if (index == 0)
-                processedSegments.Add(segments[index].TrimStart().TrimEndWhiteSpaceAnd(DirectorySeparatorValues.DirectorySeparators));
-            else
-                processedSegments.Add(segments[index].TrimWhiteSpaceAnd(DirectorySeparatorValues.DirectorySeparators));
+            string trimmedSegment = index == 0 ?
+                segments[index].TrimStart().TrimEndWhiteSpaceAnd(DirectorySeparatorValues.DirectorySeparators) :
+                segments[index].TrimWhiteSpaceAnd(DirectorySeparatorValues.DirectorySeparators);
+
+            // This validation is crucial as segments are directly provided by the developer.
+            // They must ensure no item in the string array is invalid (null or empty) after trimming.
+            // Unlike NormalizePath which handles repeated separators as a single separator,
+            // here we explicitly require each segment to be meaningful.
+
+            if (string.IsNullOrEmpty(trimmedSegment))
+                throw new ArgumentException("No segment can be null or whitespace.", nameof(segments));
+
+            processedSegments.Add(trimmedSegment);
         }
 
         return string.Join(DirectorySeparatorValues.GetDirectorySeparator(type), processedSegments);
@@ -109,7 +118,11 @@ public static class PathOperations
         if (Path.IsPathFullyQualified(path))
             return DirectorySeparatorValues.NormalizeDirectorySeparators(Path.GetFullPath(path), type);
 
-        // Normalize input by removing redundant separators and whitespace before processing
+        // Normalize input by removing redundant separators and whitespace before processing.
+        // Repeated separators (like "dir//file") are considered as a single separator, not an empty directory name.
+        // Unlike CombineSegments which throws an exception for empty segments, here we handle common path format
+        // issues quietly since paths may come from external sources or user input.
+
         string[] segments = path.Split(DirectorySeparatorValues.DirectorySeparators,
             StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
 
@@ -119,17 +132,17 @@ public static class PathOperations
         {
             string segment = segments[index];
 
-            // Skip current directory references as they don't affect the path
+            // Skip current directory references as they don't affect the path.
             if (segment == ".")
                 continue;
 
             if (segment == "..")
             {
                 if (resultSegments.Count > 0)
-                    // Navigate up by removing the previous path segment
+                    // Navigate up by removing the previous path segment.
                     resultSegments.RemoveAt(resultSegments.Count - 1);
                 else
-                    // Prevent navigation above the root of a relative path - this maintains path integrity
+                    // Prevent navigation above the root of a relative path - this maintains path integrity.
                     throw new InvalidOperationException("Cannot navigate above the root of a relative path.");
             }
 
