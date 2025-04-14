@@ -78,7 +78,7 @@ public static class PathOperations
 
     private static string CombineSegments(string[] segments, DirectorySeparatorType type)
     {
-        List<string> processedSegments = [];
+        List<string> trimmedSegments = [];
 
         for (int index = 0; index < segments.Length; index++)
         {
@@ -91,13 +91,17 @@ public static class PathOperations
             // Unlike NormalizePath which handles repeated separators as a single separator,
             // here we explicitly require each segment to be meaningful.
 
-            if (string.IsNullOrEmpty(trimmedSegment))
-                throw new ArgumentException("No segment can be null or whitespace.", nameof(segments));
+            // Note: A trimmed segment containing directory separators (e.g., "dir/subdir") is
+            // accepted because relative structured paths can be safely combined. The path integrity
+            // is maintained as these structures are preserved in the final path composition.
 
-            processedSegments.Add(trimmedSegment);
+            if (string.IsNullOrEmpty(trimmedSegment))
+                throw new ArgumentException("No segment can be null or empty.", nameof(segments));
+
+            trimmedSegments.Add(trimmedSegment);
         }
 
-        return string.Join(DirectorySeparatorValues.GetDirectorySeparator(type), processedSegments);
+        return string.Join(DirectorySeparatorValues.GetDirectorySeparator(type), trimmedSegments);
     }
 
     /// <summary>
@@ -105,10 +109,10 @@ public static class PathOperations
     /// </summary>
     /// <remarks>
     /// This method provides cross-platform path normalization with these behaviors:
-    /// - Leverages system Path.GetFullPath() for absolute paths to handle platform-specific edge cases
-    /// - Manually processes relative paths since .NET doesn't provide a built-in solution
-    /// - Throws an exception when attempting to navigate above the root of a relative path
-    /// - If preserving ".." segments is required, combine with a base path before normalization
+    /// - Leverages system Path.GetFullPath() for absolute paths to handle platform-specific edge cases.
+    /// - Manually processes relative paths since .NET doesn't provide a built-in solution.
+    /// - Throws an exception when attempting to navigate above the root of a relative path.
+    /// - If preserving ".." segments is required, combine with a base path before normalization.
     /// </remarks>
     public static string NormalizePath(string path, DirectorySeparatorType type = DirectorySeparatorType.Default)
     {
