@@ -8,7 +8,7 @@ public static class LineEndingValues
 
     public const string UnixLikeLineEnding = "\n";
 
-    private static readonly Lazy<string> _defaultLineEnding = new Lazy<string>(() =>
+    private static readonly Lazy<string> _defaultLineEnding = new(() =>
         OperatingSystemInfo.IsWindows ? WindowsLineEnding : UnixLikeLineEnding);
 
     public static string DefaultLineEnding => _defaultLineEnding.Value;

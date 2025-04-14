@@ -10,10 +10,10 @@ public static class DirectorySeparatorValues
 
     public static readonly char[] DirectorySeparators = [WindowsDirectorySeparator, UnixLikeDirectorySeparator];
 
-    private static readonly Lazy<char> _defaultDirectorySeparator = new Lazy<char>(() =>
+    private static readonly Lazy<char> _defaultDirectorySeparator = new(() =>
         OperatingSystemInfo.IsWindows ? WindowsDirectorySeparator : UnixLikeDirectorySeparator);
 
-    private static readonly Lazy<char> _defaultAltDirectorySeparator = new Lazy<char>(() =>
+    private static readonly Lazy<char> _defaultAltDirectorySeparator = new(() =>
         OperatingSystemInfo.IsWindows ? UnixLikeDirectorySeparator : WindowsDirectorySeparator);
 
     public static char DefaultDirectorySeparator => _defaultDirectorySeparator.Value;
