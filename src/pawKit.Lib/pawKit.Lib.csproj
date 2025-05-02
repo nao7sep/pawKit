@@ -1,9 +1,20 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+
+        <!-- Project Metadata -->
+        <AssemblyTitle>pawKitLib</AssemblyTitle>
+        <Product>pawKit</Product>
+        <Description>Core library for the pawKit project.</Description>
+        <Company>Purrfect Code</Company>
+        <Authors>nao7sep</Authors>
+        <Copyright>Copyright © 2025</Copyright>
+        <Version>0.1</Version>
+        <PackageLicenseExpression>GPL-3.0</PackageLicenseExpression>
+        <RepositoryUrl>https://github.com/nao7sep/pawKit</RepositoryUrl>
+    </PropertyGroup>
 
 </Project>
