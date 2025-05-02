@@ -1,0 +1,45 @@
+﻿# ------------------------------------------------------------------------------
+# Build Directories
+# ------------------------------------------------------------------------------
+
+# Build output directory for binaries.
+bin/
+
+# Build output directory for intermediate object files.
+obj/
+
+# ------------------------------------------------------------------------------
+# IDE and Editor Specific
+# ------------------------------------------------------------------------------
+
+# Visual Studio settings directory.
+.vs/
+
+# Visual Studio Code settings directory.
+.vscode/
+
+# JetBrains IDE settings directory.
+.idea/
+
+# ------------------------------------------------------------------------------
+# System Files
+# ------------------------------------------------------------------------------
+
+# macOS Finder attributes file.
+.DS_Store
+
+# Windows desktop configuration file.
+desktop.ini
+
+# Windows thumbnail cache file.
+Thumbs.db
+
+# ------------------------------------------------------------------------------
+# User-specific Files (Visual Studio)
+# ------------------------------------------------------------------------------
+
+# Visual Studio solution user options file.
+*.suo
+
+# Visual Studio user-specific configuration file.
+*.user
