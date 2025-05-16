@@ -1,14 +1,17 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace pawKitLib.Settings
+namespace pawKitLib.KeyValueStore
 {
-    public class SettingValueJsonConverter : JsonConverter<SettingValue>
+    /// <summary>
+    /// Custom JSON converter for StringValues, supporting null, single, or multiple string values.
+    /// </summary>
+    public class StringValuesJsonConverter : JsonConverter<StringValues>
     {
-        public override SettingValue? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        public override StringValues? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             if (reader.TokenType == JsonTokenType.Null)
-                return SettingValue.Null();
+                return StringValues.Null();
             if (reader.TokenType == JsonTokenType.StartArray)
             {
                 var list = new List<string?>();
@@ -21,16 +24,16 @@ namespace pawKitLib.Settings
                     else if (reader.TokenType == JsonTokenType.String)
                         list.Add(reader.GetString());
                     else
-                        throw new JsonException("Unexpected token in SettingValue array");
+                        throw new JsonException("Unexpected token in StringValues array");
                 }
-                return new SettingValue(list);
+                return new StringValues(list);
             }
             if (reader.TokenType == JsonTokenType.String)
-                return SettingValue.Single(reader.GetString());
-            return SettingValue.Single(null);
+                return StringValues.Single(reader.GetString());
+            return StringValues.Single(null);
         }
 
-        public override void Write(Utf8JsonWriter writer, SettingValue value, JsonSerializerOptions options)
+        public override void Write(Utf8JsonWriter writer, StringValues value, JsonSerializerOptions options)
         {
             if (value.Values == null)
             {

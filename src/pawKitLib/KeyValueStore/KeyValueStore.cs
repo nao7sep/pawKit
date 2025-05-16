@@ -1,37 +1,40 @@
-using System.Numerics;
+﻿using System.Numerics;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 
-namespace pawKitLib.Settings
+namespace pawKitLib.KeyValueStore
 {
     /// <summary>
-    /// SettingsStore manages a case-insensitive dictionary of settings.
-    /// Keys are case-insensitive and null keys are not permitted.
+    /// KeyValueStore manages a case-insensitive dictionary where each key maps to a value that can be null, a single string, or a list of strings.
+    /// This is a general-purpose, thread-safe (optional) key-value store with robust type conversion and JSON serialization.
     /// </summary>
-    public class SettingsStore
+    public class KeyValueStore
     {
-        private readonly Dictionary<string, SettingValue> _settings;
-        public IReadOnlyDictionary<string, SettingValue> Settings => _settings;
+        private readonly Dictionary<string, StringValues> _store;
+        public IReadOnlyDictionary<string, StringValues> Store => _store;
 
         private readonly ReaderWriterLockSlim? _lock;
         private readonly bool _threadSafe;
 
-        public SettingsStore(bool threadSafe = true)
+        public KeyValueStore(bool threadSafe = true)
         {
-            _settings = new Dictionary<string, SettingValue>(StringComparer.OrdinalIgnoreCase);
+            _store = new Dictionary<string, StringValues>(StringComparer.OrdinalIgnoreCase);
             _threadSafe = threadSafe;
             _lock = threadSafe ? new ReaderWriterLockSlim() : null;
         }
 
-        public SettingValue? Get(string key)
+        /// <summary>
+        /// Get the value for a key, or null if not present. Thread-safe if enabled.
+        /// </summary>
+        public StringValues? Get(string key)
         {
             if (_threadSafe)
             {
                 _lock!.EnterReadLock();
                 try
                 {
-                    return key is null ? null : _settings.TryGetValue(key, out var value) ? value : null;
+                    return key is null ? null : _store.TryGetValue(key, out var value) ? value : null;
                 }
                 finally
                 {
@@ -40,11 +43,14 @@ namespace pawKitLib.Settings
             }
             else
             {
-                return key is null ? null : _settings.TryGetValue(key, out var value) ? value : null;
+                return key is null ? null : _store.TryGetValue(key, out var value) ? value : null;
             }
         }
 
-        public void Set(string key, SettingValue value)
+        /// <summary>
+        /// Set the value for a key. Thread-safe if enabled.
+        /// </summary>
+        public void Set(string key, StringValues value)
         {
             if (key is null)
             {
@@ -55,7 +61,7 @@ namespace pawKitLib.Settings
                 _lock!.EnterWriteLock();
                 try
                 {
-                    _settings[key] = value;
+                    _store[key] = value;
                 }
                 finally
                 {
@@ -64,7 +70,7 @@ namespace pawKitLib.Settings
             }
             else
             {
-                _settings[key] = value;
+                _store[key] = value;
             }
         }
 
@@ -75,7 +81,7 @@ namespace pawKitLib.Settings
                 _lock!.EnterWriteLock();
                 try
                 {
-                    return key != null && _settings.Remove(key);
+                    return key != null && _store.Remove(key);
                 }
                 finally
                 {
@@ -84,7 +90,7 @@ namespace pawKitLib.Settings
             }
             else
             {
-                return key != null && _settings.Remove(key);
+                return key != null && _store.Remove(key);
             }
         }
 
@@ -95,7 +101,7 @@ namespace pawKitLib.Settings
                 _lock!.EnterWriteLock();
                 try
                 {
-                    _settings.Clear();
+                    _store.Clear();
                 }
                 finally
                 {
@@ -104,14 +110,14 @@ namespace pawKitLib.Settings
             }
             else
             {
-                _settings.Clear();
+                _store.Clear();
             }
         }
 
         public static Encoding DefaultEncoding { get; set; } = Encoding.UTF8;
         public static JsonSerializerOptions DefaultJsonDeserializeOptions { get; set; } = new JsonSerializerOptions
         {
-            // PropertyNameCaseInsensitive is not set because the settings dictionary is already case-insensitive.
+            // PropertyNameCaseInsensitive is not set because the store dictionary is already case-insensitive.
         };
         public static JsonSerializerOptions DefaultJsonSerializeOptions { get; set; } = new JsonSerializerOptions
         {
@@ -124,23 +130,23 @@ namespace pawKitLib.Settings
         {
             if (!File.Exists(path))
             {
-                throw new FileNotFoundException($"Settings file not found: {path}", path);
+                throw new FileNotFoundException($"KeyValueStore file not found: {path}", path);
             }
             encoding ??= DefaultEncoding;
             options ??= DefaultJsonDeserializeOptions;
-            options.Converters.Add(new SettingValueJsonConverter());
+            options.Converters.Add(new StringValuesJsonConverter());
             var json = File.ReadAllText(path, encoding);
-            var dict = JsonSerializer.Deserialize<Dictionary<string, SettingValue>>(json, options);
+            var dict = JsonSerializer.Deserialize<Dictionary<string, StringValues>>(json, options);
             if (_threadSafe)
             {
                 _lock!.EnterWriteLock();
                 try
                 {
-                    _settings.Clear();
+                    _store.Clear();
                     if (dict != null)
                     {
                         foreach (var kvp in dict)
-                            _settings[kvp.Key] = kvp.Value;
+                            _store[kvp.Key] = kvp.Value;
                     }
                 }
                 finally
@@ -150,11 +156,11 @@ namespace pawKitLib.Settings
             }
             else
             {
-                _settings.Clear();
+                _store.Clear();
                 if (dict != null)
                 {
                     foreach (var kvp in dict)
-                        _settings[kvp.Key] = kvp.Value;
+                        _store[kvp.Key] = kvp.Value;
                 }
             }
         }
@@ -163,14 +169,14 @@ namespace pawKitLib.Settings
         {
             encoding ??= DefaultEncoding;
             options ??= DefaultJsonSerializeOptions;
-            options.Converters.Add(new SettingValueJsonConverter());
+            options.Converters.Add(new StringValuesJsonConverter());
             string json;
             if (_threadSafe)
             {
                 _lock!.EnterReadLock();
                 try
                 {
-                    json = JsonSerializer.Serialize(_settings, options);
+                    json = JsonSerializer.Serialize(_store, options);
                 }
                 finally
                 {
@@ -179,7 +185,7 @@ namespace pawKitLib.Settings
             }
             else
             {
-                json = JsonSerializer.Serialize(_settings, options);
+                json = JsonSerializer.Serialize(_store, options);
             }
             File.WriteAllText(path, json, encoding);
         }
@@ -208,26 +214,26 @@ namespace pawKitLib.Settings
         public byte[]? GetBase64OrNull(string key) => Get(key)?.AsBase64OrNull();
 
         // Setters
-        public void SetBool(string key, bool value) => Set(key, SettingValue.FromBool(value));
-        public void SetChar(string key, char value) => Set(key, SettingValue.FromChar(value));
-        public void SetSByte(string key, sbyte value) => Set(key, SettingValue.FromSByte(value));
-        public void SetShort(string key, short value) => Set(key, SettingValue.FromShort(value));
-        public void SetInt(string key, int value) => Set(key, SettingValue.FromInt(value));
-        public void SetLong(string key, long value) => Set(key, SettingValue.FromLong(value));
-        public void SetBigInteger(string key, BigInteger value) => Set(key, SettingValue.FromBigInteger(value));
-        public void SetByte(string key, byte value) => Set(key, SettingValue.FromByte(value));
-        public void SetUShort(string key, ushort value) => Set(key, SettingValue.FromUShort(value));
-        public void SetUInt(string key, uint value) => Set(key, SettingValue.FromUInt(value));
-        public void SetULong(string key, ulong value) => Set(key, SettingValue.FromULong(value));
-        public void SetFloat(string key, float value) => Set(key, SettingValue.FromFloat(value));
-        public void SetDouble(string key, double value) => Set(key, SettingValue.FromDouble(value));
-        public void SetDecimal(string key, decimal value) => Set(key, SettingValue.FromDecimal(value));
-        public void SetGuid(string key, Guid value) => Set(key, SettingValue.FromGuid(value));
-        public void SetDateTime(string key, DateTime value) => Set(key, SettingValue.FromDateTime(value));
-        public void SetDateTimeOffset(string key, DateTimeOffset value) => Set(key, SettingValue.FromDateTimeOffset(value));
-        public void SetTimeSpan(string key, TimeSpan value) => Set(key, SettingValue.FromTimeSpan(value));
-        public void SetEnum<TEnum>(string key, TEnum value) where TEnum : struct, Enum => Set(key, SettingValue.FromEnum(value));
-        public void SetBase64(string key, byte[] value) => Set(key, SettingValue.FromBase64(value));
+        public void SetBool(string key, bool value) => Set(key, StringValues.FromBool(value));
+        public void SetChar(string key, char value) => Set(key, StringValues.FromChar(value));
+        public void SetSByte(string key, sbyte value) => Set(key, StringValues.FromSByte(value));
+        public void SetShort(string key, short value) => Set(key, StringValues.FromShort(value));
+        public void SetInt(string key, int value) => Set(key, StringValues.FromInt(value));
+        public void SetLong(string key, long value) => Set(key, StringValues.FromLong(value));
+        public void SetBigInteger(string key, BigInteger value) => Set(key, StringValues.FromBigInteger(value));
+        public void SetByte(string key, byte value) => Set(key, StringValues.FromByte(value));
+        public void SetUShort(string key, ushort value) => Set(key, StringValues.FromUShort(value));
+        public void SetUInt(string key, uint value) => Set(key, StringValues.FromUInt(value));
+        public void SetULong(string key, ulong value) => Set(key, StringValues.FromULong(value));
+        public void SetFloat(string key, float value) => Set(key, StringValues.FromFloat(value));
+        public void SetDouble(string key, double value) => Set(key, StringValues.FromDouble(value));
+        public void SetDecimal(string key, decimal value) => Set(key, StringValues.FromDecimal(value));
+        public void SetGuid(string key, Guid value) => Set(key, StringValues.FromGuid(value));
+        public void SetDateTime(string key, DateTime value) => Set(key, StringValues.FromDateTime(value));
+        public void SetDateTimeOffset(string key, DateTimeOffset value) => Set(key, StringValues.FromDateTimeOffset(value));
+        public void SetTimeSpan(string key, TimeSpan value) => Set(key, StringValues.FromTimeSpan(value));
+        public void SetEnum<TEnum>(string key, TEnum value) where TEnum : struct, Enum => Set(key, StringValues.FromEnum(value));
+        public void SetBase64(string key, byte[] value) => Set(key, StringValues.FromBase64(value));
         #endregion
     }
 }
