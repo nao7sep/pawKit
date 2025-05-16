@@ -1,5 +1,4 @@
 using System.Numerics;
-using pawKitLib;
 
 namespace pawKitLib.KeyValueStore
 {
@@ -16,16 +15,36 @@ namespace pawKitLib.KeyValueStore
             Values = values;
         }
 
-        public static StringValues Null() => new(null);
-        public static StringValues Single(string? value) => new([value]);
-        public static StringValues Multiple(IEnumerable<string?> values) => new([..values]);
+        public static StringValues CreateNull() => new(null);
+        public static StringValues CreateSingle(string? value) => new([value]);
+        public static StringValues CreateMultiple(IEnumerable<string?> values) => new([..values]);
 
         // Accessors
+        /// <summary>
+        /// True if the underlying list is null (no value at all).
+        /// </summary>
         public bool IsNull => Values == null;
+        /// <summary>
+        /// True if the underlying list exists but contains no values.
+        /// </summary>
+        public bool IsEmpty => Values is { Count: 0 };
+        /// <summary>
+        /// True if the underlying list contains exactly one value.
+        /// </summary>
         public bool IsSingle => Values is { Count: 1 };
+        /// <summary>
+        /// True if the underlying list contains more than one value.
+        /// </summary>
         public bool IsMultiple => Values is { Count: > 1 };
+        /// <summary>
+        /// Returns the single value if present, otherwise null.
+        /// </summary>
         public string? AsSingleOrNull() => IsSingle ? Values![0] : null;
-        public string?[]? AsArrayOrNull() => Values?.ToArray();
+        /// <summary>
+        /// Returns the list of values if present and not null, otherwise null.
+        /// This method virtually just returns the underlying Values property.
+        /// </summary>
+        public List<string?>? AsMultipleOrNull() => Values;
 
         #region Type conversion helpers (AsXxxOrNull and FromXxx)
         // AsXxxOrNull methods
@@ -51,26 +70,26 @@ namespace pawKitLib.KeyValueStore
         public byte[]? AsBase64OrNull() => IsSingle ? StringTypeConverter.ToBase64OrNull(Values![0]) : null;
 
         // FromXxx static methods
-        public static StringValues FromBool(bool value) => Single(StringTypeConverter.FromBool(value));
-        public static StringValues FromChar(char value) => Single(StringTypeConverter.FromChar(value));
-        public static StringValues FromSByte(sbyte value) => Single(StringTypeConverter.FromSByte(value));
-        public static StringValues FromShort(short value) => Single(StringTypeConverter.FromShort(value));
-        public static StringValues FromInt(int value) => Single(StringTypeConverter.FromInt(value));
-        public static StringValues FromLong(long value) => Single(StringTypeConverter.FromLong(value));
-        public static StringValues FromBigInteger(BigInteger value) => Single(StringTypeConverter.FromBigInteger(value));
-        public static StringValues FromByte(byte value) => Single(StringTypeConverter.FromByte(value));
-        public static StringValues FromUShort(ushort value) => Single(StringTypeConverter.FromUShort(value));
-        public static StringValues FromUInt(uint value) => Single(StringTypeConverter.FromUInt(value));
-        public static StringValues FromULong(ulong value) => Single(StringTypeConverter.FromULong(value));
-        public static StringValues FromFloat(float value) => Single(StringTypeConverter.FromFloat(value));
-        public static StringValues FromDouble(double value) => Single(StringTypeConverter.FromDouble(value));
-        public static StringValues FromDecimal(decimal value) => Single(StringTypeConverter.FromDecimal(value));
-        public static StringValues FromGuid(Guid value) => Single(StringTypeConverter.FromGuid(value));
-        public static StringValues FromDateTime(DateTime value) => Single(StringTypeConverter.FromDateTime(value));
-        public static StringValues FromDateTimeOffset(DateTimeOffset value) => Single(StringTypeConverter.FromDateTimeOffset(value));
-        public static StringValues FromTimeSpan(TimeSpan value) => Single(StringTypeConverter.FromTimeSpan(value));
-        public static StringValues FromEnum<TEnum>(TEnum value) where TEnum : struct, Enum => Single(StringTypeConverter.FromEnum(value));
-        public static StringValues FromBase64(byte[] value) => Single(StringTypeConverter.FromBase64(value));
+        public static StringValues FromBool(bool value) => CreateSingle(StringTypeConverter.FromBool(value));
+        public static StringValues FromChar(char value) => CreateSingle(StringTypeConverter.FromChar(value));
+        public static StringValues FromSByte(sbyte value) => CreateSingle(StringTypeConverter.FromSByte(value));
+        public static StringValues FromShort(short value) => CreateSingle(StringTypeConverter.FromShort(value));
+        public static StringValues FromInt(int value) => CreateSingle(StringTypeConverter.FromInt(value));
+        public static StringValues FromLong(long value) => CreateSingle(StringTypeConverter.FromLong(value));
+        public static StringValues FromBigInteger(BigInteger value) => CreateSingle(StringTypeConverter.FromBigInteger(value));
+        public static StringValues FromByte(byte value) => CreateSingle(StringTypeConverter.FromByte(value));
+        public static StringValues FromUShort(ushort value) => CreateSingle(StringTypeConverter.FromUShort(value));
+        public static StringValues FromUInt(uint value) => CreateSingle(StringTypeConverter.FromUInt(value));
+        public static StringValues FromULong(ulong value) => CreateSingle(StringTypeConverter.FromULong(value));
+        public static StringValues FromFloat(float value) => CreateSingle(StringTypeConverter.FromFloat(value));
+        public static StringValues FromDouble(double value) => CreateSingle(StringTypeConverter.FromDouble(value));
+        public static StringValues FromDecimal(decimal value) => CreateSingle(StringTypeConverter.FromDecimal(value));
+        public static StringValues FromGuid(Guid value) => CreateSingle(StringTypeConverter.FromGuid(value));
+        public static StringValues FromDateTime(DateTime value) => CreateSingle(StringTypeConverter.FromDateTime(value));
+        public static StringValues FromDateTimeOffset(DateTimeOffset value) => CreateSingle(StringTypeConverter.FromDateTimeOffset(value));
+        public static StringValues FromTimeSpan(TimeSpan value) => CreateSingle(StringTypeConverter.FromTimeSpan(value));
+        public static StringValues FromEnum<TEnum>(TEnum value) where TEnum : struct, Enum => CreateSingle(StringTypeConverter.FromEnum(value));
+        public static StringValues FromBase64(byte[] value) => CreateSingle(StringTypeConverter.FromBase64(value));
         #endregion
     }
 }
