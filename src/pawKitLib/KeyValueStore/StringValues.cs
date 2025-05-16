@@ -72,26 +72,5 @@ namespace pawKitLib.KeyValueStore
         public static StringValues FromEnum<TEnum>(TEnum value) where TEnum : struct, Enum => Single(StringTypeConverter.FromEnum(value));
         public static StringValues FromBase64(byte[] value) => Single(StringTypeConverter.FromBase64(value));
         #endregion
-
-        /// <summary>
-        /// Returns a developer-friendly string representation of the value(s).
-        /// Uses StringDisplayHelper for null/empty/multi display.
-        /// </summary>
-        public override string ToString()
-        {
-            if (IsNull)
-            {
-                return StringDisplayHelper.DisplayNull();
-            }
-            if (Values!.Count == 0)
-            {
-                return "[]";
-            }
-            if (IsSingle)
-            {
-                return StringDisplayHelper.DisplayValue(Values[0]);
-            }
-            return $"[{string.Join(", ", Values.Select(StringDisplayHelper.DisplayValue))}]";
-        }
     }
 }
