@@ -1,4 +1,3 @@
-<!-- filepath: specs/exception-management-and-serialization.md -->
 # Exception Management and Serialization Specification for pawKitLib
 
 ## 1. Overview

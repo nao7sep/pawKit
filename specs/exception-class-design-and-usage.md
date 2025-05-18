@@ -1,4 +1,3 @@
-<!-- filepath: specs/exception-class-design-and-usage.md -->
 # Exception Class Design and Usage Specification for pawKitLib
 
 ## 1. Overview

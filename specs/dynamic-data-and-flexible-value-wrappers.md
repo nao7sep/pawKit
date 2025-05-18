@@ -1,4 +1,3 @@
-<!-- filepath: specs/dynamic-data-and-flexible-value-wrappers.md -->
 # Dynamic Data and Flexible Value Wrappers Specification for pawKitLib
 
 ## 1. Overview

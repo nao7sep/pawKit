@@ -1,4 +1,3 @@
-<!-- filepath: c:\Repositories\pawKit\specs\type-conversion-utilities.md -->
 # Type Conversion Utilities Specification for pawKitLib
 
 ## 1. Overview
