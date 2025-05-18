@@ -67,9 +67,17 @@ This file records major development events, design decisions, and document gener
     - File: `specs/webassembly-blazor-support-policy.md`
     - Policy and guidance for Wasm/Blazor compatibility and modularization.
 
+**Notes:**
+- The order of topics in this entry matches `specs/topics-and-details.md` and may change as topics are added or removed in the future.
+- Each topic is covered in a dedicated specification file, ensuring no gaps from the original design conversation.
+- For all future changes, additions, or major document revisions, add a new dated entry to this log.
+
 ---
 
-**Note:**
-- The order of topics matches the current `topics-and-details.md` and may change as topics are added or removed in the future.
-- Each topic is covered in a dedicated specification file, ensuring no gaps from the original design conversation.
-- Update this log with a new dated entry for future changes, additions, or major document revisions.
+## [2025-05-18] Implementation Plan and Rules Directory Established
+
+- Created `docs/implementation-plan.md` to track the recommended implementation order, status, and progress for all major modules. This document provides a clear, step-by-step roadmap for development and is updated as modules are completed or their status changes.
+- Established the `rules/` directory to centralize all project rules for AI-assisted code, comment, and documentation generation. Initial rules include naming conventions and code generation quality standards. All contributors and AI agents are required to consult these rules before generating or modifying any project artifacts.
+- Updated the project `README.md` to instruct all contributors and AIs to refer to the rules in the `rules/` directory, ensuring consistent quality and maintainability across the project.
+
+---
