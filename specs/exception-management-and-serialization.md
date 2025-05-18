@@ -66,6 +66,15 @@ This document specifies the requirements and design for **Exception Management a
   - `TaskScheduler.UnobservedTaskException`
 - These handlers should report exceptions as `Critical` with appropriate context.
 
+### 3.7 Pluggable Storage Backends: SQLite/EF Core
+
+- (Optional) Support for storing exceptions in a SQLite database or via EF Core context.
+- **Opt-in:** No dependency unless enabled by the application.
+- **Schema:** Default schema for exceptions, auto-migration support if using EF Core.
+- **Usage:** `ExceptionStore.UseSqlite(path)` or similar API to enable.
+- **No impact on binary size for apps that do not use this feature.**
+- **Not supported in Blazor WebAssembly (browser); Blazor Server/Hybrid is supported.**
+
 ---
 
 ## 4. API Patterns

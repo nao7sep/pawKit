@@ -32,6 +32,8 @@ This document defines the namespace, folder, and project structure for `pawKitLi
   - `Cli` — Process and command line utilities
   - `Logging` — Logging infrastructure
   - `Localization` — Localization system
+  - `Email` — Email sending abstraction and implementations
+  - `Storage` — Pluggable storage backends (e.g., SQLite, EF Core)
 
 **Example:**
 ```
@@ -65,6 +67,14 @@ src/pawKitLib/
     ILocalizer.cs
     JsonLocalizer.cs
     FallbackLocalizer.cs
+  Email/
+    IEmailSender.cs
+    EmailMessage.cs
+    ConsoleEmailSender.cs
+    FileEmailSender.cs
+  Storage/
+    LogSink.cs
+    ExceptionStore.cs
 pawKitLib.csproj
 ```
 
@@ -126,6 +136,44 @@ To add a new feature (e.g., a caching system):
 
 - All requirements and design decisions are based on the design conversation log and the `topics-and-details.md` topic list
 - Contradictions or ambiguities are resolved in favor of explicitness, minimalism, and testability
+
+---
+
+## 10. Email Abstraction and Sending
+
+- **Subfolder:** `Email/` — Contains all email-related interfaces and implementations
+- **Interfaces:** `IEmailSender` (core abstraction for sending email)
+- **Models:** `EmailMessage` (structured email data)
+- **Default Implementations:**
+  - `ConsoleEmailSender` (writes emails to console for dev/test)
+  - `FileEmailSender` (writes emails to file for dev/test)
+- **No dependency bloat:** No MailKit/SMTP in the core; real providers live in separate adapter projects (e.g., `pawKitLib.Email.MailKit`)
+- **DI/Configuration:** Applications register the desired implementation
+
+---
+
+## 11. Pluggable Storage Backends (SQLite/EF Core)
+
+- **Optional subfolders:** `Logging/Sqlite/`, `Exceptions/Sqlite/`, etc.
+- **Purpose:** Enable structured, queryable storage for logs, exceptions, metrics, etc.
+- **Opt-in:** Not a core dependency; SQLite/EF Core support is modular and enabled by consumer apps
+- **Schema:** Default schema for logs/exceptions, auto-migration support
+- **Usage:**
+  - `LogSink.UseSqlite(path)` or `ExceptionStore.UseSqlite(path)`
+  - Can be toggled on/off via configuration or DI
+- **No impact on binary size for apps that do not use these features**
+
+---
+
+## 12. WebAssembly/Blazor Support Policy
+
+- **Default:** Core library targets .NET 6+ and is cross-platform (Windows, Linux, macOS, Blazor Server/Hybrid)
+- **Wasm Policy:**
+  - EF Core + SQLite are **not** supported in Blazor WebAssembly (browser)
+  - Mark modules as Wasm-safe or server-only where relevant
+  - Blazor Server/Hybrid is fully supported
+  - If Wasm support is needed in the future, modularize or stub out unsupported features
+- **Guidance:** Document which modules are Wasm-safe in their respective specs
 
 ---
 

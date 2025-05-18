@@ -111,6 +111,27 @@ This document lists all major topics and subtopics discussed in the design conve
 - Folder structure matches namespaces
 - Single project to start (pawKitLib.csproj), ready for future modularization
 
+## 16. Email Abstraction and Sending
+- IEmailSender interface for email sending abstraction
+- EmailMessage model for structured email data
+- Default implementations: ConsoleEmailSender, FileEmailSender (for dev/test)
+- No dependency on MailKit or SMTP in the core library
+- Real email providers implemented in separate adapter projects
+- DI/Configuration for registering implementations
+
+## 17. SQLite/EF Core as Pluggable Storage
+- Optional support for logging and exception storage in SQLite/EF Core
+- Pluggable, opt-in design: not a core dependency
+- Default schema for logs/exceptions, auto-migration
+- Usage patterns for enabling/disabling storage backends
+- Modular: can be used for logging, exception management, metrics, etc.
+
+## 18. WebAssembly/Blazor Support Policy
+- Policy for supporting (or not supporting) WebAssembly/Blazor WebAssembly
+- Marking modules as Wasm-safe or server-only where relevant
+- EF Core + SQLite not supported in Blazor WebAssembly; Blazor Server/Hybrid supported
+- Guidance for future modularization if Wasm support is needed
+
 ---
 
 **Each topic above is intended to be the basis for a dedicated specification document.**

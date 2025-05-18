@@ -88,6 +88,14 @@ This document specifies the requirements and design for the **Logging Infrastruc
 ### 4.5. Log Message Formatting
 - (Optional) Customizable log message format (template strings).
 
+### 4.6. Pluggable Storage Backends: SQLite/EF Core
+- (Optional) Support for logging to a SQLite database or EF Core context, with a pluggable sink.
+- **Opt-in:** No dependency unless enabled by the application.
+- **Schema:** Default schema for logs, auto-migration support if using EF Core.
+- **Usage:** `LogSink.UseSqlite(path)` or similar API to enable.
+- **No impact on binary size for apps that do not use this feature.**
+- **Not supported in Blazor WebAssembly (browser); Blazor Server/Hybrid is supported.**
+
 ## 5. Implementation Notes
 - **No global state**: All configuration is explicit and must be set before use.
 - **No dependency on appsettings.json**: JSON config is optional and must be loaded by the application.
