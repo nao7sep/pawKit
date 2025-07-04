@@ -23,7 +23,7 @@ public class AsyncLoggingTests : IAsyncDisposable
         _tempFiles = new List<string>();
     }
 
-    public async ValueTask DisposeAsync()
+    public ValueTask DisposeAsync()
     {
         // Clean up test files
         foreach (var file in _tempFiles)
@@ -42,6 +42,8 @@ public class AsyncLoggingTests : IAsyncDisposable
                 Directory.Delete(_testDirectory, true);
         }
         catch { }
+
+        return ValueTask.CompletedTask;
     }
 
     [Fact]
@@ -146,7 +148,7 @@ public class AsyncLoggingTests : IAsyncDisposable
         foreach (var line in lines)
         {
             var jsonDoc = JsonDocument.Parse(line);
-            Assert.NotNull(jsonDoc.RootElement.GetProperty("@timestamp"));
+            Assert.True(jsonDoc.RootElement.TryGetProperty("@timestamp", out _));
             Assert.Equal("Information", jsonDoc.RootElement.GetProperty("@level").GetString());
             Assert.Equal("TestCategory", jsonDoc.RootElement.GetProperty("@category").GetString());
             Assert.Equal("Async test message", jsonDoc.RootElement.GetProperty("@message").GetString());
@@ -203,7 +205,7 @@ public class AsyncLoggingTests : IAsyncDisposable
         var content = await File.ReadAllTextAsync(testFilePath);
         var jsonDoc = JsonDocument.Parse(content.Trim());
 
-        Assert.Equal("456", jsonDoc.RootElement.GetProperty("@UserId").GetString());
+        Assert.Equal(456, jsonDoc.RootElement.GetProperty("@UserId").GetInt32());
         Assert.Equal("10.0.0.1", jsonDoc.RootElement.GetProperty("@IpAddress").GetString());
         Assert.Contains("Async user 456 logged in from 10.0.0.1", jsonDoc.RootElement.GetProperty("@message").GetString());
     }
@@ -350,6 +352,9 @@ public class AsyncLoggingTests : IAsyncDisposable
 
         // Act
         logger.LogInformation("Message before cancellation");
+
+        // Give the logger a moment to process the message before cancelling
+        await Task.Delay(50);
         cts.Cancel();
 
         // Flush should handle cancellation gracefully

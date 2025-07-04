@@ -120,13 +120,38 @@ public sealed class AsyncPawKitLogger : ILogger, IAsyncDisposable
         // Enqueue the log entry for background processing
         if (!_writer.TryWrite(logEntry))
         {
-            // Channel is full - implement fallback strategy
-            // For critical logs, we could try to write directly as fallback
-            if (logLevel >= LogLevel.Error)
+            // Channel is full - try to wait and write, or use fallback for critical logs
+            try
             {
-                _ = Task.Run(async () => await LogAsync(logEntry).ConfigureAwait(false));
+                // For critical logs, write directly as fallback to ensure they're not lost
+                if (logLevel >= LogLevel.Error)
+                {
+                    _ = Task.Run(async () => await LogAsync(logEntry).ConfigureAwait(false));
+                }
+                else
+                {
+                    // For other logs, try to wait a short time and retry
+                    _ = Task.Run(async () =>
+                    {
+                        try
+                        {
+                            await _writer.WriteAsync(logEntry, _cancellationTokenSource.Token).ConfigureAwait(false);
+                        }
+                        catch (OperationCanceledException)
+                        {
+                            // Logger is shutting down, drop the entry
+                        }
+                        catch
+                        {
+                            // If we still can't write, drop the entry to prevent blocking
+                        }
+                    });
+                }
             }
-            // Otherwise, drop the log entry to prevent blocking
+            catch
+            {
+                // If all else fails, drop the entry to prevent application blocking
+            }
         }
     }
 
@@ -169,6 +194,12 @@ public sealed class AsyncPawKitLogger : ILogger, IAsyncDisposable
     /// <returns>A task representing the asynchronous logging operation.</returns>
     private async Task LogAsync(LogEntry logEntry)
     {
+        // Skip flush marker entries
+        if (logEntry.LogLevel == LogLevel.None && logEntry.CategoryName == "__FLUSH_MARKER__")
+        {
+            return;
+        }
+
         // Write to all destinations concurrently
         var tasks = _destinations.Select(async destination =>
         {
@@ -194,11 +225,79 @@ public sealed class AsyncPawKitLogger : ILogger, IAsyncDisposable
     /// <returns>A task representing the asynchronous flush operation.</returns>
     public async Task FlushAsync(CancellationToken cancellationToken = default)
     {
+        // Create a special flush marker entry to ensure all previous entries are processed
+        var flushMarker = new LogEntry(
+            timestampUtc: DateTime.UtcNow,
+            logLevel: LogLevel.None, // Special marker level
+            categoryName: "__FLUSH_MARKER__",
+            eventId: new EventId(-1, "FlushMarker"),
+            message: string.Empty,
+            exception: null,
+            messageTemplate: null,
+            properties: null,
+            scopeProperties: null
+        );
+
+        // Try to write the flush marker (use a non-canceled token for the marker)
+        var markerWritten = false;
+        try
+        {
+            // Use a short timeout instead of the potentially canceled token for the marker
+            using var markerCts = new CancellationTokenSource(TimeSpan.FromMilliseconds(500));
+            await _writer.WriteAsync(flushMarker, markerCts.Token).ConfigureAwait(false);
+            markerWritten = true;
+        }
+        catch (OperationCanceledException)
+        {
+            // Logger is shutting down or marker timeout
+        }
+        catch
+        {
+            // Channel might be closed or full
+        }
+
+        if (markerWritten)
+        {
+            // Wait for the background task to process the marker (with timeout)
+            var timeout = TimeSpan.FromMilliseconds(2000);
+            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+
+            while (stopwatch.Elapsed < timeout && !cancellationToken.IsCancellationRequested)
+            {
+                // Check if the channel is empty (marker has been processed)
+                if (_logChannel.Reader.Count == 0)
+                    break;
+
+                try
+                {
+                    await Task.Delay(10, cancellationToken).ConfigureAwait(false);
+                }
+                catch (OperationCanceledException)
+                {
+                    // Cancellation requested, but continue to flush destinations
+                    break;
+                }
+            }
+        }
+        else
+        {
+            // If we couldn't write the marker, wait a bit for any pending entries
+            try
+            {
+                await Task.Delay(100, cancellationToken).ConfigureAwait(false);
+            }
+            catch (OperationCanceledException)
+            {
+                // Continue to flush destinations even if canceled
+            }
+        }
+
+        // Now flush all destinations (don't pass the cancellation token to avoid failing the flush)
         var tasks = _destinations.Select(async destination =>
         {
             try
             {
-                await destination.FlushAsync(cancellationToken).ConfigureAwait(false);
+                await destination.FlushAsync(CancellationToken.None).ConfigureAwait(false);
             }
             catch (Exception ex)
             {

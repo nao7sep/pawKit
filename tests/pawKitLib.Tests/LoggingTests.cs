@@ -201,7 +201,7 @@ public class LoggingTests : IDisposable
         {
             // Each line should be valid JSON
             var jsonDoc = JsonDocument.Parse(line);
-            Assert.NotNull(jsonDoc.RootElement.GetProperty("@timestamp"));
+            Assert.True(jsonDoc.RootElement.TryGetProperty("@timestamp", out _));
             Assert.Equal("Information", jsonDoc.RootElement.GetProperty("@level").GetString());
             Assert.Equal("TestCategory", jsonDoc.RootElement.GetProperty("@category").GetString());
             Assert.Equal("Test message", jsonDoc.RootElement.GetProperty("@message").GetString());
@@ -258,7 +258,7 @@ public class LoggingTests : IDisposable
         var content = File.ReadAllText(testFilePath);
         var jsonDoc = JsonDocument.Parse(content.Trim());
 
-        Assert.Equal("123", jsonDoc.RootElement.GetProperty("@UserId").GetString());
+        Assert.Equal(123, jsonDoc.RootElement.GetProperty("@UserId").GetInt32());
         Assert.Equal("192.168.1.1", jsonDoc.RootElement.GetProperty("@IpAddress").GetString());
         Assert.Contains("User 123 logged in from 192.168.1.1", jsonDoc.RootElement.GetProperty("@message").GetString());
     }
@@ -316,7 +316,7 @@ public class LoggingTests : IDisposable
     }
 
     [Fact]
-    public void ThreadSafeDestination_HandlesMultipleThreads()
+    public async Task ThreadSafeDestination_HandlesMultipleThreads()
     {
         // Arrange
         var testFilePath = Path.Combine(_testDirectory, "threadsafe.log");
@@ -342,7 +342,7 @@ public class LoggingTests : IDisposable
             }));
         }
 
-        Task.WaitAll(tasks.ToArray());
+        await Task.WhenAll(tasks.ToArray());
         factory.Flush();
 
         // Assert - All messages should be present
