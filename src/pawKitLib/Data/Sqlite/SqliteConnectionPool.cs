@@ -1,7 +1,7 @@
-using Microsoft.Data.Sqlite;
+﻿using Microsoft.Data.Sqlite;
 using System.Collections.Concurrent;
 
-namespace PawKitLib.Logging.Destinations.Database;
+namespace PawKitLib.Data.Sqlite;
 
 /// <summary>
 /// A simple connection pool for SQLite connections to improve performance under high load.
