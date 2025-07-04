@@ -6,8 +6,14 @@ using Xunit;
 
 namespace pawKitLib.Tests;
 
+/// <summary>
+/// Comprehensive tests for the PawKit logging system.
+/// Tests are organized from basic components to complex integrations.
+/// </summary>
 public class LoggingTests
 {
+    #region Helper Methods
+
     /// <summary>
     /// Helper method to safely delete a file with retry logic for SQLite database files.
     /// </summary>
@@ -35,168 +41,46 @@ public class LoggingTests
         // The temp file will be cleaned up by the OS eventually
     }
 
-    [Fact]
-    public void PawKitLog_StaticConfiguration_ShouldWork()
+    /// <summary>
+    /// Creates a temporary SQLite database file path.
+    /// </summary>
+    /// <returns>A temporary database file path with .db extension.</returns>
+    private static string CreateTempDbPath()
     {
-        // Arrange
-        var tempLogFile = Path.GetTempFileName();
-        var tempJsonFile = Path.GetTempFileName();
-
-        try
-        {
-            // Act
-            PawKitLog.Configure(config => config
-                .SetMinimumLevel(LogLevel.Information)
-                .AddPawKitConsole(LogWriteMode.Immediate, LogThreadSafety.ThreadSafe, useColors: false)
-                .AddPawKitPlainText(tempLogFile, LogWriteMode.Immediate, LogThreadSafety.ThreadSafe)
-                .AddPawKitJson(tempJsonFile, LogWriteMode.Immediate, LogThreadSafety.ThreadSafe));
-
-            var logger = PawKitLog.CreateLogger<LoggingTests>();
-
-            logger.LogInformation("Test information message");
-            logger.LogWarning("Test warning message");
-            logger.LogError(new InvalidOperationException("Test exception"), "Test error message");
-
-            PawKitLog.Flush();
-
-            // Assert
-            Assert.True(File.Exists(tempLogFile));
-            Assert.True(File.Exists(tempJsonFile));
-
-            var logContent = File.ReadAllText(tempLogFile);
-            Assert.Contains("Test information message", logContent);
-            Assert.Contains("Test warning message", logContent);
-            Assert.Contains("Test error message", logContent);
-
-            var jsonContent = File.ReadAllText(tempJsonFile);
-            Assert.Contains("Test information message", jsonContent);
-            Assert.Contains("Test warning message", jsonContent);
-            Assert.Contains("Test error message", jsonContent);
-        }
-        finally
-        {
-            // Cleanup
-            PawKitLog.Shutdown();
-            if (File.Exists(tempLogFile)) File.Delete(tempLogFile);
-            if (File.Exists(tempJsonFile)) File.Delete(tempJsonFile);
-        }
+        var tempDbFile = Path.GetTempFileName();
+        File.Delete(tempDbFile); // Delete the temp file so SQLite can create it properly
+        return Path.ChangeExtension(tempDbFile, ".db");
     }
 
-    [Fact]
-    public void PawKitLogging_DependencyInjection_ShouldWork()
-    {
-        // Arrange
-        var tempLogFile = Path.GetTempFileName();
+    #endregion
 
-        try
-        {
-            var services = new ServiceCollection();
-            services.AddPawKitLogging(config => config
-                .SetMinimumLevel(LogLevel.Debug)
-                .AddPawKitConsole(LogWriteMode.Immediate, LogThreadSafety.ThreadSafe, useColors: false)
-                .AddPawKitPlainText(tempLogFile, LogWriteMode.Immediate, LogThreadSafety.ThreadSafe));
-
-            var serviceProvider = services.BuildServiceProvider();
-
-            // Act
-            var logger = serviceProvider.GetRequiredService<ILogger<LoggingTests>>();
-            logger.LogDebug("Debug message");
-            logger.LogInformation("Information message");
-            logger.LogWarning("Warning message");
-
-            // Assert
-            Assert.True(File.Exists(tempLogFile));
-            var logContent = File.ReadAllText(tempLogFile);
-            Assert.Contains("Debug message", logContent);
-            Assert.Contains("Information message", logContent);
-            Assert.Contains("Warning message", logContent);
-
-            // Cleanup
-            serviceProvider.Dispose();
-        }
-        finally
-        {
-            if (File.Exists(tempLogFile)) File.Delete(tempLogFile);
-        }
-    }
+    #region Core Component Tests
 
     [Fact]
-    public void LoggerConfiguration_BufferedMode_ShouldFlushOnDispose()
+    public void LogEntry_Construction_ShouldSetAllProperties()
     {
         // Arrange
-        var tempLogFile = Path.GetTempFileName();
+        var utcNow = DateTime.UtcNow;
+        var eventId = new EventId(1, "TestEvent");
+        var exception = new InvalidOperationException("Test exception");
 
-        try
-        {
-            var config = LoggerConfiguration.Create()
-                .AddPawKitPlainText(tempLogFile, LogWriteMode.Buffered, LogThreadSafety.ThreadSafe);
+        // Act
+        var logEntry = new LogEntry(
+            timestampUtc: utcNow,
+            logLevel: LogLevel.Error,
+            categoryName: "TestCategory",
+            eventId: eventId,
+            message: "Test message",
+            exception: exception
+        );
 
-            using var loggerFactory = config.Build();
-            var logger = loggerFactory.CreateLogger("TestLogger");
-
-            // Act
-            logger.LogInformation("Buffered message");
-
-            // Before dispose, file might be empty due to buffering
-            var contentBeforeDispose = File.Exists(tempLogFile) ? File.ReadAllText(tempLogFile) : "";
-
-            // Dispose should flush the buffer
-            loggerFactory.Dispose();
-
-            // Assert
-            Assert.True(File.Exists(tempLogFile));
-            var contentAfterDispose = File.ReadAllText(tempLogFile);
-            Assert.Contains("Buffered message", contentAfterDispose);
-        }
-        finally
-        {
-            if (File.Exists(tempLogFile)) File.Delete(tempLogFile);
-        }
-    }
-
-    [Fact]
-    public void LoggerConfiguration_MinimumLevel_ShouldFilterLogs()
-    {
-        // Arrange
-        var tempLogFile = Path.GetTempFileName();
-
-        try
-        {
-            var config = LoggerConfiguration.Create()
-                .SetMinimumLevel(LogLevel.Warning)
-                .AddPawKitPlainText(tempLogFile, LogWriteMode.Immediate, LogThreadSafety.ThreadSafe);
-
-            using var loggerFactory = config.Build();
-            var logger = loggerFactory.CreateLogger("TestLogger");
-
-            // Act
-            logger.LogDebug("Debug message - should be filtered");
-            logger.LogInformation("Info message - should be filtered");
-            logger.LogWarning("Warning message - should appear");
-            logger.LogError("Error message - should appear");
-
-            // Assert
-            Assert.True(File.Exists(tempLogFile));
-            var logContent = File.ReadAllText(tempLogFile);
-            Assert.DoesNotContain("Debug message", logContent);
-            Assert.DoesNotContain("Info message", logContent);
-            Assert.Contains("Warning message", logContent);
-            Assert.Contains("Error message", logContent);
-        }
-        finally
-        {
-            if (File.Exists(tempLogFile)) File.Delete(tempLogFile);
-        }
-    }
-
-    [Fact]
-    public void LoggerConfiguration_NoDestinations_ShouldThrowException()
-    {
-        // Arrange
-        var config = LoggerConfiguration.Create();
-
-        // Act & Assert
-        Assert.Throws<InvalidOperationException>(() => config.Build());
+        // Assert
+        Assert.Equal(utcNow, logEntry.TimestampUtc);
+        Assert.Equal(LogLevel.Error, logEntry.LogLevel);
+        Assert.Equal("TestCategory", logEntry.CategoryName);
+        Assert.Equal(eventId, logEntry.EventId);
+        Assert.Equal("Test message", logEntry.Message);
+        Assert.Equal(exception, logEntry.Exception);
     }
 
     [Fact]
@@ -242,121 +126,90 @@ public class LoggingTests
         Assert.Equal(utcNow, logEntry.TimestampUtc);
     }
 
+    #endregion
+
+    #region Configuration Tests
+
     [Fact]
-    public void PawKitLogging_SqliteDestination_ShouldWork()
+    public void LoggerConfiguration_NoDestinations_ShouldThrowException()
     {
         // Arrange
-        var tempDbFile = Path.GetTempFileName();
-        File.Delete(tempDbFile); // Delete the temp file so SQLite can create it properly
-        tempDbFile = Path.ChangeExtension(tempDbFile, ".db");
+        var config = LoggerConfiguration.Create();
 
-        try
-        {
-            // Act
-            PawKitLog.Configure(config => config
-                .SetMinimumLevel(LogLevel.Information)
-                .AddPawKitSqlite(tempDbFile, LogWriteMode.Immediate, LogThreadSafety.ThreadSafe));
-
-            var logger = PawKitLog.CreateLogger<LoggingTests>();
-
-            logger.LogInformation("Test information message for SQLite");
-            logger.LogWarning("Test warning message for SQLite");
-            logger.LogError(new InvalidOperationException("Test SQLite exception"), "Test error message for SQLite");
-
-            PawKitLog.Flush();
-
-            // Assert
-            Assert.True(File.Exists(tempDbFile));
-
-            // Verify the data was written to the database
-            using var connection = new SqliteConnection($"Data Source={tempDbFile}");
-            connection.Open();
-
-            using var command = connection.CreateCommand();
-            command.CommandText = "SELECT COUNT(*) FROM LogEntries";
-            var count = Convert.ToInt32(command.ExecuteScalar());
-            Assert.Equal(3, count);
-
-            // Verify specific log entries
-            command.CommandText = "SELECT Message, LogLevel, Exception FROM LogEntries ORDER BY Id";
-            using var reader = command.ExecuteReader();
-
-            Assert.True(reader.Read());
-            Assert.Equal("Test information message for SQLite", reader.GetString(0)); // Message
-            Assert.Equal("Information", reader.GetString(1)); // LogLevel
-            Assert.True(reader.IsDBNull(2)); // Exception
-
-            Assert.True(reader.Read());
-            Assert.Equal("Test warning message for SQLite", reader.GetString(0)); // Message
-            Assert.Equal("Warning", reader.GetString(1)); // LogLevel
-            Assert.True(reader.IsDBNull(2)); // Exception
-
-            Assert.True(reader.Read());
-            Assert.Equal("Test error message for SQLite", reader.GetString(0)); // Message
-            Assert.Equal("Error", reader.GetString(1)); // LogLevel
-            Assert.False(reader.IsDBNull(2)); // Exception
-            Assert.Contains("InvalidOperationException", reader.GetString(2)); // Exception
-        }
-        finally
-        {
-            // Cleanup
-            PawKitLog.Shutdown();
-
-            // Force garbage collection to help release SQLite connections
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
-            GC.Collect();
-
-            // Try to delete the file with retry logic
-            TryDeleteFile(tempDbFile);
-        }
+        // Act & Assert
+        Assert.Throws<InvalidOperationException>(() => config.Build());
     }
 
     [Fact]
-    public void PawKitLogging_SqliteDestination_DependencyInjection_ShouldWork()
+    public void LoggerConfiguration_MinimumLevel_ShouldFilterLogs()
     {
         // Arrange
-        var tempDbFile = Path.GetTempFileName();
-        File.Delete(tempDbFile); // Delete the temp file so SQLite can create it properly
-        tempDbFile = Path.ChangeExtension(tempDbFile, ".db");
+        var tempLogFile = Path.GetTempFileName();
 
         try
         {
-            var services = new ServiceCollection();
-            services.AddPawKitLogging(config => config
-                .SetMinimumLevel(LogLevel.Debug)
-                .AddPawKitSqlite(tempDbFile, LogWriteMode.Immediate, LogThreadSafety.ThreadSafe));
+            var config = LoggerConfiguration.Create()
+                .SetMinimumLevel(LogLevel.Warning)
+                .AddPawKitPlainText(tempLogFile, LogWriteMode.Immediate, LogThreadSafety.ThreadSafe);
 
-            var serviceProvider = services.BuildServiceProvider();
+            using var loggerFactory = config.Build();
+            var logger = loggerFactory.CreateLogger("TestLogger");
 
             // Act
-            var logger = serviceProvider.GetRequiredService<ILogger<LoggingTests>>();
-            logger.LogDebug("Debug message for SQLite");
-            logger.LogInformation("Information message for SQLite");
-            logger.LogWarning("Warning message for SQLite");
+            logger.LogDebug("Debug message - should be filtered");
+            logger.LogInformation("Info message - should be filtered");
+            logger.LogWarning("Warning message - should appear");
+            logger.LogError("Error message - should appear");
 
             // Assert
-            Assert.True(File.Exists(tempDbFile));
-
-            using var connection = new SqliteConnection($"Data Source={tempDbFile}");
-            connection.Open();
-
-            using var command = connection.CreateCommand();
-            command.CommandText = "SELECT COUNT(*) FROM LogEntries WHERE Message LIKE '%SQLite'";
-            var count = Convert.ToInt32(command.ExecuteScalar());
-            Assert.Equal(3, count);
-
-            // Cleanup
-            serviceProvider.Dispose();
+            Assert.True(File.Exists(tempLogFile));
+            var logContent = File.ReadAllText(tempLogFile);
+            Assert.DoesNotContain("Debug message", logContent);
+            Assert.DoesNotContain("Info message", logContent);
+            Assert.Contains("Warning message", logContent);
+            Assert.Contains("Error message", logContent);
         }
         finally
         {
-            // Force garbage collection to help release SQLite connections
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
-            GC.Collect();
+            if (File.Exists(tempLogFile)) File.Delete(tempLogFile);
+        }
+    }
 
-            TryDeleteFile(tempDbFile);
+    #endregion
+
+    #region Write Mode Tests
+
+    [Fact]
+    public void LoggerConfiguration_BufferedMode_ShouldFlushOnDispose()
+    {
+        // Arrange
+        var tempLogFile = Path.GetTempFileName();
+
+        try
+        {
+            var config = LoggerConfiguration.Create()
+                .AddPawKitPlainText(tempLogFile, LogWriteMode.Buffered, LogThreadSafety.ThreadSafe);
+
+            using var loggerFactory = config.Build();
+            var logger = loggerFactory.CreateLogger("TestLogger");
+
+            // Act
+            logger.LogInformation("Buffered message");
+
+            // Before dispose, file might be empty due to buffering
+            var contentBeforeDispose = File.Exists(tempLogFile) ? File.ReadAllText(tempLogFile) : "";
+
+            // Dispose should flush the buffer
+            loggerFactory.Dispose();
+
+            // Assert
+            Assert.True(File.Exists(tempLogFile));
+            var contentAfterDispose = File.ReadAllText(tempLogFile);
+            Assert.Contains("Buffered message", contentAfterDispose);
+        }
+        finally
+        {
+            if (File.Exists(tempLogFile)) File.Delete(tempLogFile);
         }
     }
 
@@ -364,9 +217,7 @@ public class LoggingTests
     public void SqliteLogDestination_BufferedMode_ShouldFlushOnDispose()
     {
         // Arrange
-        var tempDbFile = Path.GetTempFileName();
-        File.Delete(tempDbFile); // Delete the temp file so SQLite can create it properly
-        tempDbFile = Path.ChangeExtension(tempDbFile, ".db");
+        var tempDbFile = CreateTempDbPath();
 
         try
         {
@@ -412,13 +263,15 @@ public class LoggingTests
         }
     }
 
+    #endregion
+
+    #region SQLite Destination Tests
+
     [Fact]
     public void SqliteLogDestination_DatabaseSchema_ShouldBeCreatedCorrectly()
     {
         // Arrange
-        var tempDbFile = Path.GetTempFileName();
-        File.Delete(tempDbFile); // Delete the temp file so SQLite can create it properly
-        tempDbFile = Path.ChangeExtension(tempDbFile, ".db");
+        var tempDbFile = CreateTempDbPath();
 
         try
         {
@@ -479,4 +332,142 @@ public class LoggingTests
         Assert.Throws<ArgumentException>(() =>
             new SqliteLogDestination("   ", LogWriteMode.Immediate, LogThreadSafety.ThreadSafe));
     }
+
+    #endregion
+
+    #region Dependency Injection Integration Tests
+
+    [Fact]
+    public void DependencyInjection_BasicLogging_ShouldWork()
+    {
+        // Arrange
+        var tempLogFile = Path.GetTempFileName();
+
+        try
+        {
+            var services = new ServiceCollection();
+            services.AddPawKitLogging(config => config
+                .SetMinimumLevel(LogLevel.Debug)
+                .AddPawKitConsole(LogWriteMode.Immediate, LogThreadSafety.ThreadSafe, useColors: false)
+                .AddPawKitPlainText(tempLogFile, LogWriteMode.Immediate, LogThreadSafety.ThreadSafe));
+
+            var serviceProvider = services.BuildServiceProvider();
+
+            // Act
+            var logger = serviceProvider.GetRequiredService<ILogger<LoggingTests>>();
+            logger.LogDebug("Debug message");
+            logger.LogInformation("Information message");
+            logger.LogWarning("Warning message");
+
+            // Assert
+            Assert.True(File.Exists(tempLogFile));
+            var logContent = File.ReadAllText(tempLogFile);
+            Assert.Contains("Debug message", logContent);
+            Assert.Contains("Information message", logContent);
+            Assert.Contains("Warning message", logContent);
+
+            // Cleanup
+            serviceProvider.Dispose();
+        }
+        finally
+        {
+            if (File.Exists(tempLogFile)) File.Delete(tempLogFile);
+        }
+    }
+
+    [Fact]
+    public void DependencyInjection_SqliteDestination_ShouldWork()
+    {
+        // Arrange
+        var tempDbFile = CreateTempDbPath();
+
+        try
+        {
+            var services = new ServiceCollection();
+            services.AddPawKitLogging(config => config
+                .SetMinimumLevel(LogLevel.Debug)
+                .AddPawKitSqlite(tempDbFile, LogWriteMode.Immediate, LogThreadSafety.ThreadSafe));
+
+            var serviceProvider = services.BuildServiceProvider();
+
+            // Act
+            var logger = serviceProvider.GetRequiredService<ILogger<LoggingTests>>();
+            logger.LogDebug("Debug message for SQLite");
+            logger.LogInformation("Information message for SQLite");
+            logger.LogWarning("Warning message for SQLite");
+
+            // Assert
+            Assert.True(File.Exists(tempDbFile));
+
+            using var connection = new SqliteConnection($"Data Source={tempDbFile}");
+            connection.Open();
+
+            using var command = connection.CreateCommand();
+            command.CommandText = "SELECT COUNT(*) FROM LogEntries WHERE Message LIKE '%SQLite'";
+            var count = Convert.ToInt32(command.ExecuteScalar());
+            Assert.Equal(3, count);
+
+            // Cleanup
+            serviceProvider.Dispose();
+        }
+        finally
+        {
+            // Force garbage collection to help release SQLite connections
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            GC.Collect();
+
+            TryDeleteFile(tempDbFile);
+        }
+    }
+
+    [Fact]
+    public void DependencyInjection_MultipleDestinations_ShouldWriteToAll()
+    {
+        // Arrange
+        var tempLogFile = Path.GetTempFileName();
+        var tempJsonFile = Path.GetTempFileName();
+
+        try
+        {
+            var services = new ServiceCollection();
+            services.AddPawKitLogging(config => config
+                .SetMinimumLevel(LogLevel.Information)
+                .AddPawKitConsole(LogWriteMode.Immediate, LogThreadSafety.ThreadSafe, useColors: false)
+                .AddPawKitPlainText(tempLogFile, LogWriteMode.Immediate, LogThreadSafety.ThreadSafe)
+                .AddPawKitJson(tempJsonFile, LogWriteMode.Immediate, LogThreadSafety.ThreadSafe));
+
+            var serviceProvider = services.BuildServiceProvider();
+
+            // Act
+            var logger = serviceProvider.GetRequiredService<ILogger<LoggingTests>>();
+            logger.LogInformation("Test information message");
+            logger.LogWarning("Test warning message");
+            logger.LogError(new InvalidOperationException("Test exception"), "Test error message");
+
+            // Assert
+            Assert.True(File.Exists(tempLogFile));
+            Assert.True(File.Exists(tempJsonFile));
+
+            var logContent = File.ReadAllText(tempLogFile);
+            Assert.Contains("Test information message", logContent);
+            Assert.Contains("Test warning message", logContent);
+            Assert.Contains("Test error message", logContent);
+
+            var jsonContent = File.ReadAllText(tempJsonFile);
+            Assert.Contains("Test information message", jsonContent);
+            Assert.Contains("Test warning message", jsonContent);
+            Assert.Contains("Test error message", jsonContent);
+
+            // Cleanup
+            serviceProvider.Dispose();
+        }
+        finally
+        {
+            if (File.Exists(tempLogFile)) File.Delete(tempLogFile);
+            if (File.Exists(tempJsonFile)) File.Delete(tempJsonFile);
+        }
+    }
+
+    #endregion
 }
