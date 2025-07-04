@@ -17,7 +17,7 @@ public sealed class PlainTextFileLogDestination : BaseLogDestination
     /// <param name="writeMode">The write mode for this destination.</param>
     /// <param name="threadSafety">The thread safety mode for this destination.</param>
     /// <param name="appendToFile">Whether to append to an existing file or overwrite it.</param>
-    public PlainTextFileLogDestination(string filePath, WriteMode writeMode, ThreadSafety threadSafety, bool appendToFile = true)
+    public PlainTextFileLogDestination(string filePath, LogWriteMode writeMode, LogThreadSafety threadSafety, bool appendToFile = true)
         : base(writeMode, threadSafety)
     {
         _filePath = filePath ?? throw new ArgumentNullException(nameof(filePath));
@@ -64,7 +64,7 @@ public sealed class PlainTextFileLogDestination : BaseLogDestination
     /// <returns>The formatted log entry string.</returns>
     private static string FormatLogEntry(LogEntry logEntry)
     {
-        var timestamp = logEntry.Timestamp.ToString("yyyy-MM-dd HH:mm:ss.fff");
+        var timestamp = logEntry.TimestampUtc.ToString("O"); // ISO 8601 roundtrip format
         var level = GetLogLevelString(logEntry.LogLevel);
         var category = logEntry.CategoryName;
         var message = logEntry.Message;

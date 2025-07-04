@@ -8,12 +8,12 @@ public interface ILogDestination : IDisposable
     /// <summary>
     /// Gets the write mode for this destination.
     /// </summary>
-    WriteMode WriteMode { get; }
+    LogWriteMode WriteMode { get; }
 
     /// <summary>
     /// Gets the thread safety mode for this destination.
     /// </summary>
-    ThreadSafety ThreadSafety { get; }
+    LogThreadSafety ThreadSafety { get; }
 
     /// <summary>
     /// Writes a log entry to the destination.

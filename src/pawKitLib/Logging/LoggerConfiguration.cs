@@ -28,7 +28,7 @@ public sealed class LoggerConfiguration
     /// <param name="threadSafety">The thread safety mode for this destination.</param>
     /// <param name="useColors">Whether to use colors for different log levels.</param>
     /// <returns>The current LoggerConfiguration instance for method chaining.</returns>
-    public LoggerConfiguration AddPawKitConsole(WriteMode writeMode = WriteMode.Immediate, ThreadSafety threadSafety = ThreadSafety.ThreadSafe, bool useColors = true)
+    public LoggerConfiguration AddPawKitConsole(LogWriteMode writeMode = LogWriteMode.Immediate, LogThreadSafety threadSafety = LogThreadSafety.ThreadSafe, bool useColors = true)
     {
         var destination = new ConsoleLogDestination(writeMode, threadSafety, useColors);
         _destinations.Add(destination);
@@ -43,7 +43,7 @@ public sealed class LoggerConfiguration
     /// <param name="threadSafety">The thread safety mode for this destination.</param>
     /// <param name="appendToFile">Whether to append to an existing file or overwrite it.</param>
     /// <returns>The current LoggerConfiguration instance for method chaining.</returns>
-    public LoggerConfiguration AddPawKitPlainText(string filePath, WriteMode writeMode = WriteMode.Buffered, ThreadSafety threadSafety = ThreadSafety.ThreadSafe, bool appendToFile = true)
+    public LoggerConfiguration AddPawKitPlainText(string filePath, LogWriteMode writeMode = LogWriteMode.Buffered, LogThreadSafety threadSafety = LogThreadSafety.ThreadSafe, bool appendToFile = true)
     {
         if (string.IsNullOrWhiteSpace(filePath))
             throw new ArgumentException("File path cannot be null or empty.", nameof(filePath));
@@ -61,7 +61,7 @@ public sealed class LoggerConfiguration
     /// <param name="threadSafety">The thread safety mode for this destination.</param>
     /// <param name="appendToFile">Whether to append to an existing file or overwrite it.</param>
     /// <returns>The current LoggerConfiguration instance for method chaining.</returns>
-    public LoggerConfiguration AddPawKitJson(string filePath, WriteMode writeMode = WriteMode.Buffered, ThreadSafety threadSafety = ThreadSafety.ThreadSafe, bool appendToFile = true)
+    public LoggerConfiguration AddPawKitJson(string filePath, LogWriteMode writeMode = LogWriteMode.Buffered, LogThreadSafety threadSafety = LogThreadSafety.ThreadSafe, bool appendToFile = true)
     {
         if (string.IsNullOrWhiteSpace(filePath))
             throw new ArgumentException("File path cannot be null or empty.", nameof(filePath));

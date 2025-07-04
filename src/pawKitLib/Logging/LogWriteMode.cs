@@ -3,7 +3,7 @@ namespace PawKitLib.Logging;
 /// <summary>
 /// Specifies how log entries are written to their destination.
 /// </summary>
-public enum WriteMode
+public enum LogWriteMode
 {
     /// <summary>
     /// Log entries are written immediately to the destination.

@@ -8,9 +8,9 @@ namespace PawKitLib.Logging;
 public sealed class LogEntry
 {
     /// <summary>
-    /// Gets the timestamp when the log entry was created.
+    /// Gets the UTC timestamp when the log entry was created.
     /// </summary>
-    public DateTime Timestamp { get; }
+    public DateTime TimestampUtc { get; }
 
     /// <summary>
     /// Gets the log level of the entry.
@@ -40,9 +40,9 @@ public sealed class LogEntry
     /// <summary>
     /// Initializes a new instance of the LogEntry class.
     /// </summary>
-    public LogEntry(DateTime timestamp, LogLevel logLevel, string categoryName, EventId eventId, string message, Exception? exception = null)
+    public LogEntry(DateTime timestampUtc, LogLevel logLevel, string categoryName, EventId eventId, string message, Exception? exception = null)
     {
-        Timestamp = timestamp;
+        TimestampUtc = timestampUtc;
         LogLevel = logLevel;
         CategoryName = categoryName ?? throw new ArgumentNullException(nameof(categoryName));
         EventId = eventId;

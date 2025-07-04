@@ -15,7 +15,7 @@ public sealed class ConsoleLogDestination : BaseLogDestination
     /// <param name="writeMode">The write mode for this destination.</param>
     /// <param name="threadSafety">The thread safety mode for this destination.</param>
     /// <param name="useColors">Whether to use colors for different log levels.</param>
-    public ConsoleLogDestination(WriteMode writeMode, ThreadSafety threadSafety, bool useColors = true)
+    public ConsoleLogDestination(LogWriteMode writeMode, LogThreadSafety threadSafety, bool useColors = true)
         : base(writeMode, threadSafety)
     {
         _useColors = useColors;
@@ -55,7 +55,7 @@ public sealed class ConsoleLogDestination : BaseLogDestination
     /// <returns>The formatted log entry string.</returns>
     private static string FormatLogEntry(LogEntry logEntry)
     {
-        var timestamp = logEntry.Timestamp.ToString("yyyy-MM-dd HH:mm:ss.fff");
+        var timestamp = logEntry.TimestampUtc.ToString("O"); // ISO 8601 roundtrip format
         var level = GetLogLevelString(logEntry.LogLevel);
         var category = logEntry.CategoryName;
         var message = logEntry.Message;

@@ -19,7 +19,7 @@ public sealed class JsonFileLogDestination : BaseLogDestination
     /// <param name="writeMode">The write mode for this destination.</param>
     /// <param name="threadSafety">The thread safety mode for this destination.</param>
     /// <param name="appendToFile">Whether to append to an existing file or overwrite it.</param>
-    public JsonFileLogDestination(string filePath, WriteMode writeMode, ThreadSafety threadSafety, bool appendToFile = true)
+    public JsonFileLogDestination(string filePath, LogWriteMode writeMode, LogThreadSafety threadSafety, bool appendToFile = true)
         : base(writeMode, threadSafety)
     {
         _filePath = filePath ?? throw new ArgumentNullException(nameof(filePath));
@@ -75,7 +75,7 @@ public sealed class JsonFileLogDestination : BaseLogDestination
     {
         var jsonEntry = new
         {
-            timestamp = logEntry.Timestamp.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"),
+            timestampUtc = logEntry.TimestampUtc.ToString("O"), // ISO 8601 roundtrip format
             level = logEntry.LogLevel.ToString(),
             category = logEntry.CategoryName,
             eventId = new

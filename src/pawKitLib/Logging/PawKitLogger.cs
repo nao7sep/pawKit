@@ -68,7 +68,7 @@ public sealed class PawKitLogger : ILogger
             return;
 
         var logEntry = new LogEntry(
-            timestamp: DateTime.UtcNow,
+            timestampUtc: DateTime.UtcNow,
             logLevel: logLevel,
             categoryName: _categoryName,
             eventId: eventId,

@@ -15,12 +15,12 @@ public abstract class BaseLogDestination : ILogDestination
     /// <summary>
     /// Gets the write mode for this destination.
     /// </summary>
-    public WriteMode WriteMode { get; }
+    public LogWriteMode WriteMode { get; }
 
     /// <summary>
     /// Gets the thread safety mode for this destination.
     /// </summary>
-    public ThreadSafety ThreadSafety { get; }
+    public LogThreadSafety ThreadSafety { get; }
 
     /// <summary>
     /// Gets the maximum number of entries to buffer before automatic flush.
@@ -33,12 +33,12 @@ public abstract class BaseLogDestination : ILogDestination
     /// </summary>
     /// <param name="writeMode">The write mode for this destination.</param>
     /// <param name="threadSafety">The thread safety mode for this destination.</param>
-    protected BaseLogDestination(WriteMode writeMode, ThreadSafety threadSafety)
+    protected BaseLogDestination(LogWriteMode writeMode, LogThreadSafety threadSafety)
     {
         WriteMode = writeMode;
         ThreadSafety = threadSafety;
 
-        if (writeMode == WriteMode.Buffered)
+        if (writeMode == LogWriteMode.Buffered)
         {
             _buffer = new List<LogEntry>();
         }
@@ -47,7 +47,7 @@ public abstract class BaseLogDestination : ILogDestination
             _buffer = null!;
         }
 
-        if (threadSafety == ThreadSafety.ThreadSafe)
+        if (threadSafety == LogThreadSafety.ThreadSafe)
         {
             _lock = new ReaderWriterLockSlim();
         }
@@ -62,7 +62,7 @@ public abstract class BaseLogDestination : ILogDestination
         if (_disposed)
             throw new ObjectDisposedException(nameof(BaseLogDestination));
 
-        if (ThreadSafety == ThreadSafety.ThreadSafe)
+        if (ThreadSafety == LogThreadSafety.ThreadSafe)
         {
             _lock!.EnterWriteLock();
             try
@@ -88,12 +88,12 @@ public abstract class BaseLogDestination : ILogDestination
         if (_disposed)
             throw new ObjectDisposedException(nameof(BaseLogDestination));
 
-        if (WriteMode == WriteMode.Immediate)
+        if (WriteMode == LogWriteMode.Immediate)
             return;
 
         lock (_flushLock)
         {
-            if (ThreadSafety == ThreadSafety.ThreadSafe)
+            if (ThreadSafety == LogThreadSafety.ThreadSafe)
             {
                 _lock!.EnterWriteLock();
                 try
@@ -118,7 +118,7 @@ public abstract class BaseLogDestination : ILogDestination
     /// <param name="logEntry">The log entry to write.</param>
     private void WriteLogInternal(LogEntry logEntry)
     {
-        if (WriteMode == WriteMode.Immediate)
+        if (WriteMode == LogWriteMode.Immediate)
         {
             WriteLogEntry(logEntry);
         }
@@ -165,7 +165,7 @@ public abstract class BaseLogDestination : ILogDestination
 
         try
         {
-            if (WriteMode == WriteMode.Buffered)
+            if (WriteMode == LogWriteMode.Buffered)
             {
                 Flush();
             }
