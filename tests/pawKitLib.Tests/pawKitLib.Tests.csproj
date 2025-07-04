@@ -4,11 +4,12 @@
         <TargetFramework>net9.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <IsPackable>false</IsPackable>
 
         <!-- Project Metadata -->
-        <AssemblyTitle>pawKitLib</AssemblyTitle>
+        <AssemblyTitle>pawKitLib.Tests</AssemblyTitle>
         <Product>pawKit</Product>
-        <Description>A C# class library containing core utilities for pawKit.</Description>
+        <Description>Unit tests for pawKitLib - A C# class library containing core utilities for pawKit.</Description>
         <Company>Purrfect Code</Company>
         <Authors>nao7sep</Authors>
         <Copyright>Copyright © 2025</Copyright>
@@ -19,7 +20,18 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.6" />
+        <PackageReference Include="coverlet.collector" Version="6.0.4" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+        <PackageReference Include="xunit" Version="2.9.3" />
+        <PackageReference Include="xunit.runner.visualstudio" Version="3.1.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Using Include="Xunit" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\pawKitLib\pawKitLib.csproj" />
     </ItemGroup>
 
 </Project>
