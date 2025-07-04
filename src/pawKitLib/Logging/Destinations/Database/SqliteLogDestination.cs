@@ -1,5 +1,6 @@
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Logging;
+using PawKitLib.Data.Sqlite;
 using PawKitLib.Logging.Core;
 using PawKitLib.Logging.Destinations.Base;
 

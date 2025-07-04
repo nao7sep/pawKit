@@ -6,7 +6,7 @@ namespace PawKitLib.Data.Sqlite;
 /// <summary>
 /// A simple connection pool for SQLite connections to improve performance under high load.
 /// </summary>
-internal sealed class SqliteConnectionPool : IDisposable
+public sealed class SqliteConnectionPool : IDisposable
 {
     private readonly string _connectionString;
     private readonly ConcurrentQueue<SqliteConnection> _connections = new();
@@ -189,7 +189,7 @@ internal sealed class SqliteConnectionPool : IDisposable
 /// <summary>
 /// Represents a pooled SQLite connection that automatically returns to the pool when disposed.
 /// </summary>
-internal sealed class PooledConnection : IDisposable
+public class PooledConnection : IDisposable
 {
     private readonly SqliteConnectionPool _pool;
     private SqliteConnection? _connection;
@@ -205,7 +205,7 @@ internal sealed class PooledConnection : IDisposable
     /// </summary>
     /// <param name="connection">The SQLite connection.</param>
     /// <param name="pool">The connection pool.</param>
-    internal PooledConnection(SqliteConnection connection, SqliteConnectionPool pool)
+    public PooledConnection(SqliteConnection connection, SqliteConnectionPool pool)
     {
         _connection = connection ?? throw new ArgumentNullException(nameof(connection));
         _pool = pool ?? throw new ArgumentNullException(nameof(pool));
