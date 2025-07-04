@@ -1,6 +1,11 @@
 using Microsoft.Extensions.Logging;
+using PawKitLib.Logging.Core;
+using PawKitLib.Logging.Loggers;
+using PawKitLib.Logging.Destinations.Console;
+using PawKitLib.Logging.Destinations.File;
+using PawKitLib.Logging.Destinations.Database;
 
-namespace PawKitLib.Logging;
+namespace PawKitLib.Logging.Configuration;
 
 /// <summary>
 /// Provides a fluent API for configuring PawKit logging destinations.
@@ -45,8 +50,7 @@ public sealed class LoggerConfiguration
     /// <returns>The current LoggerConfiguration instance for method chaining.</returns>
     public LoggerConfiguration AddPawKitPlainText(string filePath, LogWriteMode writeMode = LogWriteMode.Buffered, LogThreadSafety threadSafety = LogThreadSafety.ThreadSafe, bool appendToFile = true)
     {
-        if (string.IsNullOrWhiteSpace(filePath))
-            throw new ArgumentException("File path cannot be null or empty.", nameof(filePath));
+        ValidateFilePath(filePath, nameof(filePath));
 
         var destination = new PlainTextFileLogDestination(filePath, writeMode, threadSafety, appendToFile);
         _destinations.Add(destination);
@@ -63,8 +67,7 @@ public sealed class LoggerConfiguration
     /// <returns>The current LoggerConfiguration instance for method chaining.</returns>
     public LoggerConfiguration AddPawKitJson(string filePath, LogWriteMode writeMode = LogWriteMode.Buffered, LogThreadSafety threadSafety = LogThreadSafety.ThreadSafe, bool appendToFile = true)
     {
-        if (string.IsNullOrWhiteSpace(filePath))
-            throw new ArgumentException("File path cannot be null or empty.", nameof(filePath));
+        ValidateFilePath(filePath, nameof(filePath));
 
         var destination = new JsonFileLogDestination(filePath, writeMode, threadSafety, appendToFile);
         _destinations.Add(destination);
@@ -79,12 +82,11 @@ public sealed class LoggerConfiguration
     /// <param name="threadSafety">The thread safety mode for this destination.</param>
     /// <param name="createIfNotExists">Whether to create the database and table if they don't exist.</param>
     /// <returns>The current LoggerConfiguration instance for method chaining.</returns>
-    public LoggerConfiguration AddPawKitSqlite(string filePath, LogWriteMode writeMode = LogWriteMode.Buffered, LogThreadSafety threadSafety = LogThreadSafety.ThreadSafe, bool createIfNotExists = true)
+    public LoggerConfiguration AddPawKitSqlite(string filePath, LogWriteMode writeMode = LogWriteMode.Buffered, LogThreadSafety threadSafety = LogThreadSafety.ThreadSafe, bool createIfNotExists = true, int maxPoolSize = 10)
     {
-        if (string.IsNullOrWhiteSpace(filePath))
-            throw new ArgumentException("File path cannot be null or empty.", nameof(filePath));
+        ValidateFilePath(filePath, nameof(filePath));
 
-        var destination = new SqliteLogDestination(filePath, writeMode, threadSafety, createIfNotExists);
+        var destination = new SqliteLogDestination(filePath, writeMode, threadSafety, createIfNotExists, maxPoolSize);
         _destinations.Add(destination);
         return this;
     }
@@ -123,5 +125,49 @@ public sealed class LoggerConfiguration
     public static LoggerConfiguration Create()
     {
         return new LoggerConfiguration();
+    }
+
+    /// <summary>
+    /// Validates a file path parameter.
+    /// </summary>
+    /// <param name="filePath">The file path to validate.</param>
+    /// <param name="parameterName">The parameter name for exception reporting.</param>
+    /// <exception cref="ArgumentException">Thrown when the file path is invalid.</exception>
+    private static void ValidateFilePath(string filePath, string parameterName)
+    {
+        if (string.IsNullOrWhiteSpace(filePath))
+            throw new ArgumentException("File path cannot be null, empty, or whitespace.", parameterName);
+
+        try
+        {
+            // Validate that the path is not just invalid characters
+            var fullPath = Path.GetFullPath(filePath);
+            var directory = Path.GetDirectoryName(fullPath);
+            var fileName = Path.GetFileName(fullPath);
+
+            if (string.IsNullOrWhiteSpace(fileName))
+                throw new ArgumentException("File path must include a valid file name.", parameterName);
+
+            // Check for invalid characters in the file name
+            var invalidChars = Path.GetInvalidFileNameChars();
+            if (fileName.IndexOfAny(invalidChars) >= 0)
+                throw new ArgumentException($"File name contains invalid characters: {string.Join(", ", invalidChars.Where(c => fileName.Contains(c)))}.", parameterName);
+
+            // Check for invalid characters in the directory path
+            if (!string.IsNullOrEmpty(directory))
+            {
+                var invalidPathChars = Path.GetInvalidPathChars();
+                if (directory.IndexOfAny(invalidPathChars) >= 0)
+                    throw new ArgumentException($"Directory path contains invalid characters: {string.Join(", ", invalidPathChars.Where(c => directory.Contains(c)))}.", parameterName);
+            }
+        }
+        catch (ArgumentException)
+        {
+            throw; // Re-throw our validation exceptions
+        }
+        catch (Exception ex)
+        {
+            throw new ArgumentException($"Invalid file path: {ex.Message}", parameterName, ex);
+        }
     }
 }

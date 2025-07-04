@@ -1,7 +1,8 @@
 using Microsoft.Extensions.Logging;
+using PawKitLib.Logging.Core;
 using System.Collections.Concurrent;
 
-namespace PawKitLib.Logging;
+namespace PawKitLib.Logging.Loggers;
 
 /// <summary>
 /// A logger factory implementation that creates PawKit loggers with configured destinations.

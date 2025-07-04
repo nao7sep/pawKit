@@ -1,7 +1,12 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using PawKitLib.Logging.Core;
+using PawKitLib.Logging.Loggers;
+using PawKitLib.Logging.Destinations.Console;
+using PawKitLib.Logging.Destinations.File;
+using PawKitLib.Logging.Destinations.Database;
 
-namespace PawKitLib.Logging;
+namespace PawKitLib.Logging.Configuration;
 
 /// <summary>
 /// Extension methods for configuring PawKit logging with dependency injection.
@@ -49,6 +54,56 @@ public static class ServiceCollectionExtensions
 
         // Register the logger factory as singleton
         services.AddSingleton<ILoggerFactory>(loggerFactory);
+
+        // Register generic ILogger<T> factory
+        services.AddSingleton(typeof(ILogger<>), typeof(Logger<>));
+
+        return services;
+    }
+
+    /// <summary>
+    /// Adds PawKit asynchronous logging services to the specified IServiceCollection.
+    /// </summary>
+    /// <param name="services">The IServiceCollection to add services to.</param>
+    /// <param name="configureLogging">A delegate to configure the async logging destinations.</param>
+    /// <returns>The IServiceCollection so that additional calls can be chained.</returns>
+    public static IServiceCollection AddPawKitAsyncLogging(this IServiceCollection services, Action<AsyncLoggerConfiguration> configureLogging)
+    {
+        if (services == null)
+            throw new ArgumentNullException(nameof(services));
+        if (configureLogging == null)
+            throw new ArgumentNullException(nameof(configureLogging));
+
+        var configuration = AsyncLoggerConfiguration.Create();
+        configureLogging(configuration);
+        var loggerFactory = configuration.Build();
+
+        // Register the async logger factory as singleton
+        services.AddSingleton<ILoggerFactory>(loggerFactory);
+        services.AddSingleton<AsyncPawKitLoggerFactory>(loggerFactory);
+
+        // Register generic ILogger<T> factory
+        services.AddSingleton(typeof(ILogger<>), typeof(Logger<>));
+
+        return services;
+    }
+
+    /// <summary>
+    /// Adds PawKit asynchronous logging services to the specified IServiceCollection with a pre-configured logger factory.
+    /// </summary>
+    /// <param name="services">The IServiceCollection to add services to.</param>
+    /// <param name="loggerFactory">The pre-configured AsyncPawKitLoggerFactory.</param>
+    /// <returns>The IServiceCollection so that additional calls can be chained.</returns>
+    public static IServiceCollection AddPawKitAsyncLogging(this IServiceCollection services, AsyncPawKitLoggerFactory loggerFactory)
+    {
+        if (services == null)
+            throw new ArgumentNullException(nameof(services));
+        if (loggerFactory == null)
+            throw new ArgumentNullException(nameof(loggerFactory));
+
+        // Register the async logger factory as singleton
+        services.AddSingleton<ILoggerFactory>(loggerFactory);
+        services.AddSingleton<AsyncPawKitLoggerFactory>(loggerFactory);
 
         // Register generic ILogger<T> factory
         services.AddSingleton(typeof(ILogger<>), typeof(Logger<>));

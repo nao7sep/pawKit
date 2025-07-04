@@ -1,15 +1,17 @@
 using System.Collections.Concurrent;
+using PawKitLib.Logging.Core;
 
-namespace PawKitLib.Logging;
+namespace PawKitLib.Logging.Destinations.Base;
 
 /// <summary>
 /// Base class for log destinations that provides common functionality for buffering and thread safety.
 /// </summary>
 public abstract class BaseLogDestination : ILogDestination
 {
-    private readonly List<LogEntry> _buffer;
+    private readonly ConcurrentQueue<LogEntry> _buffer;
     private readonly ReaderWriterLockSlim? _lock;
     private readonly object _flushLock = new();
+    private volatile int _bufferCount;
     private bool _disposed;
 
     /// <summary>
@@ -40,7 +42,7 @@ public abstract class BaseLogDestination : ILogDestination
 
         if (writeMode == LogWriteMode.Buffered)
         {
-            _buffer = new List<LogEntry>();
+            _buffer = new ConcurrentQueue<LogEntry>();
         }
         else
         {
@@ -124,8 +126,9 @@ public abstract class BaseLogDestination : ILogDestination
         }
         else
         {
-            _buffer.Add(logEntry);
-            if (_buffer.Count >= BufferSize)
+            _buffer.Enqueue(logEntry);
+            var currentCount = Interlocked.Increment(ref _bufferCount);
+            if (currentCount >= BufferSize)
             {
                 FlushInternal();
             }
@@ -137,12 +140,19 @@ public abstract class BaseLogDestination : ILogDestination
     /// </summary>
     private void FlushInternal()
     {
-        if (_buffer.Count == 0)
+        if (_bufferCount == 0)
             return;
 
-        var entriesToWrite = _buffer.ToArray();
-        _buffer.Clear();
+        var entriesToWrite = new List<LogEntry>();
 
+        // Dequeue all current entries
+        while (_buffer.TryDequeue(out var entry))
+        {
+            entriesToWrite.Add(entry);
+            Interlocked.Decrement(ref _bufferCount);
+        }
+
+        // Write all entries
         foreach (var entry in entriesToWrite)
         {
             WriteLogEntry(entry);

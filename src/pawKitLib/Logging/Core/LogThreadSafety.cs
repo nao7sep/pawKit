@@ -1,4 +1,4 @@
-namespace PawKitLib.Logging;
+namespace PawKitLib.Logging.Core;
 
 /// <summary>
 /// Specifies the thread safety behavior for log destinations.

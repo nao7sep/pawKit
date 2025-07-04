@@ -1,4 +1,4 @@
-namespace PawKitLib.Logging;
+namespace PawKitLib.Logging.Core;
 
 /// <summary>
 /// Specifies how log entries are written to their destination.

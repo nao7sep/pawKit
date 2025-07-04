@@ -1,4 +1,4 @@
-namespace PawKitLib.Logging;
+namespace PawKitLib.Logging.Core;
 
 /// <summary>
 /// Defines the contract for log destinations that can receive and process log entries.

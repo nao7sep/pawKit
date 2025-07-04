@@ -1,26 +1,28 @@
 using Microsoft.Extensions.Logging;
+using PawKitLib.Logging.Core;
+using PawKitLib.Logging.Destinations.Base;
 using System.Text;
 using System.Text.Json;
 
-namespace PawKitLib.Logging;
+namespace PawKitLib.Logging.Destinations.File;
 
 /// <summary>
-/// A log destination that writes log entries to a JSON file.
+/// An asynchronous log destination that writes log entries to a JSON System.IO.File.
 /// </summary>
-public sealed class JsonFileLogDestination : BaseLogDestination
+public sealed class AsyncJsonFileLogDestination : BaseAsyncLogDestination
 {
     private readonly string _filePath;
     private readonly bool _appendToFile;
     private readonly JsonSerializerOptions _jsonOptions;
 
     /// <summary>
-    /// Initializes a new instance of the JsonFileLogDestination class.
+    /// Initializes a new instance of the AsyncJsonFileLogDestination class.
     /// </summary>
-    /// <param name="filePath">The path to the log file.</param>
+    /// <param name="filePath">The path to the log System.IO.File.</param>
     /// <param name="writeMode">The write mode for this destination.</param>
     /// <param name="threadSafety">The thread safety mode for this destination.</param>
     /// <param name="appendToFile">Whether to append to an existing file or overwrite it.</param>
-    public JsonFileLogDestination(string filePath, LogWriteMode writeMode, LogThreadSafety threadSafety, bool appendToFile = true)
+    public AsyncJsonFileLogDestination(string filePath, LogWriteMode writeMode, LogThreadSafety threadSafety, bool appendToFile = true)
         : base(writeMode, threadSafety)
     {
         _filePath = filePath ?? throw new ArgumentNullException(nameof(filePath));
@@ -40,30 +42,32 @@ public sealed class JsonFileLogDestination : BaseLogDestination
         }
 
         // If not appending, clear the file
-        if (!_appendToFile && File.Exists(_filePath))
+        if (!_appendToFile && System.IO.File.Exists(_filePath))
         {
-            File.WriteAllText(_filePath, string.Empty, Encoding.UTF8);
+            System.IO.File.WriteAllText(_filePath, string.Empty, Encoding.UTF8);
         }
     }
 
     /// <summary>
-    /// Writes a single log entry to the JSON file.
+    /// Asynchronously writes a single log entry to the JSON System.IO.File.
     /// </summary>
     /// <param name="logEntry">The log entry to write.</param>
-    protected override void WriteLogEntry(LogEntry logEntry)
+    /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
+    /// <returns>A task representing the asynchronous write operation.</returns>
+    protected override async Task WriteLogEntryAsync(LogEntry logEntry, CancellationToken cancellationToken)
     {
         var jsonLogEntry = CreateJsonLogEntry(logEntry);
 
         try
         {
             var jsonString = JsonSerializer.Serialize(jsonLogEntry, _jsonOptions);
-            File.AppendAllText(_filePath, jsonString + Environment.NewLine, Encoding.UTF8);
+            await System.IO.File.AppendAllTextAsync(_filePath, jsonString + Environment.NewLine, Encoding.UTF8, cancellationToken).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
             // If we can't write to the file, write to console as fallback
-            Console.WriteLine($"Failed to write to JSON log file '{_filePath}': {ex.Message}");
-            Console.WriteLine($"Log entry: {logEntry.Message}");
+            await System.Console.Out.WriteLineAsync($"Failed to write to JSON log file '{_filePath}': {ex.Message}").ConfigureAwait(false);
+            await System.Console.Out.WriteLineAsync($"Log entry: {logEntry.Message}").ConfigureAwait(false);
         }
     }
 
@@ -74,25 +78,52 @@ public sealed class JsonFileLogDestination : BaseLogDestination
     /// <returns>An object suitable for JSON serialization.</returns>
     private static object CreateJsonLogEntry(LogEntry logEntry)
     {
-        var jsonEntry = new
+        // Create a flattened structure for better searchability
+        var jsonEntry = new Dictionary<string, object?>
         {
-            timestampUtc = logEntry.TimestampUtc.ToString("O"), // ISO 8601 roundtrip format
-            level = logEntry.LogLevel.ToString(),
-            category = logEntry.CategoryName,
-            eventId = new
+            ["@timestamp"] = logEntry.TimestampUtc.ToString("O"), // ISO 8601 roundtrip format
+            ["@level"] = logEntry.LogLevel.ToString(),
+            ["@category"] = logEntry.CategoryName,
+            ["@message"] = logEntry.Message,
+            ["@messageTemplate"] = logEntry.MessageTemplate,
+            ["eventId"] = new
             {
                 id = logEntry.EventId.Id,
                 name = logEntry.EventId.Name
-            },
-            message = logEntry.Message,
-            exception = logEntry.Exception != null ? new
+            }
+        };
+
+        // Add structured properties at root level for better searchability
+        if (logEntry.Properties.Count > 0)
+        {
+            foreach (var prop in logEntry.Properties)
+            {
+                // Prefix with @ to avoid conflicts with built-in fields
+                var key = prop.Key.StartsWith("@") ? prop.Key : $"@{prop.Key}";
+                jsonEntry[key] = prop.Value;
+            }
+        }
+
+        // Add scope properties with scope prefix
+        if (logEntry.ScopeProperties.Count > 0)
+        {
+            foreach (var prop in logEntry.ScopeProperties)
+            {
+                jsonEntry[$"scope.{prop.Key}"] = prop.Value;
+            }
+        }
+
+        // Add exception information
+        if (logEntry.Exception != null)
+        {
+            jsonEntry["exception"] = new
             {
                 type = logEntry.Exception.GetType().Name,
                 message = logEntry.Exception.Message,
                 stackTrace = logEntry.Exception.StackTrace,
                 innerException = GetInnerExceptionInfo(logEntry.Exception.InnerException)
-            } : null
-        };
+            };
+        }
 
         return jsonEntry;
     }

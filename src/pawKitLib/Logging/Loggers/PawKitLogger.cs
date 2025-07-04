@@ -1,6 +1,8 @@
 using Microsoft.Extensions.Logging;
+using PawKitLib.Logging.Core;
+using PawKitLib.Logging.Structured;
 
-namespace PawKitLib.Logging;
+namespace PawKitLib.Logging.Loggers;
 
 /// <summary>
 /// A logger implementation that writes to multiple configured destinations.
@@ -32,8 +34,7 @@ public sealed class PawKitLogger : ILogger
     /// <returns>An IDisposable that ends the logical operation scope on dispose.</returns>
     public IDisposable? BeginScope<TState>(TState state) where TState : notnull
     {
-        // Simple scope implementation - could be enhanced with actual scope tracking
-        return new LogScope();
+        return LogScope.BeginScope(state);
     }
 
     /// <summary>
@@ -67,13 +68,29 @@ public sealed class PawKitLogger : ILogger
         if (string.IsNullOrEmpty(message) && exception == null)
             return;
 
+        // Extract structured properties and message template
+        string? messageTemplate = null;
+        IReadOnlyDictionary<string, object?>? properties = null;
+
+        if (state is StructuredLogState structuredState)
+        {
+            messageTemplate = structuredState.MessageTemplate;
+            properties = structuredState.Properties;
+        }
+
+        // Get scoped properties
+        var scopeProperties = LogScope.GetAllScopeProperties();
+
         var logEntry = new LogEntry(
             timestampUtc: DateTime.UtcNow,
             logLevel: logLevel,
             categoryName: _categoryName,
             eventId: eventId,
             message: message ?? string.Empty,
-            exception: exception
+            exception: exception,
+            messageTemplate: messageTemplate,
+            properties: properties,
+            scopeProperties: scopeProperties
         );
 
         // Write to all destinations
@@ -111,14 +128,4 @@ public sealed class PawKitLogger : ILogger
         }
     }
 
-    /// <summary>
-    /// Simple implementation of a log scope.
-    /// </summary>
-    private sealed class LogScope : IDisposable
-    {
-        public void Dispose()
-        {
-            // Simple scope - no actual implementation needed for basic functionality
-        }
-    }
 }

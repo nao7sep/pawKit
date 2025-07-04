@@ -1,50 +1,62 @@
 using Microsoft.Extensions.Logging;
+using PawKitLib.Logging.Core;
+using PawKitLib.Logging.Destinations.Base;
+using System.Text;
 
-namespace PawKitLib.Logging;
+namespace PawKitLib.Logging.Destinations.File;
 
 /// <summary>
-/// A log destination that writes log entries to the console.
+/// A log destination that writes log entries to a plain text file.
 /// </summary>
-public sealed class ConsoleLogDestination : BaseLogDestination
+public sealed class PlainTextFileLogDestination : BaseLogDestination
 {
-    private readonly bool _useColors;
+    private readonly string _filePath;
+    private readonly bool _appendToFile;
 
     /// <summary>
-    /// Initializes a new instance of the ConsoleLogDestination class.
+    /// Initializes a new instance of the PlainTextFileLogDestination class.
     /// </summary>
+    /// <param name="filePath">The path to the log file.</param>
     /// <param name="writeMode">The write mode for this destination.</param>
     /// <param name="threadSafety">The thread safety mode for this destination.</param>
-    /// <param name="useColors">Whether to use colors for different log levels.</param>
-    public ConsoleLogDestination(LogWriteMode writeMode, LogThreadSafety threadSafety, bool useColors = true)
+    /// <param name="appendToFile">Whether to append to an existing file or overwrite it.</param>
+    public PlainTextFileLogDestination(string filePath, LogWriteMode writeMode, LogThreadSafety threadSafety, bool appendToFile = true)
         : base(writeMode, threadSafety)
     {
-        _useColors = useColors;
+        _filePath = filePath ?? throw new ArgumentNullException(nameof(filePath));
+        _appendToFile = appendToFile;
+
+        // Ensure the directory exists
+        var directory = Path.GetDirectoryName(_filePath);
+        if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+        {
+            Directory.CreateDirectory(directory);
+        }
+
+        // If not appending, clear the file
+        if (!_appendToFile && System.IO.File.Exists(_filePath))
+        {
+            System.IO.File.WriteAllText(_filePath, string.Empty, Encoding.UTF8);
+        }
     }
 
     /// <summary>
-    /// Writes a single log entry to the console.
+    /// Writes a single log entry to the plain text file.
     /// </summary>
     /// <param name="logEntry">The log entry to write.</param>
     protected override void WriteLogEntry(LogEntry logEntry)
     {
         var message = FormatLogEntry(logEntry);
 
-        if (_useColors)
+        try
         {
-            var originalColor = Console.ForegroundColor;
-            try
-            {
-                Console.ForegroundColor = GetLogLevelColor(logEntry.LogLevel);
-                Console.WriteLine(message);
-            }
-            finally
-            {
-                Console.ForegroundColor = originalColor;
-            }
+            System.IO.File.AppendAllText(_filePath, message + Environment.NewLine, Encoding.UTF8);
         }
-        else
+        catch (Exception ex)
         {
-            Console.WriteLine(message);
+            // If we can't write to the file, write to console as fallback
+            System.Console.WriteLine($"Failed to write to log file '{_filePath}': {ex.Message}");
+            System.Console.WriteLine($"Log entry: {message}");
         }
     }
 
@@ -87,26 +99,6 @@ public sealed class ConsoleLogDestination : BaseLogDestination
             LogLevel.Critical => "CRIT",
             LogLevel.None => "NONE",
             _ => logLevel.ToString().ToUpperInvariant()
-        };
-    }
-
-    /// <summary>
-    /// Gets the console color for a log level.
-    /// </summary>
-    /// <param name="logLevel">The log level.</param>
-    /// <returns>The console color for the log level.</returns>
-    private static ConsoleColor GetLogLevelColor(LogLevel logLevel)
-    {
-        return logLevel switch
-        {
-            LogLevel.Trace => ConsoleColor.Gray,
-            LogLevel.Debug => ConsoleColor.Gray,
-            LogLevel.Information => ConsoleColor.White,
-            LogLevel.Warning => ConsoleColor.Yellow,
-            LogLevel.Error => ConsoleColor.Red,
-            LogLevel.Critical => ConsoleColor.DarkRed,
-            LogLevel.None => ConsoleColor.White,
-            _ => ConsoleColor.White
         };
     }
 }
