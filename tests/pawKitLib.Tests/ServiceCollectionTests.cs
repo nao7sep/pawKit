@@ -75,7 +75,7 @@ public class ServiceCollectionTests
         // In practice, you would ensure PawKitLog.Configure() is called during application initialization.
 
         // We'll test that the methods exist and can be called instead
-        Assert.NotNull(typeof(PawKitLog).GetMethod("Configure"));
+        Assert.NotNull(typeof(PawKitLog).GetMethod("Configure", new[] { typeof(ILoggerFactory) }));
         Assert.NotNull(typeof(PawKitLog).GetMethod("CreateLogger", new[] { typeof(string) }));
     }
 

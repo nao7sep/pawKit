@@ -4,6 +4,7 @@ namespace PawKitLib.Logging;
 
 /// <summary>
 /// Provides centralized logging functionality for pawKit library.
+/// This class serves as a bridge between the old static logging approach and the new PawKit logging system.
 /// </summary>
 public static class PawKitLog
 {
@@ -16,6 +17,20 @@ public static class PawKitLog
     public static void Configure(ILoggerFactory loggerFactory)
     {
         _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
+    }
+
+    /// <summary>
+    /// Configures the logger factory using PawKit logging configuration.
+    /// </summary>
+    /// <param name="configureLogging">A delegate to configure the logging destinations.</param>
+    public static void Configure(Action<LoggerConfiguration> configureLogging)
+    {
+        if (configureLogging == null)
+            throw new ArgumentNullException(nameof(configureLogging));
+
+        var configuration = LoggerConfiguration.Create();
+        configureLogging(configuration);
+        _loggerFactory = configuration.Build();
     }
 
     /// <summary>
@@ -44,5 +59,28 @@ public static class PawKitLog
             throw new InvalidOperationException("Logger factory has not been configured. Call Configure() first.");
 
         return _loggerFactory.CreateLogger(categoryName);
+    }
+
+    /// <summary>
+    /// Flushes all loggers if the configured factory supports it.
+    /// </summary>
+    public static void Flush()
+    {
+        if (_loggerFactory is PawKitLoggerFactory pawKitFactory)
+        {
+            pawKitFactory.Flush();
+        }
+    }
+
+    /// <summary>
+    /// Disposes the logger factory if it implements IDisposable.
+    /// </summary>
+    public static void Shutdown()
+    {
+        if (_loggerFactory is IDisposable disposableFactory)
+        {
+            disposableFactory.Dispose();
+        }
+        _loggerFactory = null;
     }
 }

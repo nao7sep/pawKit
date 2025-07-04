@@ -1,0 +1,17 @@
+namespace PawKitLib.Logging;
+
+/// <summary>
+/// Specifies how log entries are written to their destination.
+/// </summary>
+public enum WriteMode
+{
+    /// <summary>
+    /// Log entries are written immediately to the destination.
+    /// </summary>
+    Immediate,
+
+    /// <summary>
+    /// Log entries are buffered and written when the buffer is flushed.
+    /// </summary>
+    Buffered
+}
