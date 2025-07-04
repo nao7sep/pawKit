@@ -72,6 +72,24 @@ public sealed class LoggerConfiguration
     }
 
     /// <summary>
+    /// Adds a SQLite database output destination.
+    /// </summary>
+    /// <param name="filePath">The path to the SQLite database file.</param>
+    /// <param name="writeMode">The write mode for this destination.</param>
+    /// <param name="threadSafety">The thread safety mode for this destination.</param>
+    /// <param name="createIfNotExists">Whether to create the database and table if they don't exist.</param>
+    /// <returns>The current LoggerConfiguration instance for method chaining.</returns>
+    public LoggerConfiguration AddPawKitSqlite(string filePath, LogWriteMode writeMode = LogWriteMode.Buffered, LogThreadSafety threadSafety = LogThreadSafety.ThreadSafe, bool createIfNotExists = true)
+    {
+        if (string.IsNullOrWhiteSpace(filePath))
+            throw new ArgumentException("File path cannot be null or empty.", nameof(filePath));
+
+        var destination = new SqliteLogDestination(filePath, writeMode, threadSafety, createIfNotExists);
+        _destinations.Add(destination);
+        return this;
+    }
+
+    /// <summary>
     /// Adds a custom log destination.
     /// </summary>
     /// <param name="destination">The custom log destination to add.</param>
