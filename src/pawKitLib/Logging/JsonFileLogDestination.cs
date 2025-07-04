@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using System.Text;
 using System.Text.Json;
 
 namespace PawKitLib.Logging;
@@ -41,7 +42,7 @@ public sealed class JsonFileLogDestination : BaseLogDestination
         // If not appending, clear the file
         if (!_appendToFile && File.Exists(_filePath))
         {
-            File.WriteAllText(_filePath, string.Empty);
+            File.WriteAllText(_filePath, string.Empty, Encoding.UTF8);
         }
     }
 
@@ -56,7 +57,7 @@ public sealed class JsonFileLogDestination : BaseLogDestination
         try
         {
             var jsonString = JsonSerializer.Serialize(jsonLogEntry, _jsonOptions);
-            File.AppendAllText(_filePath, jsonString + Environment.NewLine);
+            File.AppendAllText(_filePath, jsonString + Environment.NewLine, Encoding.UTF8);
         }
         catch (Exception ex)
         {

@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using System.Text;
 
 namespace PawKitLib.Logging;
 
@@ -33,7 +34,7 @@ public sealed class PlainTextFileLogDestination : BaseLogDestination
         // If not appending, clear the file
         if (!_appendToFile && File.Exists(_filePath))
         {
-            File.WriteAllText(_filePath, string.Empty);
+            File.WriteAllText(_filePath, string.Empty, Encoding.UTF8);
         }
     }
 
@@ -47,7 +48,7 @@ public sealed class PlainTextFileLogDestination : BaseLogDestination
 
         try
         {
-            File.AppendAllText(_filePath, message + Environment.NewLine);
+            File.AppendAllText(_filePath, message + Environment.NewLine, Encoding.UTF8);
         }
         catch (Exception ex)
         {
