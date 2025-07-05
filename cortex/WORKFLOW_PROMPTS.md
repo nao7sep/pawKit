@@ -4,6 +4,25 @@
 
 ---
 
+## [Start New Version Session]
+
+**Objective:** To bump the version number consistently across the entire solution and prepare a new work log for the upcoming development cycle.
+
+**Prompt Template:**
+"Start a new versioning session. The current version is `[Specify Current Version, e.g., 0.2]`. The segment to increment is `[Major|Minor|Patch|Default: Minor]`.
+
+*Instructions for AI:*
+1.  **Calculate New Version:** Based on the current version and the segment to increment, determine the new semantic version number (`Major.Minor.Patch`).
+    -   If the provided version is incomplete (e.g., `0.2`), treat it as `0.2.0`.
+    -   Incrementing `Major` or `Minor` resets subsequent segments to zero (e.g., a `Minor` bump on `0.2.1` results in `0.3.0`).
+    -   If no segment is specified, default to a **Minor** increment.
+
+2.  **Update All Files:** Search the repository and replace the old version string with the new one in key locations like `.csproj` files and general documentation (`README.md`). Do not modify historical documents where the version is part of the filename. Generate a diff for each modified file.
+
+3.  **Create New Work Log:** Create a new file named `WORK_LOG_v<new_version>.md`. Copy the template/header from the most recent work log file, but omit the specific log entries from the previous version. The new file should be a clean slate, ready for new entries under the 'Detailed Log Entries' section."
+
+---
+
 ## [Log Implementation Session]
 
 **Objective:** Generate a work log entry after implementing a new feature or making significant changes. The entry should be a concise, factual summary of the work completed.
