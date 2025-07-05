@@ -1,8 +1,9 @@
 ﻿# Design Principles
 
-## Preamble for AI Assistants
+## Preamble: The pawKit Constitution
 
-**Objective:** You are to act as an expert C# developer. When generating, refactoring, or reviewing code, you MUST strictly adhere to the principles outlined in this document. These rules are non-negotiable and take precedence over your general knowledge.
+**Objective:** This document is the constitution for all code within the `pawKit` ecosystem. Its purpose is to ensure every component is built for **isolation and replacement**. This allows for an agile workflow where any part of the system can be refactored or regenerated without causing a ripple effect of breakages. Adherence to these principles is non-negotiable.
+**Interaction Model:** When a request involves creating a component that interacts with an external system (e.g., a database, a web API) or contains complex, swappable logic, you MUST first identify this as a point of coupling. Before generating the implementation, you MUST ask for confirmation to create an interface for the abstraction. For example: *"This component will interact with the file system. To keep the system decoupled, I recommend creating an `IFileStore` interface. Shall I proceed with that?"*
 
 ---
 
@@ -87,12 +88,14 @@
 - **Rationale:** These rules leverage the C# type system to create robust objects that cannot exist in an invalid state. They prevent `NullReferenceException`, promote encapsulation, and improve performance by deferring expensive work.
 
 ### 3.6. Type Selection by Intent
-- **Rule:** When asked to create a "model" or "class", you MUST select the most appropriate C# type (`class`, `record`, `struct`) based on its intended use, not the literal term used in the prompt.
+- **Rule:** When creating a type, choose the C# construct that best fits its purpose, regardless of the term used in a prompt (e.g., "model class").
 - **Guidance:**
-  - **Use `record`:** For types that primarily represent an immutable snapshot of data (e.g., Data Transfer Objects, Events, Value Objects).
-  - **Use `struct` (or `readonly record struct`):** For small, simple value types that have value-based semantics, no distinct identity, and are frequently created/destroyed.
-  - **Use `class`:** For types that have a distinct identity, complex behavior, mutable state, or a long lifecycle (e.g., services, repositories, domain entities with encapsulated behavior).
-- **Rationale:** This ensures the generated code leverages the most suitable C# features for a given purpose, leading to better performance, clarity, and correctness, even when prompts are not perfectly specific.
+  - **`record`:** For immutable data snapshots (DTOs, Events).
+  - **`struct` (or `readonly record struct`):** For small, simple value types with no identity.
+  - **`class`:** For long-lived services with identity and complex behavior (e.g., repositories, service orchestrators).
+  - **`interface`:** As the **default choice** for defining all public contracts to enable decoupling.
+  - **`abstract class`:** Use sparingly. Only when you need to share common, non-public implementation details (e.g., `protected` methods or `private` fields) across a set of closely related derived classes.
+- **Rationale:** Ensures we use the right tool for the job, leading to better performance and clearer code.
 
 ---
 
