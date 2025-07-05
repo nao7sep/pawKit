@@ -1,4 +1,4 @@
-﻿# Refactoring & Quality Checklist
+﻿﻿# Refactoring & Quality Checklist
 
 *This file contains a list of specific, reusable prompts to run against new or modified code to ensure it meets our quality bar. This checklist should be consulted after a feature is considered "functionally complete."*
 
@@ -13,6 +13,7 @@
 
 - [ ] **Prompt:** "Review the internal organization of this class. Ensure members are ordered logically: fields, constructors, properties, public methods, then private methods."
 - [ ] **Prompt:** "Scan this class for any generic, reusable logic that is not specific to its primary feature. Suggest how to extract it into a separate utility class."
+- [ ] **Prompt:** "Analyze this class for violations of the Single Responsibility Principle. Does it have more than one reason to change? If so, suggest how to split it into smaller, more focused classes."
 - [ ] **Prompt:** "Analyze the namespace and folder location for this class. Does it accurately reflect its purpose? Suggest a better location and namespace if one exists."
 
 ## Documentation & Naming

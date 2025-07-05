@@ -44,4 +44,11 @@ Append the generated entry to the top of the 'Detailed Log Entries' section in t
 
 ## [Audit for Checklist Debt]
 
-**Objective:** Compare the `REFACTORING_CHECKLIST.md` against a specific module's entry in the work log to find any new checks that need to be retroactively applied.
+**Objective:** Compare the master `REFACTORING_CHECKLIST.md` against a specific module's "Applied Checks" in the work log to find any new checks that need to be retroactively applied.
+
+**Prompt Template:**
+"Analyze the master `REFACTORING_CHECKLIST.md` and the `WORK_LOG_vX.Y.Z.md`.
+
+For the module `[Specify Module Name]`, identify any checks that exist in the master checklist but are NOT listed under the 'Applied Checks' section of its most recent 'Log Check & Refactor Session' entry.
+
+List the module and the specific new checks that should be retroactively applied."
