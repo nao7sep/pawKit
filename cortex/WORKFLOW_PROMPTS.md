@@ -35,8 +35,10 @@ Append the generated entry to the top of the 'Detailed Log Entries' section in t
 - Generate the following fields for the log entry:
   - **Date:** Use today's date (YYYY-MM-DD).
   - **Module:** `[Specify Module Name, e.g., pawKitLib.Logging]`
-  - **Summary:** Describe the key refactoring changes and improvements made during the audit (e.g., "Refactored the `Process` method to use the Strategy pattern, improving extensibility."). If no code was changed, state "Audit completed with no code changes."
-  - **Applied Checks:** List all checks from the `REFACTORING_CHECKLIST.md` that were successfully applied and passed during the session.
+  - **Audit & Refinements:** Create a bulleted list. Each bullet point should summarize the outcome of a specific check from the `REFACTORING_CHECKLIST.md`. Describe any code changes made as a result of the check, or confirm that no issues were found.
+    - Example:
+      - "Verified adherence to the Single Responsibility Principle by extracting message formatting logic into a new `DefaultLogFormatter` class."
+      - "Confirmed that each file contains only one public type and that filenames match their types; no changes were needed."
 
 Append the generated entry to the top of the 'Detailed Log Entries' section in the work log file."
 

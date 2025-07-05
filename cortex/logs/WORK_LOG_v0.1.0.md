@@ -19,5 +19,8 @@
 
 **Date:** 2025-07-05
 **Module:** `Project Infrastructure`
-**Summary:** Created the initial `cortex` directory and its core files (`DESIGN_PRINCIPLES.md`, `REFACTORING_CHECKLIST.md`, and this versioned work log). This establishes the foundation for our development process.
-**Applied Checks:** N/A
+**Summary:** Established the `cortex` system for AI-assisted development. This includes creating the core files: `DESIGN_PRINCIPLES.md`, `REFACTORING_CHECKLIST.md`, `WORKFLOW_PROMPTS.md`, and the versioned work log structure.
+**Key Architectural Decisions:**
+- The development process is structured into two distinct phases: an "Implementation Session" and a "Check & Refactor Session," each with its own logging template.
+- Work logs are versioned (e.g., `WORK_LOG_v0.1.0.md`) and maintained in reverse-chronological order.
+- The log format for check sessions was refined to be a narrative, bulleted list summarizing the outcome of each check, rather than a simple checklist.
