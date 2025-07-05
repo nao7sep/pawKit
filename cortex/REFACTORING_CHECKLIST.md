@@ -14,13 +14,14 @@
 - [ ] **Prompt:** "Review the internal organization of this class. Ensure members are ordered logically: fields, constructors, properties, public methods, then private methods."
 - [ ] **Prompt:** "Scan this class for any generic, reusable logic that is not specific to its primary feature. Suggest how to extract it into a separate utility class."
 - [ ] **Prompt:** "Analyze this class for violations of the Single Responsibility Principle. Does it have more than one reason to change? If so, suggest how to split it into smaller, more focused classes."
+- [ ] **Prompt:** "Verify that each file contains only one public type (class, record, enum, etc.). If multiple public types exist in one file, suggest splitting them into separate files."
+- [ ] **Prompt:** "Verify that the public type name within each file exactly matches the filename (e.g., `MyClass.cs` must contain `public class MyClass`). List any mismatches."
 - [ ] **Prompt:** "Analyze the namespace and folder location for this class. Does it accurately reflect its purpose? Suggest a better location and namespace if one exists."
 
 ## Documentation & Naming
 
 - [ ] **Prompt:** "Ensure all public and internal types and members in this code have complete XML documentation (`///`)."
-- [ ] **Prompt:** "Review all comments in this code. Are they accurate and up-to-date with the current code logic? Identify any misleading or outdated comments."
-- [ ] **Prompt:** "Verify that all naming conventions (PascalCase, camelCase, `I` for interfaces, `Async` suffix) are correctly applied according to our design principles."
+- [ ] **Prompt:** "Review all comments in this code. Are they accurate and up-to-date with the current code logic? Pay special attention to comments that reference identifiers that may have been renamed."
 
 ## Logging-Specific Checks
 

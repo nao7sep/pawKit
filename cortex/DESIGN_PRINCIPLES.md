@@ -72,3 +72,7 @@ public class DataProcessor
 
 ### 2.3. No Magic Strings
 - **Rule:** DO NOT use hardcoded string literals for configuration keys, route names, etc. Use `const string` or `static readonly string` defined in a static class.
+
+### 2.4. File Organization
+- **Rule:** There MUST be only one public type per file. This includes classes, records, interfaces, enums, and delegates.
+- **Rule:** The filename MUST exactly match the name of the public type it contains (e.g., `UserService.cs` must contain `public class UserService`).
