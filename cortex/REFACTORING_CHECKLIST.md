@@ -9,9 +9,16 @@
 - [ ] **Prompt:** "Scan this code for any 'magic strings'. Replace them with constants defined in an appropriate static class."
 - [ ] **Prompt:** "Apply the 'Principle of Surgical Modification'. Review this code and identify if any new functionality was added by accretion instead of refactoring. Suggest how to refactor it cleanly."
 
+## Code Structure & Organization
+
+- [ ] **Prompt:** "Review the internal organization of this class. Ensure members are ordered logically: fields, constructors, properties, public methods, then private methods."
+- [ ] **Prompt:** "Scan this class for any generic, reusable logic that is not specific to its primary feature. Suggest how to extract it into a separate utility class."
+- [ ] **Prompt:** "Analyze the namespace and folder location for this class. Does it accurately reflect its purpose? Suggest a better location and namespace if one exists."
+
 ## Documentation & Naming
 
 - [ ] **Prompt:** "Ensure all public and internal types and members in this code have complete XML documentation (`///`)."
+- [ ] **Prompt:** "Review all comments in this code. Are they accurate and up-to-date with the current code logic? Identify any misleading or outdated comments."
 - [ ] **Prompt:** "Verify that all naming conventions (PascalCase, camelCase, `I` for interfaces, `Async` suffix) are correctly applied according to our design principles."
 
 ## Logging-Specific Checks
