@@ -64,6 +64,17 @@
   - Reordering class members for logical grouping (e.g., fields, constructors, properties, public methods, private methods).
 - **Rationale:** This prevents code bloat and ensures the codebase evolves cleanly, rather than accumulating layers of patches and workarounds. The goal is to leave the code cleaner than you found it.
 
+### 2.5. Property and Field Initialization
+- **Rule (Required Properties):** Properties that are mandatory for an object's state to be valid MUST be non-nullable and marked with the `required` keyword (e.g., `public required int Id { get; init; }`).
+- **Rule (Optional Properties):** Properties that can be meaningfully absent MUST be nullable (e.g., `public string? MiddleName { get; init; }`).
+- **Rule (Collections):** Public properties exposing a collection MUST be of a read-only interface type (e.g., `IReadOnlyList<T>`). They MUST NOT be nullable and MUST be initialized to an empty collection (e.g., `public IReadOnlyList<string> Roles { get; init; } = [];`).
+    -   For DTOs/models used in JSON deserialization, this pattern is mandatory. If the JSON source is missing the collection property, the object's property will safely remain an empty list instead of becoming `null`.
+    -   For internal modification, the public read-only property MUST expose a private, mutable backing field (e.g., `private readonly List<T> _items = []; public IReadOnlyList<T> Items => _items;`).
+
+- **Rule (Lazy Loading):** For member instances that are computationally expensive to create and are not always required (e.g., a database call), their initialization MUST be deferred using `System.Lazy<T>`. The lazy instance should be created in the constructor, and the public property should expose its `.Value`.
+
+- **Rationale:** These rules leverage the C# type system to create robust objects that cannot exist in an invalid state. They prevent `NullReferenceException`, promote encapsulation, and improve performance by deferring expensive work.
+
 ---
 
 ## 3. Style & Organization
