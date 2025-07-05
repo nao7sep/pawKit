@@ -35,7 +35,7 @@
 - Synthesize the entire session's history into a summary of the **final state**. Do not log intermediate or reversed decisions.
 - Generate the following fields for the log entry:
   - **Date:** Use today's date (YYYY-MM-DD).
-  - **Module:** `[Specify Module Name, e.g., pawKitLib.Logging]`
+  - **Module:** `[Specify Module Name, e.g., pawKitLib.Logging]` (Omit this field if changes are not module-specific).
   - **Summary:** A brief, factual summary of what was implemented (e.g., "Implemented the initial `ILogger` interface and a `ConsoleLogger` class.").
   - **Key Architectural Decisions:** Note any significant patterns or choices made (e.g., "Established a provider pattern for future loggers."). If none, state "N/A".
 
@@ -53,7 +53,7 @@ Append the generated entry to the top of the 'Detailed Log Entries' section in t
 *Instructions for AI:*
 - Generate the following fields for the log entry:
   - **Date:** Use today's date (YYYY-MM-DD).
-  - **Module:** `[Specify Module Name, e.g., pawKitLib.Logging]`
+  - **Module:** `[Specify Module Name, e.g., pawKitLib.Logging]` (Omit this field if the audit was not module-specific).
   - **Audit & Refinements:** Create a bulleted list. Each bullet point should summarize the outcome of a specific check from the `REFACTORING_CHECKLIST.md`. Describe any code changes made as a result of the check, or confirm that no issues were found.
     - Example:
       - "Verified adherence to the Single Responsibility Principle by extracting message formatting logic into a new `DefaultLogFormatter` class."

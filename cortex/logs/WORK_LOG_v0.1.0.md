@@ -18,7 +18,12 @@
 *Add detailed entries below as work is completed.*
 
 **Date:** 2025-07-05
-**Module:** `Project Infrastructure`
+**Summary:** Refined the `[Start New Version Session]` prompt in `WORKFLOW_PROMPTS.md`. The prompt was simplified and its instructions were clarified to ensure consistent semantic versioning, prevent accidental modification of historical documents, and correctly initialize a clean work log for the new version.
+**Key Architectural Decisions:** Established a clear policy for automated version bumps: target general project files (`.csproj`, `README.md`) while explicitly ignoring version-stamped documentation to preserve historical integrity.
+
+---
+
+**Date:** 2025-07-05
 **Summary:** Established the `cortex` system for AI-assisted development. This includes creating the core files: `DESIGN_PRINCIPLES.md`, `REFACTORING_CHECKLIST.md`, `WORKFLOW_PROMPTS.md`, and the versioned work log structure.
 **Key Architectural Decisions:**
 - The development process is structured into two distinct phases: an "Implementation Session" and a "Check & Refactor Session," each with its own logging template.
