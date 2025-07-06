@@ -55,6 +55,7 @@
 ### 3.1. Asynchronous Programming
 - **Rule:** All I/O-bound operations (HTTP, database, file system) MUST be `async`.
 - **Rule:** Methods returning `Task` or `Task<T>` MUST have an `Async` suffix (e.g., `GetProductAsync`).
+- **Rule:** Publicly-exposed `async` methods SHOULD accept a `CancellationToken` as the last parameter to support cancellation.
 - **Rule:** NEVER block on an async method using `.Result` or `.Wait()`. Always `await` the task.
 - **Rule:** NEVER use `async void`. Use `async Task` instead.
 
@@ -109,3 +110,14 @@
 ### 4.2. File Organization
 - **Rule:** There MUST be only one public type per file. This includes classes, records, interfaces, enums, and delegates.
 - **Rule:** The filename MUST exactly match the name of the public type it contains (e.g., `UserService.cs` must contain `public class UserService`).
+
+### 4.3. Class Member Organization
+- **Rule:** Class members MUST be ordered logically to enhance readability. The standard order is:
+  1.  Private/Protected Fields (static then instance)
+  2.  Constructors
+  3.  Public/Internal Properties
+  4.  Public/Internal Methods
+  5.  Private/Protected Methods
+
+### 4.4. Documentation
+- **Rule:** All `public` and `internal` types and members MUST have complete XML documentation comments (`///`).
