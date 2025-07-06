@@ -8,6 +8,14 @@ This document outlines the technical specifications for the core `pawKitLib` lib
 
 This module contains the core building blocks of the library. It has no dependencies on other `pawKitLib` modules.
 
+*   **`pawKitLib.Abstractions`**
+    *   `IClock` (interface): Provides an abstraction for getting the current time. This is crucial for testing, as it allows you to control time in your unit tests instead of relying on the non-deterministic `DateTime.UtcNow`.
+    *   `IValidator<T>` (interface): Defines a contract for a class that can validate an object of type `T`. This allows for a standardized validation mechanism across the application.
+    *   `IUnitOfWork` (interface): Defines a contract for managing atomic database operations. It will typically contain methods like `CommitAsync()` and `RollbackAsync()` to ensure that a series of changes either all succeed or all fail together.
+    *   `IRepository<T>` (interface): A generic interface for a data repository, defining standard CRUD (Create, Read, Update, Delete) operations for a given entity `T`. This decouples business logic from the data access technology.
+
+*   **`pawKitLib.Exceptions`**
+    *   `ValidationException` (class): A custom exception thrown when an object fails validation. It would typically contain a collection of validation errors.
     *   `ResourceNotFoundException` (class): A custom exception thrown when a specific entity (e.g., a user or product with a given ID) cannot be found in the data store.
     *   `ConfigurationException` (class): A custom exception thrown when a required configuration value is missing or invalid, preventing the application from starting or functioning correctly.
 
@@ -119,6 +127,9 @@ This module contains implementations for application-level concerns like configu
 
 This module contains the concrete implementations for data access.
 
+*   **`pawKitLib.Data.Sqlite`** (Example Implementation)
+    *   `PawKitDbContext` (class): The Entity Framework Core `DbContext` for the application. It defines the `DbSet<T>` properties for your entities and configures the database connection (in this case, to SQLite).
+    *   `SqliteUnitOfWork` (class): The concrete implementation of `IUnitOfWork` for SQLite, which will manage the `PawKitDbContext` transaction.
     *   `SqliteRepository<T>` (class): The concrete implementation of `IRepository<T>` for SQLite.
     *   `SqliteKeyValueStore` (class): A persistent key-value store implementation of `ICacheProvider` using a simple two-column SQLite table.
 
@@ -129,4 +140,3 @@ This module contains utilities for building specific types of applications.
 *   **`pawKitLib.Console`**
     *   `CommandLineParser` (class): A utility to parse `string[] args` from a console application into a structured object.
     *   `ArgumentBuilder` (class): A fluent API to define the expected arguments, options, and commands for a console application.
-
