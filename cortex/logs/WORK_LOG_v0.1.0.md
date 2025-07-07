@@ -1,6 +1,6 @@
 ﻿# Work Log - Version 0.1.0
 
-## 1. Executive Summary
+### 1. Executive Summary
 
 *This section is a high-level summary for quickly briefing an AI in a new conversation. Keep it concise.*
 
@@ -13,11 +13,13 @@
 
 ---
 
-## 2. Detailed Log Entries (Reverse Chronological)
+### 2. Detailed Log Entries (Reverse Chronological)
 
 *Add detailed entries below as work is completed.*
 
-**Date:** 2025-07-06
+---
+
+#### 2025-07-06 - Architectural Design Finalization
 
 **Summary:**
 - Completed the initial architectural design phase.
@@ -31,7 +33,7 @@
 
 ---
 
-**Date:** 2025-07-05
+#### 2025-07-05 - Workflow Prompt Refinement
 
 **Summary:**
 - Refined the `[Start New Version Session]` prompt in `WORKFLOW_PROMPTS.md`.
@@ -47,7 +49,7 @@
 
 ---
 
-**Date:** 2025-07-05
+#### 2025-07-05 - Cortex System Establishment
 
 **Summary:**
 - Established the `cortex` system for AI-assisted development.
