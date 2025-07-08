@@ -3,9 +3,8 @@
 ## Preamble: The pawKit Constitution
 
 **Objective:** This document is the constitution for all code within the `pawKit` ecosystem. Its purpose is to ensure every component is built for **isolation and replacement**. This allows for an agile workflow where any part of the system can be refactored or regenerated without causing a ripple effect of breakages. Adherence to these principles is non-negotiable.
-**Interaction Model:** When a request involves creating a component that interacts with an external system (e.g., a database, a web API) or contains complex, swappable logic, you MUST first identify this as a point of coupling. Before generating the implementation, you MUST ask for confirmation to create an interface for the abstraction. For example: *"This component will interact with the file system. To keep the system decoupled, I recommend creating an `IFileStore` interface. Shall I proceed with that?"*
 
----
+**Interaction Model:** When a request involves creating a component that interacts with an external system (e.g., a database, a web API) or contains complex, swappable logic, you MUST first identify this as a point of coupling. Before generating the implementation, you MUST ask for confirmation to create an interface for the abstraction. For example: *"This component will interact with the file system. To keep the system decoupled, I recommend creating an `IFileStore` interface. Shall I proceed with that?"*
 
 ## 1. Foundational Philosophies
 
@@ -15,8 +14,6 @@
 -   **Open/Closed Principle (OCP):** Software entities should be open for extension, but closed for modification.
 -   **Dependency Inversion Principle (DIP):** High-level modules should not depend on low-level modules. Both should depend on abstractions. This is primarily achieved through Dependency Injection.
 -   **Separation of Concerns (SoC):** The application is divided into distinct sections with minimal overlap in functionality. This is reflected in our project structure and architectural patterns.
-
----
 
 ## 2. Core Architectural Patterns
 
@@ -45,8 +42,6 @@
 - **Rule:** Configuration values MUST be exposed to services via strongly-typed classes injected using the `IOptions<T>` interface.
 - **Rationale:** Decouples services from the configuration source (e.g., `appsettings.json`, environment variables). It promotes type safety and is fully integrated with the DI container.
 - **Application:** The `pawKitLib.Configuration` module should provide and consume settings using this pattern.
-
----
 
 ## 3. Code Implementation & Quality
 
@@ -83,9 +78,7 @@
 - **Rule (Collections):** Public properties exposing a collection MUST be of a read-only interface type (e.g., `IReadOnlyList<T>`). They MUST NOT be nullable and MUST be initialized to an empty collection (e.g., `public IReadOnlyList<string> Roles { get; init; } = [];`).
     -   For DTOs/models used in JSON deserialization, this pattern is mandatory. If the JSON source is missing the collection property, the object's property will safely remain an empty list instead of becoming `null`.
     -   For internal modification, the public read-only property MUST expose a private, mutable backing field (e.g., `private readonly List<T> _items = []; public IReadOnlyList<T> Items => _items;`).
-
 - **Rule (Lazy Loading):** For member instances that are computationally expensive to create and are not always required (e.g., a database call), their initialization MUST be deferred using `System.Lazy<T>`. The lazy instance should be created in the constructor, and the public property should expose its `.Value`.
-
 - **Rationale:** These rules leverage the C# type system to create robust objects that cannot exist in an invalid state. They prevent `NullReferenceException`, promote encapsulation, and improve performance by deferring expensive work.
 
 ### 3.6. Type Selection by Intent
@@ -97,8 +90,6 @@
   - **`interface`:** As the **default choice** for defining all public contracts to enable decoupling.
   - **`abstract class`:** Use sparingly. Only when you need to share common, non-public implementation details (e.g., `protected` methods or `private` fields) across a set of closely related derived classes.
 - **Rationale:** Ensures we use the right tool for the job, leading to better performance and clearer code.
-
----
 
 ## 4. Style & Organization
 

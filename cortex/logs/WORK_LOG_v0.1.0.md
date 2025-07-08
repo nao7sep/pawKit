@@ -1,6 +1,6 @@
 ﻿# Work Log - Version 0.1.0
 
-### 1. Executive Summary
+## 1. Executive Summary
 
 *This section is a high-level summary for quickly briefing an AI in a new conversation. Keep it concise.*
 
@@ -11,15 +11,13 @@
 
 **Current Status:** The `cortex` system for AI-assisted development has been established. Ready to begin implementation of the first feature.
 
----
-
-### 2. Detailed Log Entries (Reverse Chronological)
+## 2. Detailed Log Entries (Reverse Chronological)
 
 *Add detailed entries below as work is completed.*
 
 ---
 
-#### 2025-07-06 - Architectural Design Finalization
+### 2025-07-06 - Architectural Design Finalization
 
 **Summary:**
 - Completed the initial architectural design phase.
@@ -33,7 +31,7 @@
 
 ---
 
-#### 2025-07-05 - Workflow Prompt Refinement
+### 2025-07-05 - Workflow Prompt Refinement
 
 **Summary:**
 - Refined the `[Start New Version Session]` prompt in `WORKFLOW_PROMPTS.md`.
@@ -49,7 +47,7 @@
 
 ---
 
-#### 2025-07-05 - Cortex System Establishment
+### 2025-07-05 - Cortex System Establishment
 
 **Summary:**
 - Established the `cortex` system for AI-assisted development.
