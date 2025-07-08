@@ -2,8 +2,6 @@
 
 This document outlines the technical specifications for the core `pawKitLib` library. It is a living document that details the planned modules, their corresponding namespaces, and their key public types.
 
----
-
 ## 1. Foundational
 
 This module contains the core building blocks of the library. It has no dependencies on other `pawKitLib` modules.
@@ -13,7 +11,6 @@ This module contains the core building blocks of the library. It has no dependen
     *   `IValidator<T>` (interface): Defines a contract for a class that can validate an object of type `T`. This allows for a standardized validation mechanism across the application.
     *   `IUnitOfWork` (interface): Defines a contract for managing atomic database operations. It will typically contain methods like `CommitAsync()` and `RollbackAsync()` to ensure that a series of changes either all succeed or all fail together.
     *   `IRepository<T>` (interface): A generic interface for a data repository, defining standard CRUD (Create, Read, Update, Delete) operations for a given entity `T`. This decouples business logic from the data access technology.
-
 *   **`pawKitLib.Exceptions`**
     *   `ValidationException` (class): A custom exception thrown when an object fails validation. It would typically contain a collection of validation errors.
     *   `ResourceNotFoundException` (class): A custom exception thrown when a specific entity (e.g., a user or product with a given ID) cannot be found in the data store.
@@ -26,11 +23,9 @@ This module contains implementations of key design patterns that are used across
 *   **`pawKitLib.Caching`**
     *   `ICacheProvider` (interface): An abstraction for a key-value cache.
     *   `InMemoryCacheProvider` (class): A simple, dictionary-based implementation of `ICacheProvider` for single-instance applications.
-
 *   **`pawKitLib.Storage`**
     *   `IFileStore` (interface): An abstraction for storing and retrieving files (blobs), with convenience methods like `WriteAllTextAsync`.
     *   `LocalFileStore` (class): An implementation of `IFileStore` that saves files to the local disk.
-
 *   **`pawKitLib.Events`**
     *   `IEvent` (interface): A marker interface for event records. This helps with type constraints.
     *   `OrderPlacedEvent` (record): An example of a specific event record, containing data relevant to the event (e.g., `OrderId`).
@@ -48,14 +43,11 @@ This module contains static helper classes and extensions for common, reusable t
     *   `TypeConverter` (static class): Provides safe methods for converting between different data types, handling potential conversion errors gracefully.
     *   `Result<TSuccess, TError>` (record): A generic type to represent the outcome of an operation that can either succeed with a value or fail with an error, avoiding exceptions for control flow.
     *   `StateMachine<TState, TTrigger>` (class): A generic finite state machine for managing object lifecycles.
-
 *   **`pawKitLib.Utils.Json`**
     *   `JsonSerializerDefaults` (static class): A central place to hold the default `System.Text.Json.JsonSerializerOptions` used throughout the application, ensuring consistent serialization behavior.
-
 *   **`pawKitLib.Utils.Encoding`**
     *   `IShortIdEncoder` (interface): Defines a contract for converting a `long` to a short, URL-safe string identifier and back.
     *   `UrlSafeBase64ShortIdEncoder` (class): An implementation of `IShortIdEncoder` that produces YouTube-like IDs.
-
 *   **`pawKitLib.Utils.Web`**
     *   `UrlBuilder` (class): A fluent builder class to safely construct URLs with query parameters, handling encoding automatically.
 
@@ -72,7 +64,6 @@ This module contains all security-related abstractions and implementations.
     *   `Sha256BlobHasher` (class): A concrete implementation of `IBlobHasher`.
     *   `ISecretGenerator` (interface): An abstraction for generating cryptographically secure random strings, suitable for API keys.
     *   `RandomStringSecretGenerator` (class): A concrete implementation of `ISecretGenerator`.
-
 *   **`pawKitLib.Security.Authentication`**
     *   `IAuthenticationService` (interface): An interface for services that handle user login, logout, and identity validation.
     *   `IUserStore` (interface): An abstraction for the storage and retrieval of user identity information.
@@ -80,7 +71,6 @@ This module contains all security-related abstractions and implementations.
     *   `IAuthorizationHandler` (interface): An interface for services that check if a user has the required permissions.
     *   `IApiKeyValidator` (interface): An abstraction for validating an API key.
     *   `CachingApiKeyValidator` (class): A decorator implementation of `IApiKeyValidator` that uses an `ICacheProvider` to reduce lookups on the primary validator.
-
 *   **`pawKitLib.Security.Tokens`**
     *   `IJwtTokenGenerator` (interface): An abstraction for creating JWTs.
     *   `IJwtTokenValidator` (interface): An abstraction for validating JWTs.
@@ -94,7 +84,6 @@ This module contains implementations for application-level concerns like configu
     *   `IConfigManager` (interface): An interface for retrieving strongly-typed application configuration objects (admin-defined).
     *   `ISettingsProvider` (interface): An interface for retrieving and saving user-specific settings, which might be stored in a database or a user-specific file.
     *   `JsonFileSettingsProvider` (class): An implementation of `ISettingsProvider` that reads and writes settings to a specified JSON file.
-
 *   **`pawKitLib.Logging`**
     *   `ILogger` (interface): The core logging abstraction that services will depend on. It will have methods like `Info`, `Warn`, `Error`.
     *   `ILogSink` (interface): An interface representing a destination for log messages (e.g., the console, a file, a remote service).
@@ -103,11 +92,9 @@ This module contains implementations for application-level concerns like configu
     *   `FileSink` (class): An implementation of `ILogSink` that writes formatted log messages to a file, handling log rotation.
     *   `JsonFileSink` (class): An implementation of `ILogSink` that serializes `LogEntry` objects to a JSON file.
     *   `SqliteLogSink` (class): An implementation of `ILogSink` that writes `LogEntry` objects to a SQLite database.
-
 *   **`pawKitLib.Localization`**
     *   `IStringLocalizer` (interface): An abstraction for retrieving translated strings based on a key.
     *   `JsonLocalizer` (class): An implementation of `IStringLocalizer` that loads translations from JSON files (e.g., `en-US.json`, `es-ES.json`).
-
 *   **`pawKitLib.Communication`**
     *   `IEmailSender` (interface): An abstraction for sending emails.
     *   `ISmsClient` (interface): An abstraction for sending SMS messages via a third-party gateway.
