@@ -27,11 +27,12 @@
 *Instructions for AI:*
 - If a text summary of previous work is provided, treat it as context that occurred *before* this conversation.
 - Synthesize the entire session's history into a summary of the **final state**. Do not log intermediate or reversed decisions.
-- Generate the following fields for the log entry:
-  - **Date:** Use today's date (YYYY-MM-DD).
-  - **Module:** `[Specify Module Name, e.g., pawKitLib.Logging]` (Omit this field if changes are not module-specific).
-  - **Summary:** A brief, factual summary of what was implemented (e.g., "Implemented the initial `ILogger` interface and a `ConsoleLogger` class.").
-  - **Key Architectural Decisions:** Note any significant patterns or choices made (e.g., "Established a provider pattern for future loggers."). If none, state "N/A".
+- Generate a new entry in Markdown format, preceded by a `---` separator.
+- The entry must start with a level 3 heading (`###`) containing today's date (YYYY-MM-DD) and a concise title for the work, inferred from the conversation context.
+  - Example: `### 2025-07-07 - Initial Logging Implementation`
+- Below the heading, generate the following sections:
+  - **Summary:** A bulleted list detailing what was implemented.
+  - **Key Architectural Decisions:** A bulleted list of any significant patterns or choices made. If none, state "N/A".
 
 Append the generated entry to the top of the 'Detailed Log Entries' section in the work log file.
 
@@ -42,9 +43,10 @@ Append the generated entry to the top of the 'Detailed Log Entries' section in t
 **Prompt Template:** Based on our conversation, generate a new entry for the `WORK_LOG_vX.Y.Z.md`.
 
 *Instructions for AI:*
-- Generate the following fields for the log entry:
-  - **Date:** Use today's date (YYYY-MM-DD).
-  - **Module:** `[Specify Module Name, e.g., pawKitLib.Logging]` (Omit this field if the audit was not module-specific).
+- Generate a new entry in Markdown format, preceded by a `---` separator.
+- The entry must start with a level 3 heading (`###`) containing today's date (YYYY-MM-DD) and a concise title for the session, inferred from the conversation context.
+  - Example: `### 2025-07-08 - Quality Audit and Refinement for pawKitLib.Logging`
+- Below the heading, generate the following section:
   - **Audit & Refinements:** Create a bulleted list. Each bullet point should summarize the outcome of a specific check from the `REFACTORING_CHECKLIST.md`. Describe any code changes made as a result of the check, or confirm that no issues were found.
     - Example:
       - "Verified adherence to the Single Responsibility Principle by extracting message formatting logic into a new `DefaultLogFormatter` class."
