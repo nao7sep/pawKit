@@ -19,8 +19,13 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="coverlet.collector" Version="6.0.2" />
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.0" />
+        <!--
+            PrivateAssets and IncludeAssets are not specified for coverlet.collector because:
+            - This test project is not intended to be referenced by any other project, so transitive dependency control is unnecessary.
+            - The default asset inclusion is sufficient for our needs.
+        -->
+        <PackageReference Include="coverlet.collector" Version="6.0.4" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
         <PackageReference Include="xunit" Version="2.9.3" />
         <PackageReference Include="xunit.runner.visualstudio" Version="3.1.1" />
     </ItemGroup>
