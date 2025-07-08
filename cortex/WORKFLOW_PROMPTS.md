@@ -2,14 +2,11 @@
 
 *This file contains standardized prompt templates for common development tasks. Use these to ensure consistent interactions with AI assistants.*
 
----
-
 ## [Start New Version Session]
 
 **Objective:** To bump the version number consistently across the entire solution and prepare a new work log for the upcoming development cycle.
 
-**Prompt Template:**
-"Start a new versioning session. The current version is `[Specify Current Version, e.g., 0.2]`. The segment to increment is `[Major|Minor|Patch|Default: Minor]`.
+**Prompt Template:** Start a new versioning session. The current version is `[Specify Current Version, e.g., 0.2]`. The segment to increment is `[Major|Minor|Patch|Default: Minor]`.
 
 *Instructions for AI:*
 1.  **Calculate New Version:** Based on the current version and the segment to increment, determine the new semantic version number (`Major.Minor.Patch`).
@@ -19,16 +16,13 @@
 
 2.  **Update All Files:** Search the repository and replace the old version string with the new one in key locations like `.csproj` files and general documentation (`README.md`). Do not modify historical documents where the version is part of the filename. Generate a diff for each modified file.
 
-3.  **Create New Work Log:** Create a new file named `WORK_LOG_v<new_version>.md`. Copy the template/header from the most recent work log file, but omit the specific log entries from the previous version. The new file should be a clean slate, ready for new entries under the 'Detailed Log Entries' section."
-
----
+3.  **Create New Work Log:** Create a new file named `WORK_LOG_v<new_version>.md`. Copy the template/header from the most recent work log file, but omit the specific log entries from the previous version. The new file should be a clean slate, ready for new entries under the 'Detailed Log Entries' section.
 
 ## [Log Implementation Session]
 
 **Objective:** Generate a work log entry after implementing a new feature or making significant changes. The entry should be a concise, factual summary of the work completed.
 
-**Prompt Template:**
-"Based on our conversation, generate a new entry for the `WORK_LOG_vX.Y.Z.md`.
+**Prompt Template:** Based on our conversation, generate a new entry for the `WORK_LOG_vX.Y.Z.md`.
 
 *Instructions for AI:*
 - If a text summary of previous work is provided, treat it as context that occurred *before* this conversation.
@@ -39,16 +33,13 @@
   - **Summary:** A brief, factual summary of what was implemented (e.g., "Implemented the initial `ILogger` interface and a `ConsoleLogger` class.").
   - **Key Architectural Decisions:** Note any significant patterns or choices made (e.g., "Established a provider pattern for future loggers."). If none, state "N/A".
 
-Append the generated entry to the top of the 'Detailed Log Entries' section in the work log file."
-
----
+Append the generated entry to the top of the 'Detailed Log Entries' section in the work log file.
 
 ## [Log Check & Refactor Session]
 
 **Objective:** Generate a work log entry after completing a quality and refactoring audit on a module.
 
-**Prompt Template:**
-"Based on our conversation, generate a new entry for the `WORK_LOG_vX.Y.Z.md`.
+**Prompt Template:** Based on our conversation, generate a new entry for the `WORK_LOG_vX.Y.Z.md`.
 
 *Instructions for AI:*
 - Generate the following fields for the log entry:
@@ -59,17 +50,14 @@ Append the generated entry to the top of the 'Detailed Log Entries' section in t
       - "Verified adherence to the Single Responsibility Principle by extracting message formatting logic into a new `DefaultLogFormatter` class."
       - "Confirmed that each file contains only one public type and that filenames match their types; no changes were needed."
 
-Append the generated entry to the top of the 'Detailed Log Entries' section in the work log file."
-
----
+Append the generated entry to the top of the 'Detailed Log Entries' section in the work log file.
 
 ## [Audit for Checklist Debt]
 
 **Objective:** Compare the master `REFACTORING_CHECKLIST.md` against a specific module's "Applied Checks" in the work log to find any new checks that need to be retroactively applied.
 
-**Prompt Template:**
-"Analyze the master `REFACTORING_CHECKLIST.md` and the `WORK_LOG_vX.Y.Z.md`.
+**Prompt Template:** Analyze the master `REFACTORING_CHECKLIST.md` and the `WORK_LOG_vX.Y.Z.md`.
 
 For the module `[Specify Module Name]`, identify any checks that exist in the master checklist but are NOT listed under the 'Applied Checks' section of its most recent 'Log Check & Refactor Session' entry.
 
-List the module and the specific new checks that should be retroactively applied."
+List the module and the specific new checks that should be retroactively applied.
