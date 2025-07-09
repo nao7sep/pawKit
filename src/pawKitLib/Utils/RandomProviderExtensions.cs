@@ -310,7 +310,7 @@ public static class RandomProviderExtensions
     /// <remarks>
     /// Extremely useful for generating test data or initializing objects with a random state.
     /// </remarks>
-    public static TEnum GetEnumValue<TEnum>(this IRandomProvider provider) where TEnum : Enum
+    public static TEnum GetEnumValue<TEnum>(this IRandomProvider provider) where TEnum : struct, Enum
     {
         var values = Enum.GetValues<TEnum>();
         return provider.GetItem(values);
