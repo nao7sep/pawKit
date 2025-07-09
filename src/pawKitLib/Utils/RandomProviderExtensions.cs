@@ -142,13 +142,16 @@ public static class RandomProviderExtensions
             throw new ArgumentException("Character set cannot be empty.", nameof(characterSet));
         }
 
-        return string.Create(length, provider, (span, random) =>
+        // The high-performance string.Create method cannot be used here because its lambda
+        // cannot capture 'characterSet', which is a ref struct (ReadOnlySpan<char>).
+        // The fallback is to create a char array and initialize the string from it.
+        // This is a simple, correct, and still highly performant approach.
+        var buffer = new char[length];
+        for (var i = 0; i < buffer.Length; i++)
         {
-            for (var i = 0; i < span.Length; i++)
-            {
-                span[i] = characterSet[random.GetInt32(characterSet.Length)];
-            }
-        });
+            buffer[i] = characterSet[provider.GetInt32(characterSet.Length)];
+        }
+        return new string(buffer);
     }
 
     /// <summary>
@@ -331,21 +334,25 @@ public static class RandomProviderExtensions
             throw new ArgumentOutOfRangeException(nameof(length), "Password length must be at least 8 characters to ensure complexity.");
         }
 
-        var passwordChars = new List<char>(length)
-        {
-            // 1. Start with one of each required character type to guarantee complexity.
-            provider.GetItem(PasswordLowercaseChars),
-            provider.GetItem(PasswordUppercaseChars),
-            provider.GetItem(PasswordDigitChars),
-            provider.GetItem(PasswordSymbolChars)
-        };
+        // This implementation avoids intermediate lists and array copies for better performance.
+        var passwordChars = new char[length];
+        var span = passwordChars.AsSpan();
+
+        // 1. Start with one of each required character type to guarantee complexity.
+        span[0] = provider.GetItem(PasswordLowercaseChars);
+        span[1] = provider.GetItem(PasswordUppercaseChars);
+        span[2] = provider.GetItem(PasswordDigitChars);
+        span[3] = provider.GetItem(PasswordSymbolChars);
 
         // 2. Fill the rest of the password with characters from the full set.
-        passwordChars.AddRange(provider.GetItems(FullPasswordChars, length - passwordChars.Count));
+        if (length > 4)
+        {
+            provider.GetItems(FullPasswordChars, span[4..]);
+        }
 
-        // 3. Shuffle the entire list to ensure the required characters are not always at the start.
-        provider.Shuffle(passwordChars.ToArray());
+        // 3. Shuffle the entire span to ensure the required characters are not always at the start.
+        provider.Shuffle(span);
 
-        return new string(passwordChars.ToArray());
+        return new string(passwordChars);
     }
 }
