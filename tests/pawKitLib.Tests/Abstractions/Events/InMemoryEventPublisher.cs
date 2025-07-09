@@ -6,7 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using pawKitLib.Abstractions.Events;
 
-namespace pawKitLib.Tests.Events;
+namespace pawKitLib.Tests.Abstractions.Events;
 
 /// <summary>
 /// An in-memory implementation of <see cref="IEventPublisher"/> for testing and demonstration.

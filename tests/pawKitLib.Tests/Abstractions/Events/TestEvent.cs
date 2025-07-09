@@ -1,6 +1,6 @@
 using pawKitLib.Abstractions.Events;
 
-namespace pawKitLib.Tests.Events;
+namespace pawKitLib.Tests.Abstractions.Events;
 
 /// <summary>
 /// Represents a sample event for testing the event system.

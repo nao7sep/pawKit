@@ -2,7 +2,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace pawKitLib.Tests.Events;
+namespace pawKitLib.Tests.Abstractions.Events;
 
 /// <summary>
 /// Integration tests demonstrating the usage of the event system abstractions in pawKit.
