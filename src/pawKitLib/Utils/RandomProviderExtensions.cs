@@ -1,4 +1,5 @@
-﻿using pawKitLib.Abstractions;
+﻿using System.Text;
+using pawKitLib.Abstractions;
 
 namespace pawKitLib.Utils;
 
@@ -7,6 +8,24 @@ namespace pawKitLib.Utils;
 /// </summary>
 public static class RandomProviderExtensions
 {
+    private static readonly char[] AlphanumericChars =
+        "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".ToCharArray();
+
+    // A character set that excludes visually similar characters like O, 0, I, l, 1.
+    private static readonly char[] FriendlyChars =
+        "abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789".ToCharArray();
+
+    // A small set of syllables for generating pronounceable (but fake) words for mock data.
+    private static readonly string[] Syllables =
+        ["ban", "lek", "mur", "zon", "tal", "vex", "cor", "nis", "wok", "jen", "fal", "pom"];
+
+    // A small, curated list of words for generating memorable passphrases.
+    private static readonly string[] PassphraseWords =
+    [
+        "apple", "staple", "battery", "correct", "horse", "purple", "window", "river", "mountain", "ocean",
+        "sunshine", "galaxy", "comet", "robot", "dragon", "wizard", "anchor", "velvet", "marble", "signal"
+    ];
+
     /// <summary>
     /// Performs an in-place shuffle of an array using the Fisher-Yates algorithm.
     /// </summary>
@@ -90,5 +109,145 @@ public static class RandomProviderExtensions
         {
             destination[i] = choices[provider.GetInt32(choices.Length)];
         }
+    }
+
+    /// <summary>
+    /// Generates a cryptographically secure random string using a given character set.
+    /// This is the foundational method for custom string generation.
+    /// </summary>
+    /// <param name="provider">The random number provider.</param>
+    /// <param name="length">The desired length of the string.</param>
+    /// <param name="characterSet">The set of characters to choose from.</param>
+    /// <returns>A random string of the specified length.</returns>
+    /// <remarks>
+    /// Use this method when you need full control over the character set, for example, to create a code that excludes vowels to prevent accidental word formation.
+    /// This method is cryptographically secure and avoids modulo bias by using the unbiased
+    /// <see cref="IRandomProvider.GetInt32(int)"/> method for character selection.
+    /// </remarks>
+    public static string GetString(this IRandomProvider provider, int length, ReadOnlySpan<char> characterSet)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(length);
+        if (characterSet.IsEmpty)
+        {
+            throw new ArgumentException("Character set cannot be empty.", nameof(characterSet));
+        }
+
+        return string.Create(length, provider, (span, random) =>
+        {
+            for (var i = 0; i < span.Length; i++)
+            {
+                span[i] = characterSet[random.GetInt32(characterSet.Length)];
+            }
+        });
+    }
+
+    /// <summary>
+    /// Generates a random alphanumeric string of a given length.
+    /// </summary>
+    /// <param name="provider">The random number provider.</param>
+    /// <param name="length">The desired length of the string.</param>
+    /// <returns>A random alphanumeric string.</returns>
+    /// <remarks>
+    /// Suitable for developer-friendly identifiers, such as correlation IDs or temporary keys.
+    /// </remarks>
+    public static string GetAlphanumericString(this IRandomProvider provider, int length) =>
+        provider.GetString(length, AlphanumericChars);
+
+    /// <summary>
+    /// Generates a short, human-friendly alphanumeric string, excluding visually similar characters.
+    /// Useful for referral codes or short, readable IDs.
+    /// </summary>
+    /// <param name="provider">The random number provider.</param>
+    /// <param name="length">The desired length of the code.</param>
+    /// <returns>A random "friendly" string.</returns>
+    /// <remarks>
+    /// Ideal for user-facing codes like promo codes, invitation codes, or CAPTCHAs where readability is important.
+    /// </remarks>
+    public static string GetShortCode(this IRandomProvider provider, int length = 8) =>
+        provider.GetString(length, FriendlyChars);
+
+    /// <summary>
+    /// Generates a hexadecimal string from a specified number of random bytes.
+    /// </summary>
+    /// <param name="provider">The random number provider.</param>
+    /// <param name="byteCount">The number of random bytes to convert to a hex string.</param>
+    /// <returns>A random hexadecimal string.</returns>
+    /// <remarks>
+    /// A good choice for secure tokens or encoded binary data where a simple ASCII representation is needed, such as for cryptographic nonces.
+    /// </remarks>
+    public static string GetHexString(this IRandomProvider provider, int byteCount)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(byteCount);
+        if (byteCount == 0) return string.Empty;
+
+        var bytes = provider.GetBytes(byteCount);
+        return Convert.ToHexString(bytes).ToLowerInvariant();
+    }
+
+    /// <summary>
+    /// Generates a secure, random, URL-safe Base64 string from a specified number of random bytes.
+    /// Suitable for generating cryptographic tokens or API keys.
+    /// </summary>
+    /// <param name="provider">The random number provider.</param>
+    /// <param name="byteCount">The number of random bytes to use as entropy for the secret.</param>
+    /// <param name="trimPadding">If true, removes trailing '=' padding characters for a cleaner string. Note that padding may need to be restored for standard decoders.</param>
+    /// <returns>A cryptographically secure, URL-safe Base64 string.</returns>
+    /// <remarks>
+    /// This is the recommended method for generating tokens that will be transmitted in URLs, such as API keys, password reset tokens, or OAuth state parameters.
+    /// </remarks>
+    public static string GetUrlSafeBase64String(this IRandomProvider provider, int byteCount, bool trimPadding = true)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(byteCount);
+        if (byteCount == 0) return string.Empty;
+
+        var randomBytes = provider.GetBytes(byteCount);
+        var base64String = Convert.ToBase64String(randomBytes).Replace('+', '-').Replace('/', '_');
+
+        return trimPadding ? base64String.TrimEnd('=') : base64String;
+    }
+
+    /// <summary>
+    /// Generates a random, pronounceable, "word-like" identifier for mock data or fun usernames.
+    /// </summary>
+    /// <param name="provider">The random number provider.</param>
+    /// <returns>A randomly generated fake word.</returns>
+    /// <remarks>
+    /// Perfect for generating mock data for unit tests, fuzzing, or creating fun, readable identifiers for non-critical resources.
+    /// </remarks>
+    public static string GetFakeWord(this IRandomProvider provider) =>
+        string.Concat(provider.GetItems(Syllables, provider.GetInt32(2, 4)));
+
+    /// <summary>
+    /// Generates a standard Base64 string from a specified number of random bytes.
+    /// </summary>
+    /// <param name="provider">The random number provider.</param>
+    /// <param name="byteCount">The number of random bytes to encode.</param>
+    /// <returns>A standard Base64 encoded string.</returns>
+    /// <remarks>
+    /// Use this for encoding binary data or generating secure tokens that do not need to be URL-safe, such as internal session IDs or encryption nonces.
+    /// </remarks>
+    public static string GetBase64String(this IRandomProvider provider, int byteCount)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(byteCount);
+        if (byteCount == 0) return string.Empty;
+
+        var randomBytes = provider.GetBytes(byteCount);
+        return Convert.ToBase64String(randomBytes);
+    }
+
+    /// <summary>
+    /// Generates a memorable, multi-word passphrase, suitable for recovery codes.
+    /// </summary>
+    /// <param name="provider">The random number provider.</param>
+    /// <param name="wordCount">The number of words to include in the passphrase.</param>
+    /// <param name="separator">The character to use to separate the words.</param>
+    /// <returns>A random, memorable passphrase.</returns>
+    /// <remarks>
+    /// Ideal for generating human-readable and memorable secrets, such as "correct-horse-battery-staple" style recovery codes.
+    /// </remarks>
+    public static string GetPassphrase(this IRandomProvider provider, int wordCount, string separator = "-")
+    {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(wordCount);
+        return string.Join(separator, provider.GetItems(PassphraseWords, wordCount));
     }
 }
