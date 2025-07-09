@@ -85,7 +85,7 @@ This module contains implementations for application-level concerns like configu
     *   `ISettingsProvider` (interface): An interface for retrieving and saving user-specific settings, which might be stored in a database or a user-specific file.
     *   `JsonFileSettingsProvider` (class): An implementation of `ISettingsProvider` that reads and writes settings to a specified JSON file.
 *   **`pawKitLib.Logging`**
-    *   `ILogger` (interface): The core logging abstraction that services will depend on. It will have methods like `Info`, `Warn`, `Error`.
+    *   `PawKitLoggerProvider` (class): Implements `Microsoft.Extensions.Logging.ILoggerProvider` to integrate with the standard ASP.NET Core logging framework.
     *   `ILogSink` (interface): An interface representing a destination for log messages (e.g., the console, a file, a remote service).
     *   `LogEntry` (record): A POCO representing a structured log event, used to pass data to sinks.
     *   `ConsoleSink` (class): An implementation of `ILogSink` that writes formatted log messages to the console.
