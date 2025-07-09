@@ -5,9 +5,18 @@
 /// serving as a testable and injectable equivalent to <see cref="System.Random"/>.
 /// </summary>
 /// <remarks>
+/// <para>
 /// This abstraction allows for dependency injection and testability of components
 /// that rely on random data generation. The default implementation should use a
 /// cryptographically secure random number generator.
+/// </para>
+/// <para>
+/// The interface is intentionally kept minimal, providing only the fundamental primitives
+/// for generating random data. Higher-level functionality, such as shuffling collections
+/// or generating random strings, is provided via extension methods in the
+/// <see cref="pawKitLib.Utils.RandomProviderExtensions"/> class. This design adheres to the
+/// Open/Closed Principle, allowing for a rich feature set without modifying the core contract.
+/// </para>
 /// </remarks>
 public interface IRandomProvider
 {
