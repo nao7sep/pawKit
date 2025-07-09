@@ -1,8 +1,13 @@
-﻿namespace pawKitLib.Abstractions;
+﻿﻿namespace pawKitLib.Abstractions;
 
 /// <summary>
 /// Defines a contract for hashing and verifying passwords.
 /// </summary>
+/// <remarks>
+/// This interface is specifically for handling user-chosen passwords. Its responsibility is to
+/// securely hash a password for storage and verify a provided password against that hash.
+/// For generating machine-generated secrets like API keys or tokens, use <see cref="IRandomProvider"/>.
+/// </remarks>
 public interface IPasswordHasher
 {
     /// <summary>

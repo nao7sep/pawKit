@@ -13,7 +13,9 @@
 /// <para>
 /// It also provides flexibility to swap out the GUID generation strategy in production
 /// (e.g., from standard GUIDs to a sequential or time-based variant) without altering
-/// consumer code.
+/// consumer code. This focus on *uniqueness for identity* distinguishes it from
+/// <see cref="IRandomProvider"/>, whose primary role is to provide general-purpose
+/// cryptographic randomness for tasks like generating tokens, codes, or test data.
 /// </para>
 /// </remarks>
 public interface IUniqueIdGenerator

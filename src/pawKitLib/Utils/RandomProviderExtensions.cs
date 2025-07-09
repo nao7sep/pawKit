@@ -250,4 +250,56 @@ public static class RandomProviderExtensions
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(wordCount);
         return string.Join(separator, provider.GetItems(PassphraseWords, wordCount));
     }
+
+    /// <summary>
+    /// Selects a single random item from a read-only list.
+    /// </summary>
+    /// <typeparam name="T">The type of the elements.</typeparam>
+    /// <param name="provider">The random number provider.</param>
+    /// <param name="choices">The list of items to choose from.</param>
+    /// <returns>A randomly selected item from the list.</returns>
+    /// <remarks>
+    /// A convenient shortcut for randomly picking one element from a collection.
+    /// </remarks>
+    public static T GetItem<T>(this IRandomProvider provider, IReadOnlyList<T> choices)
+    {
+        if (choices.Count == 0)
+        {
+            throw new ArgumentException("Cannot select an item from an empty collection.", nameof(choices));
+        }
+        return choices[provider.GetInt32(choices.Count)];
+    }
+
+    /// <summary>
+    /// Returns a random boolean value.
+    /// </summary>
+    /// <param name="provider">The random number provider.</param>
+    /// <param name="probabilityOfTrue">The probability (from 0.0 to 1.0) that the result will be true.</param>
+    /// <returns>A random <c>true</c> or <c>false</c> value.</returns>
+    /// <remarks>
+    /// Useful for randomizing test conditions or for any scenario requiring a weighted coin flip.
+    /// </remarks>
+    public static bool GetBoolean(this IRandomProvider provider, double probabilityOfTrue = 0.5)
+    {
+        if (probabilityOfTrue < 0.0 || probabilityOfTrue > 1.0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(probabilityOfTrue), "Probability must be between 0.0 and 1.0.");
+        }
+        return provider.GetDouble() < probabilityOfTrue;
+    }
+
+    /// <summary>
+    /// Selects a random value from a specified enumeration.
+    /// </summary>
+    /// <typeparam name="TEnum">The type of the enumeration. Must be a valid <see cref="Enum"/>.</typeparam>
+    /// <param name="provider">The random number provider.</param>
+    /// <returns>A randomly selected value from the enumeration.</returns>
+    /// <remarks>
+    /// Extremely useful for generating test data or initializing objects with a random state.
+    /// </remarks>
+    public static TEnum GetEnumValue<TEnum>(this IRandomProvider provider) where TEnum : Enum
+    {
+        var values = Enum.GetValues<TEnum>();
+        return provider.GetItem(values);
+    }
 }
