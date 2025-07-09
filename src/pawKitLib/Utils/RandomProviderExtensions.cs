@@ -26,6 +26,16 @@ public static class RandomProviderExtensions
         "sunshine", "galaxy", "comet", "robot", "dragon", "wizard", "anchor", "velvet", "marble", "signal"
     ];
 
+    // Character sets for password generation.
+    private static readonly char[] PasswordLowercaseChars = "abcdefghijklmnopqrstuvwxyz".ToCharArray();
+    private static readonly char[] PasswordUppercaseChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".ToCharArray();
+    private static readonly char[] PasswordDigitChars = "0123456789".ToCharArray();
+    private static readonly char[] PasswordSymbolChars = "!@#$%^&*()-_=+<,>.".ToCharArray();
+
+    private static readonly char[] FullPasswordChars =
+        [..PasswordLowercaseChars, ..PasswordUppercaseChars, ..PasswordDigitChars, ..PasswordSymbolChars];
+
+
     /// <summary>
     /// Performs an in-place shuffle of an array using the Fisher-Yates algorithm.
     /// </summary>
@@ -301,5 +311,41 @@ public static class RandomProviderExtensions
     {
         var values = Enum.GetValues<TEnum>();
         return provider.GetItem(values);
+    }
+
+    /// <summary>
+    /// Generates a cryptographically secure random password that meets common complexity requirements.
+    /// </summary>
+    /// <param name="provider">The random number provider.</param>
+    /// <param name="length">The desired length of the password. Must be at least 8.</param>
+    /// <returns>A random password string containing uppercase, lowercase, digit, and symbol characters.</returns>
+    /// <remarks>
+    /// This method is ideal for generating initial passwords for users in a managed system.
+    /// It guarantees the inclusion of at least one character from each major character set
+    /// (lowercase, uppercase, digits, symbols) and then shuffles the result to ensure randomness.
+    /// </remarks>
+    public static string GetPasswordString(this IRandomProvider provider, int length = 16)
+    {
+        if (length < 8)
+        {
+            throw new ArgumentOutOfRangeException(nameof(length), "Password length must be at least 8 characters to ensure complexity.");
+        }
+
+        var passwordChars = new List<char>(length)
+        {
+            // 1. Start with one of each required character type to guarantee complexity.
+            provider.GetItem(PasswordLowercaseChars),
+            provider.GetItem(PasswordUppercaseChars),
+            provider.GetItem(PasswordDigitChars),
+            provider.GetItem(PasswordSymbolChars)
+        };
+
+        // 2. Fill the rest of the password with characters from the full set.
+        passwordChars.AddRange(provider.GetItems(FullPasswordChars, length - passwordChars.Count));
+
+        // 3. Shuffle the entire list to ensure the required characters are not always at the start.
+        provider.Shuffle(passwordChars.ToArray());
+
+        return new string(passwordChars.ToArray());
     }
 }
