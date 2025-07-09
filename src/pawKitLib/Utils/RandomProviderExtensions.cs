@@ -35,7 +35,6 @@ public static class RandomProviderExtensions
     private static readonly char[] FullPasswordChars =
         [..PasswordLowercaseChars, ..PasswordUppercaseChars, ..PasswordDigitChars, ..PasswordSymbolChars];
 
-
     /// <summary>
     /// Performs an in-place shuffle of an array using the Fisher-Yates algorithm.
     /// </summary>
