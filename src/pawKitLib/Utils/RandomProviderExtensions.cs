@@ -75,7 +75,10 @@ public static class RandomProviderExtensions
     /// <returns>An array filled with randomly chosen elements.</returns>
     public static T[] GetItems<T>(this IRandomProvider provider, T[] choices, int count)
     {
-        return provider.GetItems(choices.AsSpan(), count);
+        // We must explicitly specify the generic type argument <T> here.
+        // Otherwise, the compiler can get confused when trying to infer the type
+        // for the overloaded GetItems(ReadOnlySpan<T>, int) method.
+        return provider.GetItems<T>(choices.AsSpan(), count);
     }
 
     /// <summary>
