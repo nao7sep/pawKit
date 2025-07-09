@@ -30,16 +30,65 @@ public sealed class CryptoRandomProvider : IRandomProvider
         RandomNumberGenerator.GetInt32(int.MaxValue);
 
     /// <inheritdoc />
-    public long GetInt64(long fromInclusive, long toExclusive) =>
-        RandomNumberGenerator.GetInt64(fromInclusive, toExclusive);
+    public long GetInt64(long fromInclusive, long toExclusive)
+    {
+        if (fromInclusive >= toExclusive)
+        {
+            throw new ArgumentException("fromInclusive must be less than toExclusive.", nameof(fromInclusive));
+        }
+
+        var range = (ulong)(toExclusive - fromInclusive);
+
+        // If there's only one possible value, return it.
+        if (range == 1)
+        {
+            return fromInclusive;
+        }
+
+        // To generate a cryptographically secure and statistically uniform random number within a
+        // specific range, we use a technique called "rejection sampling".
+        //
+        // THE PROBLEM: MODULO BIAS
+        // A naive approach, such as taking a random ulong and using the modulo operator
+        // (`randomUlong % range`), would create a statistical bias. This is because the total
+        // number of possible ulong values (2^64) is not an even multiple of most possible ranges.
+        // The "leftover" values would make the first few numbers in the range slightly more
+        // likely to be chosen.
+        //
+        // THE SOLUTION: REJECTION SAMPLING
+        // We calculate the largest multiple of `range` that is less than or equal to ulong.MaxValue.
+        // This defines a "safe" upper bound (`maxMultiple`). Any random number generated within this
+        // safe zone is guaranteed to be part of a complete, unbiased set. If we generate a number
+        // *outside* this safe zone, we simply "reject" it and try again.
+        //
+        // PERFORMANCE & COST
+        // The `do-while` loop implements this rejection. While it looks like it could loop
+        // indefinitely, the probability of rejection is extremely low for most ranges. In the
+        // worst-case scenario (a range slightly more than half of ulong.MaxValue), the chance of
+        // rejection is just under 50% per attempt. The probability of needing many attempts
+        // decreases exponentially (e.g., 10 attempts is ~0.1%). For almost all practical ranges,
+        // this loop will execute only once. The performance cost is negligible.
+        var maxMultiple = ulong.MaxValue - (ulong.MaxValue % range + 1) % range;
+
+        // Buffer for the random bytes. Declared here to avoid re-allocation in the loop.
+        var buffer = new byte[sizeof(ulong)];
+        ulong randomUlong;
+        do
+        {
+            RandomNumberGenerator.Fill(buffer);
+            randomUlong = BitConverter.ToUInt64(buffer);
+        } while (randomUlong > maxMultiple);
+
+        return (long)((randomUlong % range) + (ulong)fromInclusive);
+    }
 
     /// <inheritdoc />
     public long GetInt64(long toExclusive) =>
-        RandomNumberGenerator.GetInt64(toExclusive);
+        GetInt64(0, toExclusive);
 
     /// <inheritdoc />
     public long GetInt64() =>
-        RandomNumberGenerator.GetInt64(long.MaxValue);
+        GetInt64(0, long.MaxValue);
 
     /// <inheritdoc />
     public double GetDouble()
