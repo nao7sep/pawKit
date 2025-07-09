@@ -102,6 +102,9 @@
 - **Rule:** There MUST be only one public type per file. This includes classes, records, interfaces, enums, and delegates.
 - **Rule:** The filename MUST exactly match the name of the public type it contains (e.g., `UserService.cs` must contain `public class UserService`).
 
+#### 4.2.1. Test Code Directory Structure
+- **Guidance:** Test code for `pawKitLib` should, where practical, mirror the directory structure of the code under test. For example, tests for types in `Abstractions/Events` are ideally placed in the corresponding `Abstractions/Events` directory within the test project. This encourages clarity, discoverability, and maintainability of tests. However, when tests span multiple areas or abstractions, use your best judgment to choose the most logical and discoverable location.
+
 ### 4.3. Class Member Organization
 - **Rule:** Class members MUST be ordered logically to enhance readability. The standard order is:
   1.  Private/Protected Fields (static then instance)
