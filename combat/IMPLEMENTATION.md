@@ -25,7 +25,7 @@ When implementing new functionality, use these libraries. Period.
 
 **Rule:** All I/O operations MUST be async.
 **Rule:** Async methods MUST have `Async` suffix.
-**Rule:** Public async methods SHOULD accept `CancellationToken`.
+**Rule:** Public async methods MUST accept `CancellationToken`.
 
 **Wrong:**
 ```csharp
