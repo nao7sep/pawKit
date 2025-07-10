@@ -1,42 +1,42 @@
-# pawKit Development Guidelines
+# pawKit Intellectual Combat System
 
-*Choose the guidelines you need for your current task. Don't load everything - be surgical.*
+*Choose your weapons for intellectual warfare. Don't load everything - be surgical in your brutality.*
 
-## Core Guidelines
+## Combat Arsenal
 
 ### [COMMUNICATION_PROTOCOL.md](COMMUNICATION_PROTOCOL.md)
-**When to use:** Every session. Enforces Ore-san's brutal honesty in English.
+**When to deploy:** Every engagement. Enforces Ore-san's brutal honesty in English.
 **Contains:** Communication rules, forbidden phrases, tone guidelines
 **Load this if:** You want direct, no-bullshit AI responses
 
 ### [FOUNDATIONS.md](FOUNDATIONS.md)
-**When to use:** Every session. Contains immutable design principles.
+**When to deploy:** Every engagement. Contains immutable design principles.
 **Contains:** SOLID principles, DI rules, architectural patterns
 **Load this if:** You're writing any code
 
 ### [IMPLEMENTATION.md](IMPLEMENTATION.md)
-**When to use:** Building new features or components
+**When to deploy:** Building new features or components
 **Contains:** Library choices, async patterns, type selection, coding rules
 **Load this if:** You're creating something new
 
 ### [REFACTORING.md](REFACTORING.md)
-**When to use:** Improving existing code quality
+**When to deploy:** Improving existing code quality
 **Contains:** Code smell detection, violation checks, quality standards
 **Load this if:** You're fixing or improving existing code
 
 ### [CONVENTIONS.md](CONVENTIONS.md)
-**When to use:** When consistency matters for the current task
+**When to deploy:** When consistency matters for the current task
 **Contains:** Naming, organization, documentation, file structure rules
 **Load this if:** You're organizing code or ensuring consistency
 
-## Session Commands
+## Combat Commands
 
 ### [SESSION_COMMANDS.md](SESSION_COMMANDS.md)
-**When to use:** For version management, logging, and session control
+**When to deploy:** For version management, logging, and session control
 **Contains:** Direct commands for work logs, quality audits, architecture reviews
 **Load this if:** You need to manage project workflow or recover from confusion
 
-## Workflow Patterns
+## Battle Patterns
 
 **New Feature Development:**
 1. Load `COMMUNICATION_PROTOCOL.md` + `FOUNDATIONS.md` + `IMPLEMENTATION.md`
@@ -63,8 +63,10 @@
 2. Use `[Emergency Session Recovery]` command
 3. Load relevant technical files based on AI recommendations
 
-## Anti-Pattern Alert
+## Combat Rules
 
-**Don't load everything at once** unless you're doing comprehensive work. Each file is designed for specific contexts. Loading irrelevant guidelines wastes tokens and dilutes focus.
+**Don't load everything at once** unless you're doing comprehensive warfare. Each file is designed for specific combat scenarios. Loading irrelevant guidelines wastes ammunition and dilutes focus.
 
-**Don't skip FOUNDATIONS.md** - it contains the non-negotiable principles that govern all other decisions.
+**Don't skip FOUNDATIONS.md** - it contains the non-negotiable principles that govern all other tactical decisions.
+
+Welcome to intellectual combat. May your code survive the brutality.
