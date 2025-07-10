@@ -1,4 +1,4 @@
-﻿# Session Commands
+# Session Commands
 
 *Direct commands for managing development work. No fluff, no explanations you don't need.*
 

@@ -1,4 +1,4 @@
-﻿# Work Log - Version 0.1.0
+# Work Log - Version 0.1.0
 
 ## AI Instructions for Adding New Log Entries
 
