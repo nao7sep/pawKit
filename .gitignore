@@ -1,45 +1,19 @@
-# ------------------------------------------------------------------------------
-# Build Directories
-# ------------------------------------------------------------------------------
+# Welcome to the .gitignore file. If you need this explained, you shouldn't be using git.
 
-# Build output directory for binaries.
+# Build trash. If you commit these, you're the problem.
 bin/
-
-# Build output directory for intermediate object files.
 obj/
 
-# ------------------------------------------------------------------------------
-# IDE and Editor Specific
-# ------------------------------------------------------------------------------
-
-# Visual Studio settings directory.
+# IDE droppings. Your editor's mess is not source code.
 .vs/
-
-# Visual Studio Code settings directory.
 .vscode/
-
-# JetBrains IDE settings directory.
 .idea/
 
-# ------------------------------------------------------------------------------
-# System Files
-# ------------------------------------------------------------------------------
-
-# macOS Finder attributes file.
+# System stupidity. These files are proof your OS hates you.
 .DS_Store
-
-# Windows desktop configuration file.
 desktop.ini
-
-# Windows thumbnail cache file.
 Thumbs.db
 
-# ------------------------------------------------------------------------------
-# User-specific Files (Visual Studio)
-# ------------------------------------------------------------------------------
-
-# Visual Studio solution user options file.
+# Visual Studio user garbage. Your personal settings are not a feature.
 *.suo
-
-# Visual Studio user-specific configuration file.
 *.user
