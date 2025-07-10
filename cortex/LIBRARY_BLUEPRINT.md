@@ -8,9 +8,6 @@ This module contains the core building blocks of the library. It has no dependen
 
 *   **`pawKitLib.Abstractions`**
     *   `IClock` (interface): Provides an abstraction for getting the current time. This is crucial for testing, as it allows you to control time in your unit tests instead of relying on the non-deterministic `DateTime.UtcNow`.
-    *   `IValidator<T>` (interface): Defines a contract for a class that can validate an object of type `T`. This allows for a standardized validation mechanism across the application.
-    *   `IUnitOfWork` (interface): Defines a contract for managing atomic database operations. It will typically contain methods like `CommitAsync()` and `RollbackAsync()` to ensure that a series of changes either all succeed or all fail together.
-    *   `IRepository<T>` (interface): A generic interface for a data repository, defining standard CRUD (Create, Read, Update, Delete) operations for a given entity `T`. This decouples business logic from the data access technology.
 *   **`pawKitLib.Exceptions`**
     *   `ValidationException` (class): A custom exception thrown when an object fails validation. It would typically contain a collection of validation errors.
     *   `ResourceNotFoundException` (class): A custom exception thrown when a specific entity (e.g., a user or product with a given ID) cannot be found in the data store.
@@ -26,12 +23,6 @@ This module contains implementations of key design patterns that are used across
 *   **`pawKitLib.Storage`**
     *   `IFileStore` (interface): An abstraction for storing and retrieving files (blobs), with convenience methods like `WriteAllTextAsync`.
     *   `LocalFileStore` (class): An implementation of `IFileStore` that saves files to the local disk.
-*   **`pawKitLib.Events`**
-    *   `IEvent` (interface): A marker interface for event records. This helps with type constraints.
-    *   `OrderPlacedEvent` (record): An example of a specific event record, containing data relevant to the event (e.g., `OrderId`).
-    *   `IEventPublisher` (interface): Defines the contract for publishing events to any interested subscribers.
-    *   `IEventHandler<TEvent>` (interface): A generic interface that any class wishing to handle an event of type `TEvent` must implement.
-    *   `InMemoryEventPublisher` (class): An implementation of `IEventPublisher` that dispatches events to handlers within the same process.
 
 ## 3. Utilities
 
@@ -116,8 +107,6 @@ This module contains the concrete implementations for data access.
 
 *   **`pawKitLib.Data.Sqlite`** (Example Implementation)
     *   `PawKitDbContext` (class): The Entity Framework Core `DbContext` for the application. It defines the `DbSet<T>` properties for your entities and configures the database connection (in this case, to SQLite).
-    *   `SqliteUnitOfWork` (class): The concrete implementation of `IUnitOfWork` for SQLite, which will manage the `PawKitDbContext` transaction.
-    *   `SqliteRepository<T>` (class): The concrete implementation of `IRepository<T>` for SQLite.
     *   `SqliteKeyValueStore` (class): A persistent key-value store implementation of `ICacheProvider` using a simple two-column SQLite table.
 
 ## 8. Platform-Specific Services
