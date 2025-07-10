@@ -2,6 +2,12 @@
 
 *This file contains the two essential prompt templates for managing work logs in AI-assisted development.*
 
+## Design Rationale
+
+**Why are logging instructions embedded in each work log file?**
+
+Logging instructions are embedded in each work log file (rather than centralized in a separate file) because logging rules may evolve over time. If instructions were in one shared file and later updated, the link between the rules and existing log entries would be lost. By embedding instructions in each versioned work log, we maintain a permanent record of which formatting rules were used for each set of entries, ensuring historical consistency and traceability.
+
 ## [Start New Version]
 
 **Usage:** When starting a new version of the project.
