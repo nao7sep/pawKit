@@ -16,6 +16,7 @@ When implementing new functionality, use these libraries. Period.
 - **JSON:** System.Text.Json (Newtonsoft.Json only for legacy compatibility)
 - **Testing:** xUnit + Moq
 - **HTTP Client:** Microsoft.Extensions.Http (HttpClientFactory)
+    - Flurl may be used as an HTTP client abstraction, but only if all Flurl HTTP calls are configured to use an `HttpClient` instance provided by `HttpClientFactory`.
 - **Authentication:** Microsoft.AspNetCore.Authentication.JwtBearer
 - **Database:** SQLite for embedded scenarios
 
