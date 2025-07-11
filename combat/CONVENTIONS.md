@@ -96,6 +96,19 @@ public class UserService
 
 **Anti-Pattern Alert:** "Naming doesn't matter, the code works..." Wrong. Code is read 10x more than it's written. Bad names waste everyone's time.
 
+## Temporal Data Conventions
+
+**Rule:** All `DateTime` or `DateTimeOffset` properties and variables MUST be in Coordinated Universal Time (UTC).
+**Rule:** Property and variable names for temporal data MUST end with a `Utc` suffix.
+
+**Wrong:**
+- `public DateTimeOffset CreatedAt { get; init; }`
+
+**Right:**
+- `public DateTimeOffset CreatedAtUtc { get; init; }`
+
+**Why:** Timezone ambiguity is a primary source of bugs. Enforcing UTC and explicit naming eliminates this entire class of problems. Local time has no place on the server.
+
 ## Documentation Requirements
 
 **Rule:** All public and internal types MUST have XML documentation.
