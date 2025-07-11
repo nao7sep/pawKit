@@ -6,6 +6,8 @@
 
 The core data types in `pawKitLib.Ai.Sessions`, specifically `AiSession` and `AiMessage`, are **immutable records**. This is a deliberate design choice to ensure predictable state management, thread safety, and the absence of side effects.
 
+This pattern applies specifically to objects whose purpose is to carry **state** across boundaries (DTOs, events, messages). It does not apply to objects whose purpose is to encapsulate **behavior** (services, repositories, controllers), which should be standard `class` types and managed by a dependency injection container.
+
 An `AiSession` object is a **snapshot** of the conversation at a single point in time. You do not "change" a session. You create a *new* session that represents the updated state.
 
 **Wrong:**

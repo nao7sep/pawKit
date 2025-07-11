@@ -136,6 +136,24 @@ public record UserDto
 
 **Anti-Pattern Alert:** Using `class` for everything because it's familiar? You're ignoring better tools. Using `abstract class` for contracts? You're limiting extensibility.
 
+### State vs. Behavior - The Core Distinction
+
+The choice between `record` and `class` is not arbitrary. It is a deliberate architectural decision based on a fundamental principle: the separation of state and behavior.
+
+**Use `record` for State:**
+- **What it is:** An immutable snapshot of data at a point in time.
+- **Examples:** Data Transfer Objects (DTOs), Events, Messages, Value Objects.
+- **Characteristics:** Has no dependencies, no complex logic, and its identity is defined by its data. Two `UserDto` objects with the same `Id` are conceptually the same.
+- **Why:** Immutability prevents side effects, makes state easy to reason about, and is inherently thread-safe. This is non-negotiable for data that flows through your system.
+
+**Use `class` for Behavior:**
+- **What it is:** A component that performs actions and manages processes over time.
+- **Examples:** Services (`UserService`), Repositories (`ProductRepository`), Controllers, long-lived application components.
+- **Characteristics:** Has dependencies (injected via constructor), contains methods that orchestrate logic, and has a distinct identity and lifecycle managed by the DI container. Two instances of `UserService` are not interchangeable.
+- **Why:** Services are inherently stateful (in terms of their dependencies and lifecycle, not their data) and exist to cause controlled side effects. Their mutability is a feature, managed by the container.
+
+**Anti-Pattern Alert:** Adding complex methods and dependencies to a `record`? You've created a schizophrenic object that's neither a good DTO nor a good service. Putting complex state inside a service that should be passed in via method calls? You've created a stateful service that's a nightmare to test and reason about.
+
 ## Surgical Modification Principle
 
 **Rule:** When adding functionality, modify existing code rather than adding wrapper methods.
