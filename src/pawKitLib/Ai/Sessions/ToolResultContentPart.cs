@@ -7,6 +7,5 @@
 /// <param name="Content">The output or result from the tool execution.</param>
 public sealed record ToolResultContentPart(string ToolCallId, string Content) : IContentPart
 {
-    /// <inheritdoc />
     public Modality Modality => Modality.ToolResult;
 }

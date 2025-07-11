@@ -8,7 +8,6 @@ namespace pawKitLib.Ai.Sessions;
 /// <remarks>
 /// For guidance on using this immutable model in stateful UI applications (e.g., MVVM),
 /// refer to the ARCHITECTURE.md document in the project's root.
-/// This record is an immutable snapshot of a session's state.
 /// </summary>
 public sealed record AiSession
 {

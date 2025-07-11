@@ -8,6 +8,5 @@ namespace pawKitLib.Ai.Sessions;
 /// <param name="ToolCalls">The collection of tool calls requested by the model.</param>
 public sealed record ToolCallContentPart(ImmutableList<ToolCall> ToolCalls) : IContentPart
 {
-    /// <inheritdoc />
     public Modality Modality => Modality.ToolCall;
 }

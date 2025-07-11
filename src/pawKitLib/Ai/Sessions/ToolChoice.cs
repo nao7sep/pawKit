@@ -5,16 +5,6 @@
 /// </summary>
 public sealed record ToolChoice
 {
-    /// <summary>
-    /// Gets the mode for tool selection.
-    /// </summary>
-    public ToolChoiceMode Mode { get; }
-
-    /// <summary>
-    /// Gets the name of the specific function to be called, if <see cref="Mode"/> is <see cref="ToolChoiceMode.Specific"/>.
-    /// </summary>
-    public string? FunctionName { get; }
-
     private ToolChoice(ToolChoiceMode mode, string? functionName = null)
     {
         if (mode == ToolChoiceMode.Specific && string.IsNullOrWhiteSpace(functionName))
@@ -24,6 +14,16 @@ public sealed record ToolChoice
         Mode = mode;
         FunctionName = functionName;
     }
+
+    /// <summary>
+    /// Gets the mode for tool selection.
+    /// </summary>
+    public ToolChoiceMode Mode { get; }
+
+    /// <summary>
+    /// Gets the name of the specific function to be called, if <see cref="Mode"/> is <see cref="ToolChoiceMode.Specific"/>.
+    /// </summary>
+    public string? FunctionName { get; }
 
     /// <summary>The model can choose whether to call a tool.</summary>
     public static ToolChoice Auto() => new(ToolChoiceMode.Auto);
