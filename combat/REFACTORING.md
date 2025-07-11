@@ -116,9 +116,10 @@
 - Methods retrieving data by ID without authorization checks (IDOR)
 - Sensitive data in log statements
 - Unvalidated user input used in queries
+- Unvalidated file paths from external input used in I/O operations
 - Hardcoded secrets or connection strings
 
-**Fix:** Add authorization checks, sanitize logging, validate inputs, externalize secrets.
+**Fix:** Add authorization checks, sanitize logging, validate all inputs. For file paths, combine them with a secure base directory and validate the final path is within that directory before access. Externalize secrets.
 
 **Why:** Security isn't optional. These checks prevent real vulnerabilities.
 

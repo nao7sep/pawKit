@@ -1,4 +1,4 @@
-﻿# Work Log - Version 0.1.1
+﻿﻿# Work Log - Version 0.1.1
 
 ## AI Instructions for Adding New Log Entries
 
@@ -55,6 +55,23 @@
 ## Development Log Entries (Reverse Chronological)
 
 *Documentation of actual work completed, maintained in reverse chronological order.*
+
+---
+
+### 2025-07-11 - Implemented Foundational Services and Mock Client
+
+**Summary:**
+- Implemented the core request preparation services: `ResourceResolver` and `RequestContextBuilder`.
+- The `ResourceResolver` was built to be secure by default, enforcing a strict `allowedBasePath` to prevent path traversal vulnerabilities. The design was refactored to accept this path directly via constructor, removing the heavy `IOptions<T>` dependency for improved usability in non-DI scenarios.
+- The `RequestContextBuilder` was implemented to correctly apply all session rules, including context overrides and system prompt overrides, to generate a clean `AiRequestContext`. The implementation was refactored to improve performance on the common path (text-only messages) and to robustly handle multi-part system prompts.
+- The `IAiClient` interface was refactored to accept the prepared `AiRequestContext`, decoupling it from the builder and clarifying the library's data flow.
+- Created a `MockAiClient` to serve as a test double and example implementation, allowing for isolated testing of the entire request pipeline.
+
+**Key Architectural Decisions:**
+- **Security First:** The `ResourceResolver`'s path traversal vulnerability was identified and fixed by enforcing a mandatory security boundary (`allowedBasePath`). The initial "fix" using `IOptions<T>` was rejected as overly complex, and a simpler, direct constructor injection was chosen to balance security with usability.
+- **Separation of Concerns (SoC):** The data flow was clarified by refining the `IAiClient` contract. The `RequestContextBuilder` is now solely responsible for content preparation, and the `IAiClient` is solely responsible for API protocol translation. This is a textbook application of SoC and DIP.
+- **Pragmatic Performance:** The `RequestContextBuilder` was refactored to avoid unnecessary async overhead for text-only messages, optimizing for the most common use case without adding undue complexity.
+- **Testability:** The creation of `MockAiClient` as the first implementation of `IAiClient` establishes a critical pattern for testable development. It ensures that the core logic can be validated without reliance on external services.
 
 ---
 
