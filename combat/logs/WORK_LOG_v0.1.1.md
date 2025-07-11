@@ -58,6 +58,28 @@
 
 ---
 
+### 2025-07-11 - Implemented `OpenAiClient` and Finalized Core Service Architecture
+
+**Summary:**
+- Implemented the first concrete `IAiClient`, the `OpenAiClient`, providing a production-ready client for the OpenAI Chat Completions API.
+- Created a full suite of internal, provider-specific DTOs to accurately model the OpenAI API for requests (including tools, multi-modal content, and all inference parameters) and responses (including structured errors).
+- Implemented the complete, non-streaming request/response lifecycle:
+    - Complex mapping logic from the library's abstract models to the OpenAI-specific format.
+    - HTTP POST request execution using `HttpClient`.
+    - Robust, structured error handling that deserializes the provider's error payload into a custom `OpenAiApiException`.
+    - Response mapping from the provider's format back to the library's abstract `AiMessage`.
+- Designed the `IStreamingAiClient` interface and a robust, type-safe `StreamingPart` discriminated union for future streaming implementation. The streaming model was redesigned for improved usability and to include critical features like token usage reporting.
+- Refactored the `OpenAiClient` for maintainability and robustness by centralizing all magic strings into an `OpenAiApiConstants` class and adding comprehensive XML documentation to all internal mapping logic.
+- Standardized the library's configuration pattern by reverting `ResourceResolver` to use `IOptions<T>`, ensuring consistency with `OpenAiClient`. Updated `ARCHITECTURE.md` to document both DI-based and manual usage of this pattern.
+
+**Key Architectural Decisions:**
+- **Provider-Specific Isolation (SoC):** All OpenAI-specific models and logic were strictly isolated in the `pawKitLib.Ai.Providers.OpenAI` namespace, preventing provider details from leaking into the core abstractions.
+- **Contract-Driven Development (ISP):** Rejected adding parameters (`stream`, `n`) that would break the `IAiClient` contract. A new, dedicated `IStreamingAiClient` interface was designed instead, keeping contracts focused and honest.
+- **Robustness and Maintainability:** Replaced lazy error handling (`EnsureSuccessStatusCode`) with a structured mechanism that provides clear, actionable error details to the consumer. Eradicated magic strings to make the client less brittle and easier to maintain.
+- **Architectural Consistency:** Re-aligned the configuration pattern for all services to use `IOptions<T>`. This decision was made to enforce a single, standard way of handling configuration, and the `ARCHITECTURE.md` was updated to demystify the pattern and demonstrate its flexibility for consumers not using a full DI container.
+
+---
+
 ### 2025-07-11 - Implemented Foundational Services and Mock Client
 
 **Summary:**

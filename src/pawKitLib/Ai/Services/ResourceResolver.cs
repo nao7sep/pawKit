@@ -1,4 +1,5 @@
-﻿using System.Security;
+﻿﻿using System.Security;
+using Microsoft.Extensions.Options;
 using pawKitLib.Ai.Abstractions;
 using pawKitLib.Ai.Sessions;
 
@@ -14,13 +15,14 @@ public sealed class ResourceResolver : IResourceResolver
     /// <summary>
     /// Initializes a new instance of the <see cref="ResourceResolver"/> class.
     /// </summary>
-    /// <param name="allowedBasePath">The absolute base path from which local files are allowed to be resolved. All file access will be restricted to this directory.</param>
-    public ResourceResolver(string allowedBasePath)
+    /// <param name="options">The configuration options specifying the allowed base path for file access.</param>
+    public ResourceResolver(IOptions<ResourceResolverOptions> options)
     {
         // The security check for path traversal is intentionally centralized here.
         // This class is the designated "gatekeeper" for file system access.
         // By enforcing the check internally, we ensure that any consumer of this service is secure by default.
-        _allowedBasePath = Path.GetFullPath(allowedBasePath);
+        ArgumentNullException.ThrowIfNull(options.Value, nameof(options));
+        _allowedBasePath = Path.GetFullPath(options.Value.AllowedBasePath);
     }
 
     /// <inheritdoc />

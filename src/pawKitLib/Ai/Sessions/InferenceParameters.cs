@@ -18,6 +18,10 @@ namespace pawKitLib.Ai.Sessions;
 /// <param name="ToolChoice">A specific constraint on how the model should use tools for this request.</param>
 /// <param name="ModelId">The specific model ID to use for this request (e.g., "gpt-4o").</param>
 /// <param name="ResponseFormat">A constraint on the format of the model's response (e.g., force JSON output).</param>
+/// <param name="FrequencyPenalty">Penalizes new tokens based on their existing frequency in the text so far.</param>
+/// <param name="PresencePenalty">Penalizes new tokens based on whether they appear in the text so far.</param>
+/// <param name="Seed">An integer seed for deterministic, repeatable outputs.</param>
+/// <param name="LogitBias">A map to modify the probability of specific tokens appearing in the completion.</param>
 public sealed record InferenceParameters(
     float? Temperature = null,
     int? MaxTokens = null,
@@ -27,4 +31,8 @@ public sealed record InferenceParameters(
     string? SystemPromptOverride = null,
     ToolChoice? ToolChoice = null,
     string? ModelId = null,
-    ResponseFormat? ResponseFormat = null);
+    ResponseFormat? ResponseFormat = null,
+    float? FrequencyPenalty = null,
+    float? PresencePenalty = null,
+    int? Seed = null,
+    IReadOnlyDictionary<string, int>? LogitBias = null);
