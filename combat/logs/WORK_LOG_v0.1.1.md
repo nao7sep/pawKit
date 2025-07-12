@@ -58,6 +58,24 @@
 
 ---
 
+### 2025-07-12 - Enabled Multi-Completion Support in AI Client
+
+**Summary:**
+- Refactored the `IAiClient` interface to support multiple completions: changed the contract to return `Task<IReadOnlyList<AiMessage>>` and added an `N` parameter to `InferenceParameters`.
+- Updated all implementations, including `OpenAiClient` and `MockAiClient`, to handle the new contract and propagate the `N` parameter to the provider request DTO.
+- Changed `InferenceParameters.N` to a nullable `int` with explicit documentation, ensuring correct defaulting and serialization semantics.
+- Added comprehensive XML documentation for the new parameter and contract changes.
+- Fixed all downstream compile errors and updated all usages to match the new interface.
+- Validated changes with a successful build and ensured no regressions in core request/response logic.
+
+**Key Architectural Decisions:**
+- **Interface Consistency:** The change to support multiple completions was applied at the abstraction level (`IAiClient`), enforcing consistency across all providers and mocks.
+- **Explicit Contract:** Nullable `N` with explicit documentation ensures the API contract is clear and unambiguous, preventing silent failures or ambiguous behavior.
+- **Backward Compatibility:** Defaulting logic for `N` preserves compatibility for consumers not requesting multiple completions.
+- **Documentation First:** XML comments were updated to clarify the new semantics, reducing onboarding friction and future confusion.
+
+---
+
 ### 2025-07-12 - Refactored `OpenAiClient` for SRP and Robustness
 
 **Summary:**
