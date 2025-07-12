@@ -16,11 +16,11 @@ namespace pawKitLib.Ai.Abstractions;
 public interface IAiClient
 {
     /// <summary>
-    /// Sends the conversation history and inference parameters to the AI model and gets the next message.
+    /// Sends the conversation history and inference parameters to the AI model and gets N completions.
     /// </summary>
     /// <param name="context">The prepared request context, containing the final messages and tools.</param>
-    /// <param name="parameters">The provider-specific parameters for this inference request.</param>
+    /// <param name="parameters">The provider-specific parameters for this inference request. The N property controls the number of completions.</param>
     /// <param name="cancellationToken">A token to cancel the operation.</param>
-    /// <returns>A new <see cref="AiMessage"/> from the assistant.</returns>
-    Task<AiMessage> GetCompletionAsync(AiRequestContext context, InferenceParameters parameters, CancellationToken cancellationToken = default);
+    /// <returns>A list of <see cref="AiMessage"/> objects from the assistant.</returns>
+    Task<IReadOnlyList<AiMessage>> GetCompletionAsync(AiRequestContext context, InferenceParameters parameters, CancellationToken cancellationToken = default);
 }
