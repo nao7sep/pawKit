@@ -1,6 +1,8 @@
 ﻿using System.Collections.Immutable;
 using pawKitLib.Ai.Abstractions;
 using pawKitLib.Ai.Sessions;
+using pawKitLib.Ai.Requests;
+using pawKitLib.Ai.Content;
 
 namespace pawKitLib.Ai.Mocks;
 

@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Options;
 using pawKitLib.Ai.Abstractions;
 using pawKitLib.Ai.Sessions;
+using pawKitLib.Ai.Content;
 
 namespace pawKitLib.Ai.Services;
 

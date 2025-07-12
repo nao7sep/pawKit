@@ -1,4 +1,5 @@
 ﻿using pawKitLib.Ai.Sessions;
+using pawKitLib.Ai.Content;
 
 namespace pawKitLib.Ai.Abstractions;
 

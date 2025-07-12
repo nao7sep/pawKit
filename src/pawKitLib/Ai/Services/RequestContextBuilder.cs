@@ -1,6 +1,8 @@
-﻿using System.Collections.Immutable;
+﻿using pawKitLib.Ai.Content;
+using System.Collections.Immutable;
 using pawKitLib.Ai.Abstractions;
 using pawKitLib.Ai.Sessions;
+using pawKitLib.Ai.Requests;
 
 namespace pawKitLib.Ai.Services;
 

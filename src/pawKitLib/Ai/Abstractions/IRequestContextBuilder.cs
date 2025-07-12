@@ -1,4 +1,6 @@
 ﻿using pawKitLib.Ai.Sessions;
+using pawKitLib.Ai.Requests;
+using System.Threading;
 
 namespace pawKitLib.Ai.Abstractions;
 
