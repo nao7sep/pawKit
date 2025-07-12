@@ -21,7 +21,7 @@ namespace pawKitLib.Ai.Sessions;
 /// <param name="FrequencyPenalty">Penalizes new tokens based on their existing frequency in the text so far.</param>
 /// <param name="PresencePenalty">Penalizes new tokens based on whether they appear in the text so far.</param>
 /// <param name="Seed">An integer seed for deterministic, repeatable outputs.</param>
-/// <param name="LogitBias">A map to modify the probability of specific tokens appearing in the completion.</param>
+/// <param name="LogitBias">A map to modify the probability of specific tokens appearing in the completion. Use an immutable dictionary for true immutability.</param>
 public sealed record InferenceParameters(
     float? Temperature = null,
     int? MaxTokens = null,
@@ -35,4 +35,4 @@ public sealed record InferenceParameters(
     float? FrequencyPenalty = null,
     float? PresencePenalty = null,
     int? Seed = null,
-    IReadOnlyDictionary<string, int>? LogitBias = null);
+    ImmutableDictionary<string, int>? LogitBias = null);
