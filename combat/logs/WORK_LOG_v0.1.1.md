@@ -58,6 +58,23 @@
 
 ---
 
+### 2025-07-12 - Refactored `OpenAiClient` for SRP and Robustness
+
+**Summary:**
+- Executed a critical refactoring of the `OpenAiClient` to correct a severe violation of the Single Responsibility Principle (SRP).
+- Extracted all complex mapping logic from the client into a new, dedicated `OpenAiMapper` static utility class.
+- Systematically enforced project conventions by reorganizing all provider-specific Data Transfer Objects (DTOs) into a dedicated `Dto` sub-namespace, cleaning up the provider's root directory.
+- Identified and fixed a critical bug where the `OpenAiChatCompletionRequest` DTO was missing numerous properties, rendering large parts of the `InferenceParameters` unusable.
+- Hardened the `HandleErrorResponseAsync` method to provide more detailed error messages when the API returns non-JSON error payloads, preventing silent failures during debugging.
+- Resolved multiple compile errors and type mismatches that arose during the refactoring, including a `LogitBias` type conversion from the abstract `int` to the provider-specific `float`.
+
+**Key Architectural Decisions:**
+- **Single Responsibility Principle (SRP):** The primary driver for this work was to enforce SRP. The `OpenAiClient` was incorrectly responsible for both HTTP communication and complex object mapping. Separating these into `OpenAiClient` and `OpenAiMapper` respectively makes the code more modular, testable, and maintainable.
+- **Separation of Concerns (SoC):** The file reorganization into a `Dto` subfolder was a direct application of SoC, separating data contracts (the "what") from operational code (the "how"). This aligns the provider's structure with established project conventions and improves clarity.
+- **Robustness and Fail-Fast:** The error handling was improved to be more robust. Instead of silently swallowing a `JsonException`, the raw error content is now included in the exception message. This follows a "fail-fast" philosophy, providing crucial context for debugging API integration issues instead of hiding them.
+
+---
+
 ### 2025-07-11 - Architectural Refactoring of the Core AI Domain Model
 
 **Summary:**

@@ -31,4 +31,9 @@ internal static class OpenAiApiConstants
 
     // Response Format
     public const string ResponseFormatJsonObject = "json_object";
+
+    // Data URIs
+    public const string DataUriSchemePrefix = "data:";
+    public const string DefaultImageMimeType = "image/jpeg";
+    public const string Base64DataUriQualifier = ";base64,";
 }
