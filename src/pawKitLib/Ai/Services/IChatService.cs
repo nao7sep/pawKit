@@ -7,9 +7,6 @@ using pawKitLib.Ai.Config;
 
 public interface IChatService
 {
-    Task<JsonNode> ChatAsync(IAiProviderConfig config, JsonNode request, CancellationToken cancellationToken);
-    Task<JsonNode> ChatAsync(IAiProviderConfig config, dynamic request, CancellationToken cancellationToken);
-
-    IAsyncEnumerable<JsonNode> ChatStreamAsync(IAiProviderConfig config, JsonNode request, CancellationToken cancellationToken);
-    IAsyncEnumerable<JsonNode> ChatStreamAsync(IAiProviderConfig config, dynamic request, CancellationToken cancellationToken);
+    Task<string> ChatAsync(IAiProviderConfig config, string request, CancellationToken cancellationToken);
+    IAsyncEnumerable<string> ChatStreamAsync(IAiProviderConfig config, string request, CancellationToken cancellationToken);
 }

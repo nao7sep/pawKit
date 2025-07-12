@@ -7,6 +7,5 @@ using pawKitLib.Ai.Config;
 
 public interface IImageAnalysisService
 {
-    Task<JsonNode> AnalyzeImageAsync(IAiProviderConfig config, JsonNode request, CancellationToken cancellationToken);
-    Task<JsonNode> AnalyzeImageAsync(IAiProviderConfig config, dynamic request, CancellationToken cancellationToken);
+    Task<string> AnalyzeImageAsync(IAiProviderConfig config, string request, CancellationToken cancellationToken);
 }

@@ -7,6 +7,5 @@ using pawKitLib.Ai.Config;
 
 public interface ITranscriptionService
 {
-    Task<JsonNode> TranscribeAsync(IAiProviderConfig config, JsonNode request, CancellationToken cancellationToken);
-    Task<JsonNode> TranscribeAsync(IAiProviderConfig config, dynamic request, CancellationToken cancellationToken);
+    Task<string> TranscribeAsync(IAiProviderConfig config, string request, CancellationToken cancellationToken);
 }
