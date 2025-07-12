@@ -8,7 +8,7 @@ namespace pawKitLib.Ai.Providers.OpenAI;
 internal sealed record OpenAiImageContentPart
 {
     [JsonPropertyName("type")]
-    public string Type { get; } = "image_url";
+    public string Type { get; } = OpenAiApiConstants.ContentTypeImageUrl;
 
     [JsonPropertyName("image_url")]
     public required OpenAiImageUrl ImageUrl { get; init; }

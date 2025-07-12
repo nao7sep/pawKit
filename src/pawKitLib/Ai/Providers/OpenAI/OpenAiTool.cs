@@ -8,7 +8,7 @@ namespace pawKitLib.Ai.Providers.OpenAI;
 internal sealed record OpenAiTool
 {
     [JsonPropertyName("type")]
-    public string Type { get; } = "function";
+    public string Type { get; } = OpenAiApiConstants.ToolTypeFunction;
 
     [JsonPropertyName("function")]
     public required OpenAiFunctionDefinition Function { get; init; }

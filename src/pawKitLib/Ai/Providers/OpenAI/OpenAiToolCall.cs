@@ -11,7 +11,7 @@ internal sealed record OpenAiToolCall
     public required string Id { get; init; }
 
     [JsonPropertyName("type")]
-    public string Type { get; } = "function";
+    public string Type { get; } = OpenAiApiConstants.ToolTypeFunction;
 
     [JsonPropertyName("function")]
     public required OpenAiToolCallFunction Function { get; init; }

@@ -8,7 +8,7 @@ namespace pawKitLib.Ai.Providers.OpenAI;
 internal sealed record OpenAiTextContentPart
 {
     [JsonPropertyName("type")]
-    public string Type { get; } = "text";
+    public string Type { get; } = OpenAiApiConstants.ContentTypeText;
 
     [JsonPropertyName("text")]
     public required string Text { get; init; }
