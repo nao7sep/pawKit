@@ -24,7 +24,6 @@ namespace pawKitLib.Ai.Requests;
 /// <param name="PresencePenalty">Penalizes new tokens based on whether they appear in the text so far.</param>
 /// <param name="Seed">An integer seed for deterministic, repeatable outputs.</param>
 /// <param name="LogitBias">A map to modify the probability of specific tokens appearing in the completion. Use an immutable dictionary for true immutability.</param>
-/// <param name="N">The number of completions to request.</param>
 public sealed record InferenceParameters(
     float? Temperature = null,
     int? MaxTokens = null,
