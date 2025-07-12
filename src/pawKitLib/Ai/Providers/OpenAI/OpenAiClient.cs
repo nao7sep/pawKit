@@ -190,9 +190,7 @@ public sealed class OpenAiClient : IAiClient
         return parts.Select<IContentPart, object>(part => part switch
         {
             TextContentPart tp => new OpenAiTextContentPart { Text = tp.Text },
-            MediaContentPart { Modality: Modality.Image, Resource: var res } => MapMediaPart(res, "image/jpeg"),
-            MediaContentPart { Modality: Modality.Audio, Resource: var res } => MapMediaPart(res, "audio/mpeg"),
-            MediaContentPart { Modality: Modality.Document, Resource: var res } when res.MimeType == "application/pdf" => MapMediaPart(res, "application/pdf"),
+            MediaContentPart { Modality: Modality.Image, Resource: var res } => MapImagePart(res),
             _ => throw new NotSupportedException($"Content part of type '{part.GetType().Name}' with modality '{part.Modality}' is not supported by the OpenAI provider.")
         }).ToArray();
     }
@@ -200,12 +198,12 @@ public sealed class OpenAiClient : IAiClient
     /// <summary>
     /// Maps a <see cref="ResourceRef"/> to a concrete <see cref="OpenAiImageContentPart"/>, handling data URI formatting.
     /// </summary>
-    private static OpenAiImageContentPart MapMediaPart(ResourceRef resource, string defaultMimeType)
+    private static OpenAiImageContentPart MapImagePart(ResourceRef resource)
     {
         return resource.Kind switch
         {
             ResourceKind.RemoteUrl => new OpenAiImageContentPart { ImageUrl = new OpenAiImageUrl(resource.Value) },
-            ResourceKind.InlineBase64 => new OpenAiImageContentPart { ImageUrl = new OpenAiImageUrl($"data:{resource.MimeType ?? defaultMimeType};base64,{resource.Value}") },
+            ResourceKind.InlineBase64 => new OpenAiImageContentPart { ImageUrl = new OpenAiImageUrl($"data:{resource.MimeType ?? "image/jpeg"};base64,{resource.Value}") },
             _ => throw new NotSupportedException($"The OpenAI Chat Completions API does not support resource kind '{resource.Kind}'. Use RemoteUrl or InlineBase64.")
         };
     }

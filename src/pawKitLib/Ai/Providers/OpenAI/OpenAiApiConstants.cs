@@ -22,13 +22,6 @@ internal static class OpenAiApiConstants
     public const string ToolChoiceAuto = "auto";
     public const string ToolChoiceRequired = "required";
 
-    // Content Types
-    public const string ContentTypeText = "text";
-    public const string ContentTypeImageUrl = "image_url";
-
-    // Function Calling
-    public const string ToolTypeFunction = "function";
-
     // Response Format
     public const string ResponseFormatJsonObject = "json_object";
 }
