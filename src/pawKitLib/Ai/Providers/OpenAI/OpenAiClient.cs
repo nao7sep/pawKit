@@ -38,7 +38,7 @@ public sealed class OpenAiClient : IAiClient
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<AiMessage>> GetCompletionAsync(AiRequestContext context, InferenceParameters parameters, CancellationToken cancellationToken = default)
+    public async Task<AiMessage> GetCompletionAsync(AiRequestContext context, InferenceParameters parameters, CancellationToken cancellationToken = default)
     {
         var request = BuildRequest(context, parameters);
 
@@ -56,8 +56,10 @@ public sealed class OpenAiClient : IAiClient
             throw new InvalidOperationException("The OpenAI API returned a successful response with no choices.");
         }
 
-        // Map all choices to AiMessage
-        return responseDto.Choices.Select(c => OpenAiMapper.MapResponse(c.Message)).ToList();
+        // We only support N=1, so we take the first choice.
+        var choice = responseDto.Choices[0];
+
+        return OpenAiMapper.MapResponse(choice.Message);
     }
 
     /// <summary>
@@ -98,7 +100,6 @@ public sealed class OpenAiClient : IAiClient
         return new OpenAiChatCompletionRequest
         {
             Model = parameters.ModelId,
-            N = parameters.N,
             Messages = messages,
             Temperature = parameters.Temperature,
             MaxTokens = parameters.MaxTokens,

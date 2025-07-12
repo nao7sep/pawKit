@@ -13,20 +13,18 @@ namespace pawKitLib.Ai.Mocks;
 public sealed class MockAiClient : IAiClient
 {
     /// <inheritdoc />
-    public Task<IReadOnlyList<AiMessage>> GetCompletionAsync(AiRequestContext context, InferenceParameters parameters, CancellationToken cancellationToken = default)
+    public Task<AiMessage> GetCompletionAsync(AiRequestContext context, InferenceParameters parameters, CancellationToken cancellationToken = default)
     {
         var responseText = $"Mock response to a request with {context.Messages.Count} user/assistant messages. The system prompt was: '{context.SystemPrompt ?? "none"}'. Model requested: '{parameters.ModelId ?? "default"}'.";
 
-        var messages = Enumerable.Range(0, parameters.N ?? 1)
-            .Select(_ => new AiMessage
-            {
-                Id = Guid.NewGuid(),
-                Role = MessageRole.Assistant,
-                CreatedAtUtc = DateTimeOffset.UtcNow,
-                Parts = ImmutableList.Create<IContentPart>(new TextContentPart(responseText))
-            })
-            .ToList();
+        var responseMessage = new AiMessage
+        {
+            Id = Guid.NewGuid(),
+            Role = MessageRole.Assistant,
+            CreatedAtUtc = DateTimeOffset.UtcNow,
+            Parts = ImmutableList.Create<IContentPart>(new TextContentPart(responseText))
+        };
 
-        return Task.FromResult((IReadOnlyList<AiMessage>)messages);
+        return Task.FromResult(responseMessage);
     }
 }

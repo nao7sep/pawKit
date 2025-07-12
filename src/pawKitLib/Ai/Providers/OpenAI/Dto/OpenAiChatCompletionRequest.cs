@@ -11,10 +11,6 @@ internal sealed record OpenAiChatCompletionRequest
     [JsonPropertyName("model")]
     public required string Model { get; init; }
 
-    [JsonPropertyName("n")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public int? N { get; init; }
-
     [JsonPropertyName("messages")]
     public required IReadOnlyList<OpenAiMessage> Messages { get; init; }
 

@@ -37,5 +37,4 @@ public sealed record InferenceParameters(
     float? FrequencyPenalty = null,
     float? PresencePenalty = null,
     int? Seed = null,
-    ImmutableDictionary<string, int>? LogitBias = null,
-    int? N = null);
+    ImmutableDictionary<string, int>? LogitBias = null);
