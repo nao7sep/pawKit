@@ -29,6 +29,13 @@ namespace pawKitLib.Ai.Requests;
 /// Corresponds to the 'n' parameter in the OpenAI API.
 /// Defaults to 1 if not specified by the provider.
 /// </param>
+/// <param name="LogProbs">
+/// Whether to return log probabilities of output tokens. If true, each output token will include the log probability.
+/// </param>
+/// <param name="TopLogProbs">
+/// An integer between 0 and 5 specifying the number of most likely tokens to return at each token position, each with log probabilities.
+/// Requires <see cref="LogProbs"/> to be true.
+/// </param>
 public sealed record InferenceParameters(
     float? Temperature = null,
     int? MaxTokens = null,
@@ -43,4 +50,6 @@ public sealed record InferenceParameters(
     float? PresencePenalty = null,
     int? Seed = null,
     ImmutableDictionary<string, int>? LogitBias = null,
-    int? N = null);
+    int? N = null,
+    bool? LogProbs = null,
+    int? TopLogProbs = null);

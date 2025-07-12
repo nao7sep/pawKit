@@ -56,11 +56,19 @@ internal sealed record OpenAiChatCompletionRequest
 
     [JsonPropertyName("logit_bias")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public IReadOnlyDictionary<string, float>? LogitBias { get; init; }
+    public IReadOnlyDictionary<string, int>? LogitBias { get; init; }
 
     [JsonPropertyName("user")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? User { get; init; }
+
+    [JsonPropertyName("logprobs")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public bool? LogProbs { get; init; }
+
+    [JsonPropertyName("top_logprobs")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? TopLogProbs { get; init; }
 
     [JsonPropertyName("n")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]

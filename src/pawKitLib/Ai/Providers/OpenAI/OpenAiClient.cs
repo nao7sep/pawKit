@@ -110,9 +110,11 @@ public sealed class OpenAiClient : IAiClient
             FrequencyPenalty = parameters.FrequencyPenalty,
             PresencePenalty = parameters.PresencePenalty,
             Seed = parameters.Seed,
-            LogitBias = logitBias,
+            LogitBias = parameters.LogitBias,
             User = parameters.UserId,
-            N = parameters.N
+            N = parameters.N,
+            LogProbs = parameters.LogProbs,
+            TopLogProbs = parameters.TopLogProbs
         };
     }
 

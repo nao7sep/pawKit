@@ -15,4 +15,8 @@ internal sealed record OpenAiChoice
 
     [JsonPropertyName("finish_reason")]
     public required string FinishReason { get; init; }
+
+    [JsonPropertyName("logprobs")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public OpenAiLogProbs? LogProbs { get; init; }
 }
