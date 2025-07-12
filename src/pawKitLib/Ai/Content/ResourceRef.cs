@@ -1,4 +1,4 @@
-﻿namespace pawKitLib.Ai;
+﻿namespace pawKitLib.Ai.Content;
 
 /// <summary>
 /// Represents a reference to a resource, such as an image or video file.

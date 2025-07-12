@@ -1,4 +1,4 @@
-namespace pawKitLib.Ai;
+﻿namespace pawKitLib.Ai.Content;
 
 /// <summary>
 /// Represents a JSON object as part of a multi-modal message.

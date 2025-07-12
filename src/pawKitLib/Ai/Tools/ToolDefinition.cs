@@ -1,4 +1,4 @@
-﻿namespace pawKitLib.Ai.Sessions;
+﻿namespace pawKitLib.Ai.Tools;
 
 /// <summary>
 /// Defines a tool that the AI model can invoke.

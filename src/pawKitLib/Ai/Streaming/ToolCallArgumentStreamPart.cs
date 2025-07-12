@@ -1,4 +1,4 @@
-﻿namespace pawKitLib.Ai.Sessions;
+﻿namespace pawKitLib.Ai.Streaming;
 
 /// <summary>
 /// Represents a chunk of the arguments for a tool call from the stream.

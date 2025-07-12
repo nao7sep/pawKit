@@ -1,4 +1,4 @@
-﻿namespace pawKitLib.Ai;
+﻿namespace pawKitLib.Ai.Content;
 
 /// <summary>
 /// Specifies the type of content in a message part.

@@ -1,4 +1,4 @@
-﻿namespace pawKitLib.Ai;
+﻿namespace pawKitLib.Ai.Content;
 
 /// <summary>
 /// Represents a textual part of a multi-modal message.

@@ -1,6 +1,8 @@
 ﻿﻿using System.Collections.Immutable;
+using pawKitLib.Ai.Sessions;
+using pawKitLib.Ai.Tools;
 
-namespace pawKitLib.Ai.Sessions;
+namespace pawKitLib.Ai;
 
 /// <summary>
 /// Defines provider-specific parameters for an AI inference request.

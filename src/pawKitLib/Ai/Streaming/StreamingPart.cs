@@ -1,4 +1,4 @@
-﻿namespace pawKitLib.Ai.Sessions;
+﻿namespace pawKitLib.Ai.Streaming;
 
 /// <summary>
 /// Represents a part of a streamed AI response. This is a sealed base record for a discriminated union.

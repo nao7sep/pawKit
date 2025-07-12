@@ -1,4 +1,4 @@
-﻿namespace pawKitLib.Ai.Sessions;
+﻿namespace pawKitLib.Ai.Streaming;
 
 /// <summary>
 /// Signals the start of a tool call from the stream.

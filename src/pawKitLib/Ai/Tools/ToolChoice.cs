@@ -1,4 +1,4 @@
-﻿namespace pawKitLib.Ai.Sessions;
+﻿namespace pawKitLib.Ai.Tools;
 
 /// <summary>
 /// Specifies a constraint on the model's tool-use behavior for a single request.
@@ -15,14 +15,10 @@ public sealed record ToolChoice
         FunctionName = functionName;
     }
 
-    /// <summary>
-    /// Gets the mode for tool selection.
-    /// </summary>
+    /// <summary>Gets the mode for tool selection.</summary>
     public ToolChoiceMode Mode { get; }
 
-    /// <summary>
-    /// Gets the name of the specific function to be called, if <see cref="Mode"/> is <see cref="ToolChoiceMode.Specific"/>.
-    /// </summary>
+    /// <summary>Gets the name of the specific function to be called, if <see cref="Mode"/> is <see cref="ToolChoiceMode.Specific"/>.</summary>
     public string? FunctionName { get; }
 
     /// <summary>The model can choose whether to call a tool.</summary>

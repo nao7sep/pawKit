@@ -1,4 +1,4 @@
-﻿namespace pawKitLib.Ai;
+﻿namespace pawKitLib.Ai.Content;
 
 /// <summary>
 /// Specifies the location type of a resource referenced in a message part.

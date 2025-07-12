@@ -2,9 +2,12 @@
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
+using pawKitLib.Ai;
 using Microsoft.Extensions.Options;
 using pawKitLib.Ai.Abstractions;
+using pawKitLib.Ai.Content;
 using pawKitLib.Ai.Sessions;
+using pawKitLib.Ai.Tools;
 
 namespace pawKitLib.Ai.Providers.OpenAI;
 
@@ -250,7 +253,7 @@ public sealed class OpenAiClient : IAiClient
     /// </summary>
     private static OpenAiResponseFormat? MapResponseFormat(ResponseFormat? responseFormat) => responseFormat switch
     {
-        Sessions.ResponseFormat.JsonObject => new OpenAiResponseFormat { Type = OpenAiApiConstants.ResponseFormatJsonObject },
+        ResponseFormat.JsonObject => new OpenAiResponseFormat { Type = OpenAiApiConstants.ResponseFormatJsonObject },
         _ => null
     };
 

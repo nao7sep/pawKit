@@ -1,4 +1,4 @@
-﻿namespace pawKitLib.Ai.Sessions;
+﻿namespace pawKitLib.Ai.Tools;
 
 /// <summary>
 /// Defines the modes for constraining tool use in an AI request.

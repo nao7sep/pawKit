@@ -1,4 +1,4 @@
-﻿namespace pawKitLib.Ai.Sessions;
+﻿namespace pawKitLib.Ai.Streaming;
 
 /// <summary>
 /// Represents a chunk of text content from the stream.

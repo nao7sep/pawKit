@@ -1,4 +1,4 @@
-﻿namespace pawKitLib.Ai.Sessions;
+﻿namespace pawKitLib.Ai;
 
 /// <summary>
 /// Specifies a conceptual constraint on the format of the model's response.

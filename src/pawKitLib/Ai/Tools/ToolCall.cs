@@ -1,4 +1,4 @@
-﻿namespace pawKitLib.Ai.Sessions;
+﻿namespace pawKitLib.Ai.Tools;
 
 /// <summary>
 /// Represents a request from the model to call a specific tool.

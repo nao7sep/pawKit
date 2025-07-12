@@ -1,6 +1,7 @@
 ﻿using System.Collections.Immutable;
+using pawKitLib.Ai.Tools;
 
-namespace pawKitLib.Ai.Sessions;
+namespace pawKitLib.Ai.Content;
 
 /// <summary>
 /// Represents a content part containing one or more tool call requests from the model.

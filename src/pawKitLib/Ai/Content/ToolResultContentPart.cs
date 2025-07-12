@@ -1,4 +1,4 @@
-﻿namespace pawKitLib.Ai.Sessions;
+﻿namespace pawKitLib.Ai.Content;
 
 /// <summary>
 /// Represents the result of a tool execution, to be sent back to the model.

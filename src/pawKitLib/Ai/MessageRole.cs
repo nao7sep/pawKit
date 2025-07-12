@@ -1,4 +1,4 @@
-﻿namespace pawKitLib.Ai.Sessions;
+﻿namespace pawKitLib.Ai;
 
 /// <summary>
 /// Defines the role of the author of a message in an AI session.
