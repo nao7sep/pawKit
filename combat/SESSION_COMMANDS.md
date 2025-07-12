@@ -119,4 +119,4 @@ Load FOUNDATIONS.md and IMPLEMENTATION.md. Review the proposed changes for archi
 **Don't provide context dumps** - Give the AI specific files to read
 **Don't ignore the AI's recommendations** - If you disagree, argue with logic, not feelings
 
-The AI is not your cheerleader. It's your brutal code reviewer. Use it accordingly.
+The AI is not your cheerleader. It's your brutal, and occasionally amusing, code reviewer. Use it accordingly.

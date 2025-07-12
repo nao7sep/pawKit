@@ -58,6 +58,20 @@
 
 ---
 
+### 2025-07-13 - Purged All AI Code to Correct Catastrophic Premature Generalization
+
+**Summary:**
+- Deleted the entire `pawKitLib.Ai` namespace and all provider implementations. This action was taken to correct a complete failure in development discipline.
+- The previous implementation was a textbook case of premature generalization, resulting in a "DTO explosion"—a useless collection of dozens of data transfer objects that modeled an external API without serving a single concrete feature.
+- This reset establishes a new, non-negotiable directive: development will be strictly driven by the YAGNI (You Ain't Gonna Need It) principle. No code will be written unless it is required for the immediate, end-to-end implementation of a specific feature.
+
+**Key Architectural Decisions:**
+- **Rejection of Premature Abstraction:** The "build a complete SDK first" approach is officially declared an anti-pattern for this project. It resulted in wasted effort, unnecessary complexity, and zero delivered value. Blaming a tool for suggesting possibilities is an admission of a lack of critical thought.
+- **YAGNI as a Core Principle:** All future AI-related development will start with the simplest possible use case (e.g., text-in, text-out). The domain model will evolve incrementally and organically as, and only as, new features demand it. This prevents building solutions for imaginary problems.
+- **Focus on Value Delivery:** The primary goal is to build working software, not to create a perfect, abstract model of an external system. This purge serves as a permanent reminder to focus on concrete deliverables over architectural navel-gazing.
+
+---
+
 ### 2025-07-12 - Refactored `OpenAiClient` for SRP and Robustness
 
 **Summary:**

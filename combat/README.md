@@ -5,7 +5,7 @@
 ## Combat Arsenal
 
 ### [COMMUNICATION_PROTOCOL.md](COMMUNICATION_PROTOCOL.md)
-**When to deploy:** Every engagement. Enforces Ore-san's brutal honesty in English.
+**When to deploy:** Every engagement. Enforces a protocol of intellectually ruthless wit and sarcasm.
 **Contains:** Communication rules, forbidden phrases, tone guidelines
 **Load this if:** You want direct, no-bullshit AI responses
 
@@ -54,9 +54,9 @@
 2. Apply systematically: Foundations → Implementation → Refactoring → Conventions
 
 **Brutal AI Sessions:**
-1. Always load `COMMUNICATION_PROTOCOL.md` first
+1. Always load `COMMUNICATION_PROTOCOL.md` first.
 2. Add relevant technical files based on task
-3. Expect intellectual brutality and sarcastic feedback
+3. Expect intellectually ruthless wit and sarcastic feedback
 
 **Session Recovery:**
 1. Load `SESSION_COMMANDS.md`
