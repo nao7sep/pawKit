@@ -8,4 +8,5 @@ using pawKitLib.Ai.Config;
 public interface ITranslationService
 {
     Task<JsonNode> TranslateAsync(IAiProviderConfig config, JsonNode request, CancellationToken cancellationToken);
+    Task<JsonNode> TranslateAsync(IAiProviderConfig config, dynamic request, CancellationToken cancellationToken);
 }

@@ -8,4 +8,5 @@ using pawKitLib.Ai.Config;
 public interface IWebSearchService
 {
     Task<JsonNode> SearchAsync(IAiProviderConfig config, JsonNode request, CancellationToken cancellationToken);
+    Task<JsonNode> SearchAsync(IAiProviderConfig config, dynamic request, CancellationToken cancellationToken);
 }
