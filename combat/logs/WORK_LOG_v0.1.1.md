@@ -58,6 +58,24 @@
 
 ---
 
+### 2025-07-11 - Architectural Refactoring of the Core AI Domain Model
+
+**Summary:**
+- Executed a comprehensive architectural refactoring of the entire `pawKitLib.Ai` namespace, correcting widespread violations of the Separation of Concerns principle.
+- Dismantled the flat, disorganized file structure and replaced it with a logical hierarchy of sub-namespaces: `Content`, `Tools`, `Streaming`, `Requests`, and `Sessions`.
+- Relocated over 20 files to their correct directories and updated their namespaces to enforce the "namespace must match folder structure" convention.
+- Systematically updated all dependent files with corrected `using` statements to reflect the new architecture.
+- The `pawKitLib.Ai.Sessions` namespace is now correctly isolated to contain only types representing persistent conversation state (`AiSession`, `AiMessage`).
+- The `pawKitLib.Ai.Requests` namespace was created to house transient, per-request data contracts (`InferenceParameters`, `AiRequestContext`).
+- All other core data models were organized into their respective `Content`, `Tools`, and `Streaming` namespaces.
+
+**Key Architectural Decisions:**
+- **Separation of Concerns (SoC):** This was the primary driver. The refactoring strictly separated persistent session state from transient request data, message content definitions, tool definitions, and streaming data chunks. This corrected the initial architectural flaw where all types were incorrectly mixed in the root `Ai` and `Sessions` namespaces.
+- **Namespace and Folder Parity:** The refactoring rigorously enforced the convention that namespaces must mirror the folder structure. This resolved the previous chaos, significantly improving code discoverability and maintainability.
+- **Clarity over Convenience:** The initial anti-pattern of grouping "related" types in a single file or namespace was systematically dismantled. The new structure favors a clear, single-responsibility organization, which is a foundational principle of the project.
+
+---
+
 ### 2025-07-11 - Implemented `OpenAiClient` and Finalized Core Service Architecture
 
 **Summary:**
