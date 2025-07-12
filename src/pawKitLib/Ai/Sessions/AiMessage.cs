@@ -1,5 +1,4 @@
-﻿﻿﻿using System.Collections.Immutable;
-using pawKitLib.Ai;
+﻿﻿﻿﻿﻿using System.Collections.Immutable;
 using pawKitLib.Ai.Content;
 
 namespace pawKitLib.Ai.Sessions;

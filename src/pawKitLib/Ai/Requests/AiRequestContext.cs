@@ -1,9 +1,9 @@
-﻿﻿using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using pawKitLib.Ai.Abstractions;
 using pawKitLib.Ai.Sessions;
 using pawKitLib.Ai.Tools;
 
-namespace pawKitLib.Ai;
+namespace pawKitLib.Ai.Requests;
 
 /// <summary>
 /// Represents the final, prepared context to be sent to an AI provider.

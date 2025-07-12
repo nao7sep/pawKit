@@ -1,4 +1,4 @@
-﻿namespace pawKitLib.Ai;
+﻿namespace pawKitLib.Ai.Requests;
 
 /// <summary>
 /// Specifies a conceptual constraint on the format of the model's response.
