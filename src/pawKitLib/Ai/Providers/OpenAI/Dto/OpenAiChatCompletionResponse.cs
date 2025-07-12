@@ -1,6 +1,6 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 
-namespace pawKitLib.Ai.Providers.OpenAI;
+namespace pawKitLib.Ai.Providers.OpenAI.Dto;
 
 /// <summary>
 /// Represents the response payload from the OpenAI Chat Completions API.

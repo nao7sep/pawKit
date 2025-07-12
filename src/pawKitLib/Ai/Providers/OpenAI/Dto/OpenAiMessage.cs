@@ -1,6 +1,6 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 
-namespace pawKitLib.Ai.Providers.OpenAI;
+namespace pawKitLib.Ai.Providers.OpenAI.Dto;
 
 /// <summary>
 /// Represents a single message in the OpenAI API request.

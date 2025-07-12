@@ -1,7 +1,7 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace pawKitLib.Ai.Providers.OpenAI;
+namespace pawKitLib.Ai.Providers.OpenAI.Dto;
 
 /// <summary>
 /// Represents the function definition within an OpenAI tool.
