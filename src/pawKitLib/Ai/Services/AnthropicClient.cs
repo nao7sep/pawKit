@@ -7,7 +7,7 @@ using Flurl.Http;
 using pawKitLib.Ai.Config;
 using pawKitLib.Ai.Services;
 
-namespace pawKitLib.Ai.Services.Anthropic
+namespace pawKitLib.Ai.Services
 {
     public class AnthropicClient : IChatService
     {

@@ -7,13 +7,13 @@ using Flurl.Http;
 using pawKitLib.Ai.Config;
 using pawKitLib.Ai.Services;
 
-namespace pawKitLib.Ai.Services.Xai
+namespace pawKitLib.Ai.Services
 {
-    public class XaiClient : IChatService
+    public class OpenAiClient : IChatService
     {
         private readonly IFlurlClient _flurlClient;
 
-        public XaiClient(IFlurlClient flurlClient)
+        public OpenAiClient(IFlurlClient flurlClient)
         {
             _flurlClient = flurlClient;
         }
