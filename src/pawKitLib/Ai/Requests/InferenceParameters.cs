@@ -24,6 +24,11 @@ namespace pawKitLib.Ai.Requests;
 /// <param name="PresencePenalty">Penalizes new tokens based on whether they appear in the text so far.</param>
 /// <param name="Seed">An integer seed for deterministic, repeatable outputs.</param>
 /// <param name="LogitBias">A map to modify the probability of specific tokens appearing in the completion. Use an immutable dictionary for true immutability.</param>
+/// <param name="N">
+/// How many chat completion choices to generate for each input message.
+/// Corresponds to the 'n' parameter in the OpenAI API.
+/// Defaults to 1 if not specified by the provider.
+/// </param>
 public sealed record InferenceParameters(
     float? Temperature = null,
     int? MaxTokens = null,
@@ -37,4 +42,5 @@ public sealed record InferenceParameters(
     float? FrequencyPenalty = null,
     float? PresencePenalty = null,
     int? Seed = null,
-    ImmutableDictionary<string, int>? LogitBias = null);
+    ImmutableDictionary<string, int>? LogitBias = null,
+    int? N = null);

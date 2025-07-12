@@ -1,4 +1,5 @@
-﻿using System.Collections.Immutable;
+﻿using System.Collections.Generic;
+using System.Collections.Immutable;
 using pawKitLib.Ai.Abstractions;
 using pawKitLib.Ai.Sessions;
 using pawKitLib.Ai.Requests;
@@ -13,18 +14,27 @@ namespace pawKitLib.Ai.Mocks;
 public sealed class MockAiClient : IAiClient
 {
     /// <inheritdoc />
-    public Task<AiMessage> GetCompletionAsync(AiRequestContext context, InferenceParameters parameters, CancellationToken cancellationToken = default)
+    public Task<IReadOnlyList<AiMessage>> GetCompletionAsync(AiRequestContext context, InferenceParameters parameters, CancellationToken cancellationToken = default)
     {
-        var responseText = $"Mock response to a request with {context.Messages.Count} user/assistant messages. The system prompt was: '{context.SystemPrompt ?? "none"}'. Model requested: '{parameters.ModelId ?? "default"}'.";
+        var responseCount = parameters.N ?? 1;
+        var baseResponseText = $"Mock response to a request with {context.Messages.Count} user/assistant messages. The system prompt was: '{context.SystemPrompt ?? "none"}'. Model requested: '{parameters.ModelId ?? "default"}'.";
 
-        var responseMessage = new AiMessage
+        var messages = new List<AiMessage>();
+        for (var i = 0; i < responseCount; i++)
         {
-            Id = Guid.NewGuid(),
-            Role = MessageRole.Assistant,
-            CreatedAtUtc = DateTimeOffset.UtcNow,
-            Parts = ImmutableList.Create<IContentPart>(new TextContentPart(responseText))
-        };
+            var responseText = responseCount > 1
+                ? $"{baseResponseText} (Choice {i + 1}/{responseCount})"
+                : baseResponseText;
 
-        return Task.FromResult(responseMessage);
+            messages.Add(new AiMessage
+            {
+                Id = Guid.NewGuid(),
+                Role = MessageRole.Assistant,
+                CreatedAtUtc = DateTimeOffset.UtcNow,
+                Parts = ImmutableList.Create<IContentPart>(new TextContentPart(responseText))
+            });
+        }
+
+        return Task.FromResult<IReadOnlyList<AiMessage>>(messages);
     }
 }

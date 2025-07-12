@@ -1,4 +1,5 @@
-﻿﻿using pawKitLib.Ai.Sessions;
+﻿﻿using System.Collections.Generic;
+using pawKitLib.Ai.Sessions;
 using pawKitLib.Ai.Requests;
 using System.Threading;
 
@@ -21,6 +22,6 @@ public interface IAiClient
     /// <param name="context">The prepared request context, containing the final messages and tools.</param>
     /// <param name="parameters">The provider-specific parameters for this inference request.</param>
     /// <param name="cancellationToken">A token to cancel the operation.</param>
-    /// <returns>A new <see cref="AiMessage"/> from the assistant.</returns>
-    Task<AiMessage> GetCompletionAsync(AiRequestContext context, InferenceParameters parameters, CancellationToken cancellationToken = default);
+    /// <returns>A list of new <see cref="AiMessage"/> choices from the assistant.</returns>
+    Task<IReadOnlyList<AiMessage>> GetCompletionAsync(AiRequestContext context, InferenceParameters parameters, CancellationToken cancellationToken = default);
 }

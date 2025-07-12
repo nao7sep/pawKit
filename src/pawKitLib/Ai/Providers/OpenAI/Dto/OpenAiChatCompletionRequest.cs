@@ -61,4 +61,8 @@ internal sealed record OpenAiChatCompletionRequest
     [JsonPropertyName("user")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? User { get; init; }
+
+    [JsonPropertyName("n")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? N { get; init; }
 }
