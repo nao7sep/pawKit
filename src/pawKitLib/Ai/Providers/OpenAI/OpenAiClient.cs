@@ -34,9 +34,11 @@ public sealed class OpenAiClient : IAiClient
             throw new ArgumentException("OpenAI API key is missing.", nameof(options));
         }
 
-        _httpClient.BaseAddress = new Uri(_options.BaseUrl);
-        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(OpenAiApiConstants.BearerAuthenticationScheme, _options.ApiKey);
-        _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        // The HttpClient is intentionally not configured here.
+        // As a typed client, its configuration (BaseAddress, DefaultRequestHeaders, etc.)
+        // is handled by IHttpClientFactory during dependency injection setup.
+        // This approach centralizes configuration and follows modern .NET best practices.
+
     }
 
     /// <inheritdoc />

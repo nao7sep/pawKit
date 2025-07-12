@@ -23,6 +23,10 @@ public sealed class ResourceResolver : IResourceResolver
         // This class is the designated "gatekeeper" for file system access.
         // By enforcing the check internally, we ensure that any consumer of this service is secure by default.
         ArgumentNullException.ThrowIfNull(options.Value, nameof(options));
+
+        // We store the fully resolved `_allowedBasePath` directly instead of the IOptions object.
+        // This provides a "fail-fast" mechanism by validating the path at startup, improves efficiency
+        // by avoiding repeated path normalization in `ResolveAsync`, and simplifies the internal logic.
         _allowedBasePath = Path.GetFullPath(options.Value.AllowedBasePath);
     }
 
