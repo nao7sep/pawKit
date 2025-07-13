@@ -1,19 +1,19 @@
-# Welcome to the .gitignore file. If you need this explained, you shouldn't be using git.
+# .gitignore: Because your computer loves to hoard garbage.
 
-# Build trash. If you commit these, you're the problem.
+# Build artifacts. If you want these in source control, seek help.
 bin/
 obj/
 
-# IDE droppings. Your editor's mess is not source code.
+# IDE leftovers. Your editor thinks it's special. It's not.
 .vs/
 .vscode/
 .idea/
 
-# System stupidity. These files are proof your OS hates you.
+# System detritus. Windows and macOS: united in uselessness.
 .DS_Store
 desktop.ini
 Thumbs.db
 
-# Visual Studio user garbage. Your personal settings are not a feature.
+# Visual Studio user settings. Your preferences are not a feature.
 *.suo
 *.user
