@@ -1,4 +1,4 @@
-# pawKit General Coding and Architecture Guidelines
+# pawKit Coding and Architecture Guidelines
 
 This document contains standards and guidelines for coding, design, and architecture in the pawKit repository. All contributors should follow these practices to ensure code quality, maintainability, and consistency.
 
