@@ -1,0 +1,19 @@
+﻿@* This component controls which page is shown based on the browser's address (URL). *@
+<Router AppAssembly="@typeof(App).Assembly">
+    @* If the URL matches a page in your app, Blazor will show that page. *@
+    <Found Context="routeData">
+        @* RouteView displays the matched page, using your main layout (like a template for all pages). *@
+        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+        @* FocusOnNavigate helps with accessibility: when you go to a new page, it moves keyboard focus to the first <h1> heading. *@
+        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+    </Found>
+    @* If the URL doesn't match any page, Blazor shows this "Not Found" section. *@
+    <NotFound>
+        @* PageTitle sets the browser tab title to "Not found". *@
+        <PageTitle>Not found</PageTitle>
+        @* LayoutView uses your main layout and shows a friendly message. *@
+        <LayoutView Layout="@typeof(MainLayout)">
+            <p role="alert">Sorry, there's nothing at this address.</p>
+        </LayoutView>
+    </NotFound>
+</Router>

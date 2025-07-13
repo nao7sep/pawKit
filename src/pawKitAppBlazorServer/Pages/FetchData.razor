@@ -1,0 +1,64 @@
+﻿@* This page shows a weather forecast table by fetching data from a service. *@
+@page "/fetchdata"
+@using pawKitAppBlazorServer.Data
+@* Injects the WeatherForecastService so we can use it to get data. This uses Blazor's built-in dependency injection system, which is based on a ServiceCollection. All services registered in Program.cs are added to the app's default collection, and Blazor automatically uses this collection for injection throughout the app. *@
+@inject WeatherForecastService ForecastService
+
+@* Sets the browser tab title *@
+<PageTitle>Weather forecast</PageTitle>
+
+<h1>Weather forecast</h1>
+
+@* Brief description for users *@
+<p>This component demonstrates fetching data from a service.</p>
+
+@* If forecasts is null, show a loading message. Otherwise, show the table of results. When forecasts is set (after data loads), Blazor automatically re-renders the component, replacing the loading message with the actual data. No manual refresh is needed. *@
+@if (forecasts == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    @* Table displays each forecast's date, temperatures, and summary.
+       If you call a method like ToShortDateString() and it throws an exception, Blazor will stop rendering this component and show an error.
+       In development, you'll see a detailed error message in the browser and console.
+       In production, the app will show the error UI (like the reload message in _Host.cshtml), and the SignalR connection may break, requiring a page reload.
+       You can handle exceptions by using try/catch blocks in your code, either in the @code section or in helper methods.
+       For example, you could write a helper method that wraps ToShortDateString() in a try/catch and returns a fallback value if an error occurs.
+       For async data loading, use try/catch in your async method to handle errors gracefully and show a message in the UI if needed.
+       It's good practice to validate your data or use try/catch if you expect possible errors during rendering. *@
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Temp. (C)</th>
+                <th>Temp. (F)</th>
+                <th>Summary</th>
+            </tr>
+        </thead>
+        <tbody>
+            @* Here we use a regular foreach because forecasts is an array and all data is loaded before rendering. If forecasts were an IAsyncEnumerable, we could use @await foreach to process each item as it arrives asynchronously (streaming). Use @await foreach for streaming async data, and regular foreach for data that's already loaded. *@
+            @foreach (var forecast in forecasts)
+            {
+                <tr>
+                    <td>@forecast.Date.ToShortDateString()</td>
+                    <td>@forecast.TemperatureC</td>
+                    <td>@forecast.TemperatureF</td>
+                    <td>@forecast.Summary</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    // Holds the array of weather forecasts. Starts as null (not loaded yet).
+    private WeatherForecast[]? forecasts;
+
+    // Called by Blazor when the page first loads. Fetches data from the service asynchronously.
+    protected override async Task OnInitializedAsync()
+    {
+        // Get the forecast data for today and store it in forecasts.
+        forecasts = await ForecastService.GetForecastAsync(DateOnly.FromDateTime(DateTime.Now));
+    }
+}

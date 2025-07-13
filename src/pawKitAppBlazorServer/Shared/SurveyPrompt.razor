@@ -1,0 +1,21 @@
+﻿@* This component displays a survey prompt banner on the page. *@
+<div class="alert alert-secondary mt-4">
+    @* Icon from Open Iconic, used for visual emphasis. *@
+    <span class="oi oi-pencil me-2" aria-hidden="true"></span>
+    @* The title is provided by the parent component as a parameter. *@
+    <strong>@Title</strong>
+
+    <span class="text-nowrap">
+        @* Text and link inviting the user to take a survey. The link opens in a new tab. *@
+        Please take our
+        <a target="_blank" class="font-weight-bold link-dark" href="https://go.microsoft.com/fwlink/?linkid=2186158">brief survey</a>
+    </span>
+    and tell us what you think.
+</div>
+
+@code {
+    // The Title property is marked with [Parameter], allowing the parent component to set its value.
+    // This demonstrates how to pass data from a parent to a child component in Blazor.
+    [Parameter]
+    public string? Title { get; set; }
+}

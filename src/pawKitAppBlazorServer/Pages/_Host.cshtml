@@ -1,0 +1,41 @@
+﻿@* This is the main entry point for your Blazor Server app. All unmatched routes are sent here. *@
+@page "/"
+@using Microsoft.AspNetCore.Components.Web
+@namespace pawKitAppBlazorServer.Pages
+@* Enables Tag Helpers, which let you use server-side logic in HTML markup (e.g., for forms, links, versioned static files). *@
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    @* Standard HTML head section *@
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="~/" /> @* Sets the base URL for the app *@
+    <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" /> @* Bootstrap styles *@
+    <link href="css/site.css" rel="stylesheet" /> @* Custom site styles *@
+    <link href="pawKitAppBlazorServer.styles.css" rel="stylesheet" /> @* Blazor-generated styles *@
+    <link rel="icon" type="image/png" href="favicon.png"/> @* Favicon for browser tab *@
+    @* Allows Blazor to update the <head> section dynamically (e.g., page titles) *@
+    <component type="typeof(HeadOutlet)" render-mode="ServerPrerendered" />
+</head>
+<body>
+    @* This loads your Blazor app's root component (App.razor) and starts the UI *@
+    <component type="typeof(App)" render-mode="ServerPrerendered" />
+
+    @* Error UI: Shows a message if an error occurs in the app. In Blazor Server, an unhandled exception can break the persistent SignalR connection between browser and server, so the app may need to be reloaded to work again. *@
+    <div id="blazor-error-ui">
+        <environment include="Staging,Production">
+            An error has occurred. This application may no longer respond until reloaded.
+        </environment>
+        <environment include="Development">
+            An unhandled exception has occurred. See browser dev tools for details.
+        </environment>
+        <a href="" class="reload">Reload</a>
+        <a class="dismiss">🗙</a>
+    </div>
+
+    @* Loads the Blazor Server JavaScript, enabling real-time communication between browser and server *@
+    <script src="_framework/blazor.server.js"></script>
+</body>
+</html>

@@ -1,0 +1,49 @@
+﻿@* Navigation menu component for the app sidebar. Provides links to main pages and supports collapsing for mobile view. *@
+<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        @* App name and brand link (does not navigate anywhere). *@
+        <a class="navbar-brand" href="">pawKitAppBlazorServer</a>
+        @* Button to toggle the navigation menu (visible on small screens). *@
+        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+</div>
+
+@* The navigation menu itself. The CSS class 'collapse' hides the menu when collapsed. *@
+<div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
+    <nav class="flex-column">
+        @* Home link. Uses NavLink for automatic active styling. The icon is from Open Iconic. *@
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                <span class="oi oi-home" aria-hidden="true"></span> Home
+            </NavLink>
+        </div>
+        @* Counter page link. *@
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="counter">
+                <span class="oi oi-plus" aria-hidden="true"></span> Counter
+            </NavLink>
+        </div>
+        @* Fetch data page link. *@
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="fetchdata">
+                <span class="oi oi-list-rich" aria-hidden="true"></span> Fetch data
+            </NavLink>
+        </div>
+    </nav>
+</div>
+
+@code {
+    // Tracks whether the navigation menu is collapsed (hidden) or expanded (visible).
+    private bool collapseNavMenu = true;
+
+    // Returns the CSS class for the menu. 'collapse' hides the menu; otherwise, it's visible.
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    // Toggles the collapsed state of the navigation menu when called (e.g., when the button or menu is clicked).
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+}

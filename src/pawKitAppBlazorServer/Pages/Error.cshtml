@@ -1,0 +1,57 @@
+﻿@* This is the error page shown when an unhandled exception occurs in the app. *@
+@page
+@* The @model directive binds a single instance of ErrorModel to this page, similar to a WPF item template. All data and logic for the page comes from this model instance. Razor Pages always use one model per page; if you need more data, add properties to the model. *@
+@model pawKitAppBlazorServer.Pages.ErrorModel
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    @* Standard HTML head section for error page *@
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Error</title>
+    <link href="~/css/bootstrap/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/css/site.css" rel="stylesheet" asp-append-version="true" />
+</head>
+
+<body>
+    <div class="main">
+        <div class="content px-4">
+            @* Main error message *@
+            <h1 class="text-danger">Error.</h1>
+            <h2 class="text-danger">An error occurred while processing your request.</h2>
+
+            @* Show the request ID if available, useful for debugging and tracing errors *@
+            @if (Model.ShowRequestId)
+            {
+                <p>
+                    <strong>Request ID:</strong> <code>@Model.RequestId</code>
+                </p>
+            }
+
+            @* Information about development mode and error details.
+               You can show or hide sections of a Razor page based on the environment using the <environment> tag helper.
+               For example, <environment include="Development"> will only show content in development mode, and <environment exclude="Development"> will hide content in development mode.
+               The ASPNETCORE_ENVIRONMENT variable controls which environment is active.
+               When running in Visual Studio Code or with dotnet run, it's usually set to Development via launchSettings.json.
+               In production (e.g., Azure, IIS, Docker), set ASPNETCORE_ENVIRONMENT to Production in your hosting environment.
+               If you don't set it, ASP.NET Core defaults to Production for safety.
+               You can also check the environment in code:
+               @if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development") { /* show dev-only content */ }
+               This is useful for showing debug info or warnings only in development. *@
+            <h3>Development Mode</h3>
+            <p>
+                Swapping to the <strong>Development</strong> environment displays detailed information about the error that occurred.
+            </p>
+            <p>
+                <strong>The Development environment shouldn't be enabled for deployed applications.</strong>
+                It can result in displaying sensitive information from exceptions to end users.
+                For local debugging, enable the <strong>Development</strong> environment by setting the <strong>ASPNETCORE_ENVIRONMENT</strong> environment variable to <strong>Development</strong>
+                and restarting the app.
+            </p>
+        </div>
+    </div>
+</body>
+
+</html>

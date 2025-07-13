@@ -1,14 +1,14 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
 
     <!-- Project Metadata -->
-    <AssemblyTitle>pawKitLib</AssemblyTitle>
+    <AssemblyTitle>pawKitAppBlazorServer</AssemblyTitle>
     <Product>pawKit</Product>
-    <Description>A comprehensive C# utility library providing essential tools and helpers for .NET development projects.</Description>
+    <Description>A Blazor Server application demonstrating pawKitLib functionality with both interactive components and static Razor pages.</Description>
     <Company>Purrfect Code</Company>
     <Authors>nao7sep</Authors>
     <Copyright>Copyright © 2025</Copyright>
@@ -16,5 +16,9 @@
     <PackageLicenseExpression>GPL-3.0</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/nao7sep/pawKit</RepositoryUrl>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\pawKitLib\pawKitLib.csproj" />
+  </ItemGroup>
 
 </Project>

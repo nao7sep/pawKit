@@ -1,0 +1,24 @@
+﻿@* This layout component defines the common structure for all pages that use it. *@
+@inherits LayoutComponentBase
+
+@* Sets the browser tab title for pages using this layout. *@
+<PageTitle>pawKitAppBlazorServer</PageTitle>
+
+<div class="page">
+    @* Sidebar area containing the navigation menu. NavMenu is a separate component that displays links to different pages. *@
+    <div class="sidebar">
+        <NavMenu />
+    </div>
+
+    <main>
+        @* Top row with a link to ASP.NET documentation. *@
+        <div class="top-row px-4">
+            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
+        </div>
+
+        <article class="content px-4">
+            @* @Body is a special directive that renders the content of the current page inside this layout. *@
+            @Body
+        </article>
+    </main>
+</div>
