@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net9.0</TargetFramework>
@@ -9,18 +9,20 @@
         <!-- Project Metadata -->
         <AssemblyTitle>pawKitLib.Tests</AssemblyTitle>
         <Product>pawKit</Product>
-        <Description>Unit tests for pawKitLib - A C# class library containing core utilities for pawKit.</Description>
+        <Description>Unit tests for the pawKitLib library, ensuring code quality and functionality validation.</Description>
         <Company>Purrfect Code</Company>
         <Authors>nao7sep</Authors>
         <Copyright>Copyright © 2025</Copyright>
-        <Version>0.1.1</Version>
+        <Version>0.1.0</Version>
         <PackageLicenseExpression>GPL-3.0</PackageLicenseExpression>
         <RepositoryUrl>https://github.com/nao7sep/pawKit</RepositoryUrl>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="xunit" Version="2.9.3" />
-        <PackageReference Include="xunit.runner.visualstudio" Version="3.1.1" />
+        <PackageReference Include="coverlet.collector" Version="6.0.2" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
+        <PackageReference Include="xunit" Version="2.9.2" />
+        <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
     </ItemGroup>
 
     <ItemGroup>
