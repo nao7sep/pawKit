@@ -17,7 +17,8 @@ This document contains standards and guidelines for coding, design, and architec
 - You **should** use records for immutable data models when appropriate.
 - You **should** prefer strongly-typed implementations for core parameters, but allow for extensibility (e.g., dictionaries for extra or evolving API fields) when requirements are unclear or APIs are volatile.
 - You **should** avoid unnecessary proliferation of DTOs—favor modular, maintainable models.
-- You **should** use immutable collections (e.g., `ImmutableList<T>`, `ImmutableDictionary<TKey, TValue>`) instead of `IReadOnlyList<T>` or `IReadOnlyDictionary<TKey, TValue>` when practical.
+- For static or constant-like data (such as lookup tables), you **should** use `Immutable*` collections (e.g., `ImmutableList<T>`, `ImmutableDictionary<TKey, TValue>`).
+- For parameters, temporary variables, or other data whose sole purpose is to signal that their contents will not be modified, you **should** use `IReadOnly*` collections. This provides clarity of intent without enforcing immutability.
 - You **should** use async code and APIs when they improve effectiveness, scalability, or quality.
 
 ## File Organization
