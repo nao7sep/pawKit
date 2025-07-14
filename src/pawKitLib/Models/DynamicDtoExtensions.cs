@@ -13,12 +13,18 @@ namespace pawKitLib.Models
     /// Implementing all methods up front avoids the overhead of repeatedly checking which types are supported and incrementally adding them as needed.
     /// By leveraging AI to generate the full set, the codebase remains consistent, future-proof, and easier to maintain.
     /// These are not instance methods; we use extensions to keep data and helpers separate (separation of concerns).
+    ///
+    /// The Set* methods use `JsonSerializer.SerializeToElement(value)`.
+    /// This is the most efficient and safest way to convert a .NET type into a `JsonElement`.
+    /// It directly serializes the value without creating an intermediate string, which improves performance
+    /// and avoids potential memory issues associated with undisposed `JsonDocument` instances.
+    /// This method correctly handles all JSON-specific formatting, such as quoting strings and using true/false for booleans.
     /// </summary>
     public static class DynamicDtoExtensions
     {
         // Boolean
         public static void SetBool(this DynamicDto dto, string key, bool value) =>
-            dto.ExtraProperties[key] = JsonDocument.Parse($"\"{ValueTypeConverter.ToString(value)}\"").RootElement;
+            dto.ExtraProperties[key] = JsonSerializer.SerializeToElement(value);
         public static bool GetBool(this DynamicDto dto, string key)
         {
             if (!dto.ExtraProperties.TryGetValue(key, out var value))
@@ -40,7 +46,7 @@ namespace pawKitLib.Models
 
         // Byte
         public static void SetByte(this DynamicDto dto, string key, byte value) =>
-            dto.ExtraProperties[key] = JsonDocument.Parse(ValueTypeConverter.ToString(value)).RootElement;
+            dto.ExtraProperties[key] = JsonSerializer.SerializeToElement(value);
         public static byte GetByte(this DynamicDto dto, string key)
         {
             if (!dto.ExtraProperties.TryGetValue(key, out var value))
@@ -60,7 +66,7 @@ namespace pawKitLib.Models
 
         // SByte
         public static void SetSByte(this DynamicDto dto, string key, sbyte value) =>
-            dto.ExtraProperties[key] = JsonDocument.Parse(ValueTypeConverter.ToString(value)).RootElement;
+            dto.ExtraProperties[key] = JsonSerializer.SerializeToElement(value);
         public static sbyte GetSByte(this DynamicDto dto, string key)
         {
             if (!dto.ExtraProperties.TryGetValue(key, out var value))
@@ -80,7 +86,7 @@ namespace pawKitLib.Models
 
         // Short
         public static void SetShort(this DynamicDto dto, string key, short value) =>
-            dto.ExtraProperties[key] = JsonDocument.Parse(ValueTypeConverter.ToString(value)).RootElement;
+            dto.ExtraProperties[key] = JsonSerializer.SerializeToElement(value);
         public static short GetShort(this DynamicDto dto, string key)
         {
             if (!dto.ExtraProperties.TryGetValue(key, out var value))
@@ -100,7 +106,7 @@ namespace pawKitLib.Models
 
         // UShort
         public static void SetUShort(this DynamicDto dto, string key, ushort value) =>
-            dto.ExtraProperties[key] = JsonDocument.Parse(ValueTypeConverter.ToString(value)).RootElement;
+            dto.ExtraProperties[key] = JsonSerializer.SerializeToElement(value);
         public static ushort GetUShort(this DynamicDto dto, string key)
         {
             if (!dto.ExtraProperties.TryGetValue(key, out var value))
@@ -120,7 +126,7 @@ namespace pawKitLib.Models
 
         // Int
         public static void SetInt(this DynamicDto dto, string key, int value) =>
-            dto.ExtraProperties[key] = JsonDocument.Parse(ValueTypeConverter.ToString(value)).RootElement;
+            dto.ExtraProperties[key] = JsonSerializer.SerializeToElement(value);
         public static int GetInt(this DynamicDto dto, string key)
         {
             if (!dto.ExtraProperties.TryGetValue(key, out var value))
@@ -140,7 +146,7 @@ namespace pawKitLib.Models
 
         // UInt
         public static void SetUInt(this DynamicDto dto, string key, uint value) =>
-            dto.ExtraProperties[key] = JsonDocument.Parse(ValueTypeConverter.ToString(value)).RootElement;
+            dto.ExtraProperties[key] = JsonSerializer.SerializeToElement(value);
         public static uint GetUInt(this DynamicDto dto, string key)
         {
             if (!dto.ExtraProperties.TryGetValue(key, out var value))
@@ -160,7 +166,7 @@ namespace pawKitLib.Models
 
         // Long
         public static void SetLong(this DynamicDto dto, string key, long value) =>
-            dto.ExtraProperties[key] = JsonDocument.Parse(ValueTypeConverter.ToString(value)).RootElement;
+            dto.ExtraProperties[key] = JsonSerializer.SerializeToElement(value);
         public static long GetLong(this DynamicDto dto, string key)
         {
             if (!dto.ExtraProperties.TryGetValue(key, out var value))
@@ -180,7 +186,7 @@ namespace pawKitLib.Models
 
         // ULong
         public static void SetULong(this DynamicDto dto, string key, ulong value) =>
-            dto.ExtraProperties[key] = JsonDocument.Parse(ValueTypeConverter.ToString(value)).RootElement;
+            dto.ExtraProperties[key] = JsonSerializer.SerializeToElement(value);
         public static ulong GetULong(this DynamicDto dto, string key)
         {
             if (!dto.ExtraProperties.TryGetValue(key, out var value))
@@ -200,7 +206,7 @@ namespace pawKitLib.Models
 
         // Float
         public static void SetFloat(this DynamicDto dto, string key, float value) =>
-            dto.ExtraProperties[key] = JsonDocument.Parse(ValueTypeConverter.ToString(value)).RootElement;
+            dto.ExtraProperties[key] = JsonSerializer.SerializeToElement(value);
         public static float GetFloat(this DynamicDto dto, string key)
         {
             if (!dto.ExtraProperties.TryGetValue(key, out var value))
@@ -220,7 +226,7 @@ namespace pawKitLib.Models
 
         // Double
         public static void SetDouble(this DynamicDto dto, string key, double value) =>
-            dto.ExtraProperties[key] = JsonDocument.Parse(ValueTypeConverter.ToString(value)).RootElement;
+            dto.ExtraProperties[key] = JsonSerializer.SerializeToElement(value);
         public static double GetDouble(this DynamicDto dto, string key)
         {
             if (!dto.ExtraProperties.TryGetValue(key, out var value))
@@ -240,7 +246,7 @@ namespace pawKitLib.Models
 
         // Decimal
         public static void SetDecimal(this DynamicDto dto, string key, decimal value) =>
-            dto.ExtraProperties[key] = JsonDocument.Parse(ValueTypeConverter.ToString(value)).RootElement;
+            dto.ExtraProperties[key] = JsonSerializer.SerializeToElement(value);
         public static decimal GetDecimal(this DynamicDto dto, string key)
         {
             if (!dto.ExtraProperties.TryGetValue(key, out var value))
@@ -260,7 +266,7 @@ namespace pawKitLib.Models
 
         // Char
         public static void SetChar(this DynamicDto dto, string key, char value) =>
-            dto.ExtraProperties[key] = JsonDocument.Parse($"\"{ValueTypeConverter.ToString(value)}\"").RootElement;
+            dto.ExtraProperties[key] = JsonSerializer.SerializeToElement(value);
         public static char GetChar(this DynamicDto dto, string key)
         {
             if (!dto.ExtraProperties.TryGetValue(key, out var value))
@@ -278,7 +284,7 @@ namespace pawKitLib.Models
 
         // String
         public static void SetString(this DynamicDto dto, string key, string value) =>
-            dto.ExtraProperties[key] = JsonDocument.Parse($"\"{value}\"").RootElement;
+            dto.ExtraProperties[key] = JsonSerializer.SerializeToElement(value);
 
         public static string GetString(this DynamicDto dto, string key)
         {
@@ -298,7 +304,7 @@ namespace pawKitLib.Models
 
         // Guid
         public static void SetGuid(this DynamicDto dto, string key, Guid value) =>
-            dto.ExtraProperties[key] = JsonDocument.Parse($"\"{ValueTypeConverter.ToString(value)}\"").RootElement;
+            dto.ExtraProperties[key] = JsonSerializer.SerializeToElement(ValueTypeConverter.ToString(value));
         public static Guid GetGuid(this DynamicDto dto, string key)
         {
             if (!dto.ExtraProperties.TryGetValue(key, out var value))
@@ -316,7 +322,7 @@ namespace pawKitLib.Models
 
         // DateTime
         public static void SetDateTime(this DynamicDto dto, string key, DateTime value) =>
-            dto.ExtraProperties[key] = JsonDocument.Parse($"\"{ValueTypeConverter.ToString(value)}\"").RootElement;
+            dto.ExtraProperties[key] = JsonSerializer.SerializeToElement(ValueTypeConverter.ToString(value));
         public static DateTime GetDateTime(this DynamicDto dto, string key)
         {
             if (!dto.ExtraProperties.TryGetValue(key, out var value))
@@ -334,7 +340,7 @@ namespace pawKitLib.Models
 
         // DateTimeOffset
         public static void SetDateTimeOffset(this DynamicDto dto, string key, DateTimeOffset value) =>
-            dto.ExtraProperties[key] = JsonDocument.Parse($"\"{ValueTypeConverter.ToString(value)}\"").RootElement;
+            dto.ExtraProperties[key] = JsonSerializer.SerializeToElement(ValueTypeConverter.ToString(value));
         public static DateTimeOffset GetDateTimeOffset(this DynamicDto dto, string key)
         {
             if (!dto.ExtraProperties.TryGetValue(key, out var value))
@@ -352,7 +358,7 @@ namespace pawKitLib.Models
 
         // TimeSpan
         public static void SetTimeSpan(this DynamicDto dto, string key, TimeSpan value) =>
-            dto.ExtraProperties[key] = JsonDocument.Parse($"\"{ValueTypeConverter.ToString(value)}\"").RootElement;
+            dto.ExtraProperties[key] = JsonSerializer.SerializeToElement(ValueTypeConverter.ToString(value));
         public static TimeSpan GetTimeSpan(this DynamicDto dto, string key)
         {
             if (!dto.ExtraProperties.TryGetValue(key, out var value))
@@ -370,7 +376,7 @@ namespace pawKitLib.Models
 
         // Enum
         public static void SetEnum<TEnum>(this DynamicDto dto, string key, TEnum value) where TEnum : struct, Enum =>
-            dto.ExtraProperties[key] = JsonDocument.Parse($"\"{ValueTypeConverter.ToString(value)}\"").RootElement;
+            dto.ExtraProperties[key] = JsonSerializer.SerializeToElement(ValueTypeConverter.ToString(value));
         public static TEnum GetEnum<TEnum>(this DynamicDto dto, string key) where TEnum : struct, Enum
         {
             if (!dto.ExtraProperties.TryGetValue(key, out var value))
@@ -388,12 +394,12 @@ namespace pawKitLib.Models
 
         // BigInteger
         public static void SetBigInteger(this DynamicDto dto, string key, BigInteger value) =>
-            dto.ExtraProperties[key] = JsonDocument.Parse(ValueTypeConverter.ToString(value)).RootElement;
+            dto.ExtraProperties[key] = JsonSerializer.SerializeToElement(ValueTypeConverter.ToString(value));
         public static BigInteger GetBigInteger(this DynamicDto dto, string key)
         {
             if (!dto.ExtraProperties.TryGetValue(key, out var value))
                 throw new KeyNotFoundException($"Key '{key}' not found.");
-            if (value.ValueKind == JsonValueKind.Number && value.TryGetInt64(out var result)) return new BigInteger(result);
+            if (value.ValueKind == JsonValueKind.Number) return ValueTypeConverter.ParseBigInteger(value.GetRawText());
             if (value.ValueKind == JsonValueKind.String) return ValueTypeConverter.ParseBigInteger(value.GetString()!);
             throw new InvalidCastException($"Value for '{key}' is not a BigInteger.");
         }
@@ -401,14 +407,14 @@ namespace pawKitLib.Models
         {
             result = default;
             if (!dto.ExtraProperties.TryGetValue(key, out var value)) return false;
-            if (value.ValueKind == JsonValueKind.Number && value.TryGetInt64(out var longResult)) { result = new BigInteger(longResult); return true; }
+            if (value.ValueKind == JsonValueKind.Number) return ValueTypeConverter.TryParseBigInteger(value.GetRawText(), out result);
             if (value.ValueKind == JsonValueKind.String) return ValueTypeConverter.TryParseBigInteger(value.GetString()!, out result);
             return false;
         }
 
         // Uri
         public static void SetUri(this DynamicDto dto, string key, Uri value) =>
-            dto.ExtraProperties[key] = JsonDocument.Parse($"\"{ValueTypeConverter.ToString(value)}\"").RootElement;
+            dto.ExtraProperties[key] = JsonSerializer.SerializeToElement(ValueTypeConverter.ToString(value));
         public static Uri GetUri(this DynamicDto dto, string key)
         {
             if (!dto.ExtraProperties.TryGetValue(key, out var value))
