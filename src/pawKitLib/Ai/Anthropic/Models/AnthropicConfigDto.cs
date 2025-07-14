@@ -2,7 +2,7 @@ using pawKitLib.Models;
 
 namespace pawKitLib.Ai.Anthropic.Models;
 
-public class AnthropicConfigDto : DynamicDto
+public class AnthropicConfigDto
 {
     public string BaseUrl { get; set; } = string.Empty;
     public string ApiKey { get; set; } = string.Empty;
