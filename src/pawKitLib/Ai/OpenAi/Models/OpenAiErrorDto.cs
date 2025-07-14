@@ -5,7 +5,7 @@ namespace pawKitLib.Ai.OpenAi.Models;
 /// <summary>
 /// Represents only the error details we know we'll receive from the OpenAI API.
 /// </summary>
-public class OpenAiErrorDto : BaseDto
+public class OpenAiErrorDto : DynamicDto
 {
     public string? Type { get; set; }       // e.g., "invalid_request_error"
     public string? Code { get; set; }       // e.g., "invalid_api_key"

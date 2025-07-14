@@ -32,9 +32,10 @@ This document contains standards and guidelines for coding, design, and architec
 - You **should** avoid over-engineering and recognize when "good enough" is the most effective solution.
 
 ## Code Style
-- You **should** follow .NET coding conventions for naming, spacing, and formatting.
-- You **should** write clear, beginner-friendly comments that explain the purpose and mechanism of code, focusing on practical intent and real-world usage.
-- You **should** document public APIs and significant architectural decisions, especially when deviating from textbook standards for pragmatic reasons.
+- Follow .NET coding conventions for naming, spacing, and formatting.
+- Write clear, concise C# comments that explain the practical purpose of code.
+- Use <summary> comments when helpful, but keep them simple and direct. Avoid excessive structure, lists, or verbosity.
+- Document public APIs and significant architectural decisions, especially when deviating from standards for pragmatic reasons.
 
 ## Structured Logging
 - All log messages **must** use structured logging.

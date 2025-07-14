@@ -8,7 +8,7 @@ namespace pawKitLib.Security.Identity.Models;
 // where each DTO represents a user's preferences for receiving notifications at specific email addresses. This pattern allows for flexible, user-driven extensions
 // without modifying the core DTO structure.
 [Obsolete("This DTO is for demonstration purposes only and should not be used in production code until integrated into the system.")]
-public class UserIdentityDto<TRole> : BaseDto
+public class UserIdentityDto<TRole> : DynamicDto
 {
     public Guid Id { get; set; }
     public string UserName { get; set; } = string.Empty;

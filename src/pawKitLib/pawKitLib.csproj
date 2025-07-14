@@ -17,4 +17,8 @@
     <RepositoryUrl>https://github.com/nao7sep/pawKit</RepositoryUrl>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Flurl.Http" Version="4.0.2" />
+  </ItemGroup>
+
 </Project>
