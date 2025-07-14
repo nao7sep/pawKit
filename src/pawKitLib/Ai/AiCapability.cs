@@ -3,6 +3,15 @@ namespace pawKitLib.Ai;
 /// <summary>
 /// Enumerates supported AI capabilities across providers.
 /// </summary>
+// Note: This enum is not currently linked to any service selection logic or abstraction within the codebase.
+// It serves as a personal reference for cataloging and classifying potential AI capabilities that may be implemented.
+// Type names elsewhere in the code are not necessarily consistent with the enum item names.
+// This list is maintained to help avoid confusion and ensure clarity when considering different AI features.
+// No direct mapping or dependency exists between this enum and other types.
+// If, in the future, we implement many capabilities for multiple AI providers, we might consider introducing
+// abstraction layers where this enum could become useful. This is not contrary to YAGNI: as an enum, I do not
+// strictly need it now, but as a curated list of potential capabilities requiring implementation, it is already
+// valuable. Its presence does not cause harm, as it is not merely a text file but a structured reference.
 public enum AiCapability
 {
     // Core Language & Text Features

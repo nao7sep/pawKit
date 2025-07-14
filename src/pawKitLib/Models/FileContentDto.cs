@@ -4,7 +4,10 @@ namespace pawKitLib.Models;
 /// Strongly-typed wrapper for in-memory file content, including file name and bytes.
 /// Use this for scenarios where file data is loaded into memory, such as uploads or API requests.
 /// </summary>
-public class FileContentDto : DynamicDto
+/// <remarks>
+/// Note: This class does not require the features provided by DynamicDto, as it is intended solely for strongly-typed in-memory file content representation.
+/// </remarks>
+public class FileContentDto
 {
     /// <summary>
     /// The name of the file, including extension.
