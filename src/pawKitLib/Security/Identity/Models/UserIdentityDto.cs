@@ -1,6 +1,6 @@
 using pawKitLib.Models;
 
-namespace pawKitLib.Security.Identity;
+namespace pawKitLib.Security.Identity.Models;
 
 // This DTO is not used anywhere yet and is currently provided to demonstrate DTO design principles.
 // It is designed for extensibility and maintainability, following the open/closed principle, and will be used in future implementations.
