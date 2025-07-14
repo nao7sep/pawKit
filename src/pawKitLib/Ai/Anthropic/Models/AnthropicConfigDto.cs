@@ -1,6 +1,6 @@
 using pawKitLib.Models;
 
-namespace pawKitLib.Ai.Anthropic;
+namespace pawKitLib.Ai.Anthropic.Models;
 
 public class AnthropicConfigDto : BaseDto
 {

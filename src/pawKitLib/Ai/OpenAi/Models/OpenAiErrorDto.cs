@@ -1,6 +1,6 @@
 using pawKitLib.Models;
 
-namespace pawKitLib.Ai.OpenAi;
+namespace pawKitLib.Ai.OpenAi.Models;
 
 /// <summary>
 /// Represents only the error details we know we'll receive from the OpenAI API.

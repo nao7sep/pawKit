@@ -1,8 +1,8 @@
 using pawKitLib.Models;
 
-namespace pawKitLib.Ai.Google;
+namespace pawKitLib.Ai.OpenAi.Models;
 
-public class GoogleConfigDto : BaseDto
+public class OpenAiConfigDto : BaseDto
 {
     public string BaseUrl { get; set; } = string.Empty;
     public string ApiKey { get; set; } = string.Empty;

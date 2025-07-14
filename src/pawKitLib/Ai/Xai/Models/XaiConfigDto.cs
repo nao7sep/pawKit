@@ -1,6 +1,6 @@
 using pawKitLib.Models;
 
-namespace pawKitLib.Ai.Xai;
+namespace pawKitLib.Ai.Xai.Models;
 
 public class XaiConfigDto : BaseDto
 {
