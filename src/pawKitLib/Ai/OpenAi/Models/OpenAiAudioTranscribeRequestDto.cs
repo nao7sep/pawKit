@@ -9,9 +9,10 @@ namespace pawKitLib.Ai.OpenAi.Models;
 public class OpenAiAudioTranscribeRequestDto : DynamicDto
 {
     /// <summary>
-    /// Audio file to transcribe. Uses a DTO for type safety and future extensibility.
+    /// Audio file to transcribe. Accepts FilePathReferenceDto (local path) or FileContentDto (in-memory bytes).
+    /// Consumers must handle the actual type appropriately.
     /// </summary>
-    public LocalFileReferenceDto File { get; set; } = new();
+    public object File { get; set; } = new();
 
     /// <summary>
     /// Model ID to use for transcription.
