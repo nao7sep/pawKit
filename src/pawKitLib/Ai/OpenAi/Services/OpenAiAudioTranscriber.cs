@@ -30,7 +30,7 @@ public class OpenAiAudioTranscriber
     {
         try
         {
-            var endpoint = $"{_config.BaseUrl}/v1/audio/transcriptions";
+            var endpoint = $"{_config.BaseUrl}/audio/transcriptions";
 
             using var form = new MultipartFormDataContent();
             OpenAiMultipartFormDataContentHelper.AddFile(form, request.File);

@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using pawKitLib.Ai.OpenAi.Models;
+using pawKitLib.Ai.OpenAi.Services;
 
 namespace pawKitAppConsole
 {
@@ -33,6 +35,12 @@ namespace pawKitAppConsole
                 {
                     var httpClientFactory = serviceProvider.GetRequiredService<IHttpClientFactory>();
                     var httpClient = httpClientFactory.CreateClient();
+
+                    var openAiConfig = config.GetSection("pawKit:Ai:OpenAi:Config").Get<OpenAiConfigDto>();
+                    openAiConfig = openAiConfig ?? throw new InvalidOperationException("OpenAI config section is missing or invalid.");
+
+                    var transcriberLogger = serviceProvider.GetRequiredService<ILogger<OpenAiAudioTranscriber>>();
+                    var transcriber = new OpenAiAudioTranscriber(transcriberLogger, openAiConfig, httpClient);
                 }
                 catch (Exception ex)
                 {
