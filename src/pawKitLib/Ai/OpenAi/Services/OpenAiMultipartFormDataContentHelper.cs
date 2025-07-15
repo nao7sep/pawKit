@@ -2,6 +2,7 @@ using System.Collections;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Reflection;
+using System.Text.Json.Serialization;
 using System.Text.Json;
 using pawKitLib.Conversion;
 using pawKitLib.Models;
@@ -201,32 +202,33 @@ public static class OpenAiMultipartFormDataContentHelper
 
         foreach (var prop in properties)
         {
-            var fullName = namePrefix != null ? $"{namePrefix}{prop.Name}" : prop.Name;
+            var propName = prop.GetCustomAttribute<JsonPropertyNameAttribute>()?.Name ?? prop.Name;
+            var fullName = namePrefix != null ? $"{namePrefix}{propName}" : propName;
             var content = prop.GetValue(dto);
 
-            if (content is null)
+            // This switch is exhaustive. The `case object:` pattern acts as a catch-all for any
+            // non-null object that doesn't match a more specific pattern, so a `default` case
+            // is not needed and would be unreachable.
+            switch (content)
             {
-                AddNull(form, fullName);
-            }
-            else if (content is string str)
-            {
-                AddString(form, fullName, str);
-            }
-            else if (content.GetType().IsValueType)
-            {
-                AddValue(form, fullName, content);
-            }
-            else if (content is IEnumerable && content is not string)
-            {
-                AddEnumerable(form, fullName, (IEnumerable)content);
-            }
-            else if (content.GetType().IsClass && content is not string)
-            {
-                AddDto(form, content, fullName + ".");
-            }
-            else
-            {
-                throw new NotSupportedException($"Unsupported property type: {content.GetType().FullName}");
+                case null:
+                    AddNull(form, fullName);
+                    break;
+                case string str:
+                    AddString(form, fullName, str);
+                    break;
+                // This handles value types like int, bool, Guid, DateTime, etc.
+                case var _ when content.GetType().IsValueType:
+                    AddValue(form, fullName, content);
+                    break;
+                // This handles arrays and lists, but not strings.
+                case IEnumerable enumerable:
+                    AddEnumerable(form, fullName, enumerable);
+                    break;
+                // This handles nested objects. It must be after IEnumerable.
+                case object:
+                    AddDto(form, content, fullName + ".");
+                    break;
             }
         }
 
