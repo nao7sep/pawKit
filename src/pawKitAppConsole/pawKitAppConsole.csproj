@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+
+    <!-- Project Metadata -->
+    <AssemblyTitle>pawKitAppConsole</AssemblyTitle>
+    <Product>pawKit</Product>
+    <Description>A console application demonstrating pawKitLib functionality for command-line scenarios.</Description>
+    <Company>Purrfect Code</Company>
+    <Authors>nao7sep</Authors>
+    <Copyright>Copyright © 2025</Copyright>
+    <Version>0.1.0</Version>
+    <PackageLicenseExpression>GPL-3.0</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/nao7sep/pawKit</RepositoryUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\pawKitLib\pawKitLib.csproj" />
+  </ItemGroup>
+
+</Project>

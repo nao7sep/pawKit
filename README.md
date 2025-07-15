@@ -9,6 +9,7 @@ A comprehensive C# utility library and demonstration project showcasing modern .
 
 ### Applications
 - **`src/pawKitAppBlazorServer/`** - A Blazor Server application demonstrating pawKitLib functionality with both interactive components and static Razor pages.
+- **`src/pawKitAppConsole/`** - A console application demonstrating pawKitLib functionality for command-line scenarios.
 
 ### Testing
 - **`tests/pawKitLib.Tests/`** - Unit tests for the pawKitLib library, ensuring code quality and functionality validation.
@@ -27,6 +28,11 @@ dotnet build
 ### Running the Blazor Demo Application
 ```bash
 dotnet run --project src/pawKitAppBlazorServer
+```
+
+### Running the Console Demo Application
+```bash
+dotnet run --project src/pawKitAppConsole
 ```
 
 ### Running Tests
