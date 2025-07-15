@@ -8,9 +8,9 @@ namespace pawKitLib.Ai;
 public class AiServiceException : Exception
 {
     /// <summary>
-    /// The error code returned by the provider, if available (may be null).
+    /// The status code returned by the provider, if available (may be null).
     /// </summary>
-    public string? ErrorCode { get; }
+    public string? StatusCode { get; }
     /// <summary>
     /// The raw response payload from the provider, if available (may be null).
     /// </summary>
@@ -26,10 +26,10 @@ public class AiServiceException : Exception
 
     public AiServiceException(string message, Exception innerException) : base(message, innerException) { }
 
-    public AiServiceException(string message, string? errorCode = null, string? rawResponse = null, object? providerDetails = null, Exception? innerException = null)
+    public AiServiceException(string message, string? statusCode = null, string? rawResponse = null, object? providerDetails = null, Exception? innerException = null)
         : base(message, innerException)
     {
-        ErrorCode = errorCode;
+        StatusCode = statusCode;
         RawResponse = rawResponse;
         ProviderDetails = providerDetails;
     }
