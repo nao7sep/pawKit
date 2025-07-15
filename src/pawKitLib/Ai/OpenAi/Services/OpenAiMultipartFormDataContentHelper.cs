@@ -22,21 +22,49 @@ public static class OpenAiMultipartFormDataContentHelper
 
     public static void AddFile(MultipartFormDataContent form, FilePathReferenceDto file)
     {
-        var stream = File.OpenRead(file.FilePath);
-        var fileName = Path.GetFileName(file.FilePath);
-        var contentType = MimeTypeHelper.GetMimeType(fileName, fallbackToDefault: true);
-        var fileContent = new StreamContent(stream);
-        fileContent.Headers.ContentType = new MediaTypeHeaderValue(contentType!);
-        form.Add(fileContent, "file", fileName);
+        Stream? stream = null;
+        StreamContent? fileContent = null;
+
+        try
+        {
+            stream = File.OpenRead(file.FilePath);
+            var fileName = Path.GetFileName(file.FilePath);
+            // fallbackToDefault: true ensures this never returns null
+            var contentType = MimeTypeHelper.GetMimeType(fileName, fallbackToDefault: true);
+            fileContent = new StreamContent(stream);
+            fileContent.Headers.ContentType = new MediaTypeHeaderValue(contentType!);
+            form.Add(fileContent, "file", fileName);
+        }
+        catch
+        {
+            // If we don't make it to form.Add, dispose everything that's not null
+            fileContent?.Dispose();
+            stream?.Dispose();
+            throw;
+        }
     }
 
     public static void AddFile(MultipartFormDataContent form, FileContentDto file)
     {
-        var stream = new MemoryStream(file.Bytes);
-        var contentType = MimeTypeHelper.GetMimeType(file.FileName, fallbackToDefault: true);
-        var fileContent = new StreamContent(stream);
-        fileContent.Headers.ContentType = new MediaTypeHeaderValue(contentType!);
-        form.Add(fileContent, "file", file.FileName);
+        Stream? stream = null;
+        StreamContent? fileContent = null;
+
+        try
+        {
+            stream = new MemoryStream(file.Bytes);
+            // fallbackToDefault: true ensures this never returns null
+            var contentType = MimeTypeHelper.GetMimeType(file.FileName, fallbackToDefault: true);
+            fileContent = new StreamContent(stream);
+            fileContent.Headers.ContentType = new MediaTypeHeaderValue(contentType!);
+            form.Add(fileContent, "file", file.FileName);
+        }
+        catch
+        {
+            // If we don't make it to form.Add, dispose everything that's not null
+            fileContent?.Dispose();
+            stream?.Dispose();
+            throw;
+        }
     }
 
     public static void AddFile(MultipartFormDataContent form, object file)
