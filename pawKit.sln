@@ -8,6 +8,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "pawKitLib.Tests", "tests\pa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "pawKitAppBlazorServer", "src\pawKitAppBlazorServer\pawKitAppBlazorServer.csproj", "{55FC43F5-0EBC-4072-9F38-326F29F5EC9D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "pawKitAppConsole", "src\pawKitAppConsole\pawKitAppConsole.csproj", "{B2A1F7A2-9C4B-4E2A-8A2B-1F7A2E2B1F7A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -26,6 +28,10 @@ Global
 		{55FC43F5-0EBC-4072-9F38-326F29F5EC9D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{55FC43F5-0EBC-4072-9F38-326F29F5EC9D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{55FC43F5-0EBC-4072-9F38-326F29F5EC9D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B2A1F7A2-9C4B-4E2A-8A2B-1F7A2E2B1F7A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B2A1F7A2-9C4B-4E2A-8A2B-1F7A2E2B1F7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B2A1F7A2-9C4B-4E2A-8A2B-1F7A2E2B1F7A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B2A1F7A2-9C4B-4E2A-8A2B-1F7A2E2B1F7A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
