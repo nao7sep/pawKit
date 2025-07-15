@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using pawKitLib.Models;
 
 namespace pawKitLib.Ai.OpenAi.Models;
@@ -13,10 +14,12 @@ public class OpenAiAudioTranscribeRequestDto : DynamicDto
     /// Accepts FilePathReferenceDto (local path) or FileContentDto (in-memory bytes).
     /// Consumers must handle the actual type appropriately.
     /// </summary>
+    [DtoOutputIgnore]
     public object File { get; set; } = new();
 
     /// <summary>
     /// Model ID to use for transcription.
     /// </summary>
+    [JsonPropertyName("model")]
     public string Model { get; set; } = string.Empty;
 }

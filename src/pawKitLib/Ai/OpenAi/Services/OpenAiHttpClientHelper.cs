@@ -1,7 +1,7 @@
-using System;
 using System.Text.Json;
 using pawKitLib.Ai.OpenAi.Models;
 using pawKitLib.Conversion;
+using Microsoft.Extensions.Logging;
 
 namespace pawKitLib.Ai.OpenAi.Services;
 
@@ -11,19 +11,26 @@ public static class OpenAiHttpClientHelper
     // This allows callers to easily distinguish AI-related errors from other types (e.g., IO, database) and handle them appropriately.
     // It also ensures that all relevant context (status code, raw response, provider details, inner exception) is consistently available.
 
-    public static async Task<TResponse> PostMultipartAsync<TResponse>(
+    /// <summary>
+    /// Sends an HTTP request to the OpenAI API and handles error classification and deserialization.
+    /// Accepts any HttpRequestMessage, allowing for flexible content and headers.
+    /// All errors are wrapped as AiServiceException for consistent handling.
+    /// </summary>
+    public static async Task<TResponse> SendAsync<TResponse, TService>(
+        ILogger<TService> logger,
         HttpClient client,
-        string endpoint,
-        MultipartFormDataContent content,
+        HttpRequestMessage request,
         CancellationToken cancellationToken = default)
     {
         try
         {
             // May throw HttpRequestException, TaskCanceledException, or ObjectDisposedException
-            var response = await client.PostAsync(endpoint, content, cancellationToken);
+            var response = await client.SendAsync(request, cancellationToken);
 
             // May throw ObjectDisposedException, IOException
             var json = await response.Content.ReadAsStringAsync(cancellationToken);
+
+            logger.LogDebug("Received JSON response from OpenAI API: {@Json}", json);
 
             if (response.IsSuccessStatusCode)
             {
@@ -72,13 +79,11 @@ public static class OpenAiHttpClientHelper
                 innerException: null
             );
         }
-
         // Rethrow if already an AiServiceException
         catch (AiServiceException)
         {
             throw;
         }
-
         // Network-related errors
         catch (HttpRequestException ex)
         {
@@ -89,7 +94,6 @@ public static class OpenAiHttpClientHelper
                 providerDetails: null,
                 innerException: ex);
         }
-
         // JSON deserialization errors
         catch (JsonException ex)
         {
@@ -100,7 +104,6 @@ public static class OpenAiHttpClientHelper
                 providerDetails: null,
                 innerException: ex);
         }
-
         // Any other unexpected errors
         catch (Exception ex)
         {
