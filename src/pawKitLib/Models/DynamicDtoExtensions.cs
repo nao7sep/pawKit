@@ -411,23 +411,5 @@ namespace pawKitLib.Models
             if (value.ValueKind == JsonValueKind.String) return ValueTypeConverter.TryParseBigInteger(value.GetString()!, out result);
             return false;
         }
-
-        // Uri
-        public static void SetUri(this DynamicDto dto, string key, Uri value) =>
-            dto.ExtraProperties[key] = JsonSerializer.SerializeToElement(ValueTypeConverter.ToString(value));
-        public static Uri GetUri(this DynamicDto dto, string key)
-        {
-            if (!dto.ExtraProperties.TryGetValue(key, out var value))
-                throw new KeyNotFoundException($"Key '{key}' not found.");
-            if (value.ValueKind == JsonValueKind.String) return ValueTypeConverter.ParseUri(value.GetString()!);
-            throw new InvalidCastException($"Value for '{key}' is not a Uri.");
-        }
-        public static bool TryGetUri(this DynamicDto dto, string key, out Uri? result)
-        {
-            result = null;
-            if (!dto.ExtraProperties.TryGetValue(key, out var value)) return false;
-            if (value.ValueKind == JsonValueKind.String) return ValueTypeConverter.TryParseUri(value.GetString()!, out result);
-            return false;
-        }
     }
 }

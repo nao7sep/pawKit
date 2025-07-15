@@ -116,13 +116,5 @@ namespace pawKitLib.Conversion
         public static string ToString(BigInteger value) => value.ToString(CultureInfo.InvariantCulture);
         public static BigInteger ParseBigInteger(string s) => BigInteger.Parse(s, CultureInfo.InvariantCulture);
         public static bool TryParseBigInteger(string s, out BigInteger value) => BigInteger.TryParse(s, NumberStyles.Integer, CultureInfo.InvariantCulture, out value);
-
-        // Uri
-        // Example: https://example.com
-        // Note: TryParseUri may return null because Uri is a reference type.
-        // ParseUri guarantees a non-null result or throws an exception if the input is invalid.
-        public static string ToString(Uri value) => value.ToString();
-        public static Uri ParseUri(string s) => new Uri(s, UriKind.RelativeOrAbsolute);
-        public static bool TryParseUri(string s, out Uri? value) => Uri.TryCreate(s, UriKind.RelativeOrAbsolute, out value);
     }
 }

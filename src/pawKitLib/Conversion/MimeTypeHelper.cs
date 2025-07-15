@@ -125,22 +125,28 @@ namespace pawKitLib.Conversion
             }.ToImmutableDictionary();
 
         /// <summary>
+        /// The default fallback MIME type for unknown or binary files.
+        /// </summary>
+        public static string DefaultMimeType => "application/octet-stream";
+
+        /// <summary>
         /// Gets the MIME type for the given file extension or file name.
-        /// Returns null if the extension is unknown.
+        /// Returns DefaultMimeType if the extension is unknown and fallbackToDefault is true (default).
         /// Optionally accepts additional extension/MIME mappings as a read-only, case-insensitive dictionary.
         /// The parameter name is intentionally verbose to ensure developers provide a case-insensitive dictionary,
         /// enabling reliable conversion without requiring extra normalization logic within the method.
         /// </summary>
         public static string? GetMimeType(
             string fileNameOrExtension,
-            IReadOnlyDictionary<string, string>? additionalMimeTypesCaseInsensitive = null)
+            IReadOnlyDictionary<string, string>? additionalMimeTypesCaseInsensitive = null,
+            bool fallbackToDefault = true)
         {
             if (string.IsNullOrWhiteSpace(fileNameOrExtension))
-                return null;
+                return fallbackToDefault ? DefaultMimeType : null;
 
             var ext = Path.GetExtension(fileNameOrExtension);
             if (string.IsNullOrEmpty(ext))
-                return null;
+                return fallbackToDefault ? DefaultMimeType : null;
 
             // Check additional mappings first
             if (additionalMimeTypesCaseInsensitive != null && additionalMimeTypesCaseInsensitive.TryGetValue(ext, out var customMime))
@@ -150,7 +156,7 @@ namespace pawKitLib.Conversion
             if (MimeTypes.TryGetValue(ext, out var mime))
                 return mime;
 
-            return null;
+            return fallbackToDefault ? DefaultMimeType : null;
         }
     }
 }

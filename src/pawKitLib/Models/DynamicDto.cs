@@ -27,5 +27,6 @@ public class DynamicDto
     /// Never store sensitive data in ExtraProperties, as it is unvalidated and dynamic.
     /// </summary>
     [JsonExtensionData]
+    [DtoOutputIgnore]
     public Dictionary<string, JsonElement> ExtraProperties { get; set; } = new();
 }
