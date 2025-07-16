@@ -44,7 +44,7 @@ public enum AiCapability
     /// </summary>
     ImageEditing,
     /// <summary>
-    /// Accept images as input to reason about or describe their content (now fully supported with multi-modal chat)
+    /// Accept images as input to reason about or describe their content
     /// </summary>
     VisualUnderstanding,
     /// <summary>

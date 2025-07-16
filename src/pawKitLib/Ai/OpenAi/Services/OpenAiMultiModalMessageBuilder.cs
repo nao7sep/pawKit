@@ -176,5 +176,4 @@ public static class OpenAiMultiModalMessageBuilder
             CreateFilePart(fileId)
         );
     }
-
 }
