@@ -412,8 +412,6 @@ public class OpenAiIntegrationTests
         Assert.True(felineIndex < nycIndex, "Feline text should be more similar than NYC text");
     }
 
-    #region Helper Methods
-
     /// <summary>
     /// Mock weather function for tool calling tests.
     /// </summary>
@@ -452,10 +450,6 @@ public class OpenAiIntegrationTests
         return dotProduct / (magnitude1 * magnitude2);
     }
 
-    #endregion
-
-    #region DTOs
-
     /// <summary>
     /// Arguments for the weather tool function.
     /// </summary>
@@ -463,6 +457,4 @@ public class OpenAiIntegrationTests
     {
         public string Location { get; set; } = string.Empty;
     }
-
-    #endregion
 }

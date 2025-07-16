@@ -12,8 +12,6 @@ namespace pawKitLib.Tests.Ai.OpenAi.Services;
 /// </summary>
 public class OpenAiMultipartFormDataContentHelperTests
 {
-    #region Test DTOs
-
     private class NestedTestDto
     {
         public string NestedProperty { get; set; } = string.Empty;
@@ -35,8 +33,6 @@ public class OpenAiMultipartFormDataContentHelperTests
         [DtoOutputIgnore]
         public string IgnoredProperty { get; set; } = "should-be-ignored";
     }
-
-    #endregion
 
     /// <summary>
     /// Verifies that AddDto correctly flattens a complex DTO with both declared properties
