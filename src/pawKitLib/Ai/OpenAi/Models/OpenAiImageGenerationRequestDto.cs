@@ -12,9 +12,9 @@ public class OpenAiImageGenerationRequestDto : DynamicDto
     public int N { get; set; } = 1;
 
     [JsonPropertyName("size")]
-    public string Size { get; set; } = "1024x1024";
+    public string Size { get; set; } = string.Empty;
 
     // Optional: 'url' or 'b64_json'
     [JsonPropertyName("response_format")]
-    public string ResponseFormat { get; set; } = "url";
+    public string ResponseFormat { get; set; } = string.Empty;
 }
