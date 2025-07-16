@@ -49,7 +49,11 @@ public class OpenAiEmbedder
         catch (Exception ex)
         {
             throw new AiServiceException(
-                "Unexpected error during embedding creation.", null, null, null, ex);
+                message: "Unexpected error during embedding creation.",
+                statusCode: null,
+                rawResponse: null,
+                providerDetails: null,
+                innerException: ex);
         }
     }
 }

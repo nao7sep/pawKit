@@ -65,7 +65,11 @@ public class OpenAiAudioSpeaker
         catch (Exception ex)
         {
             throw new AiServiceException(
-                "Unexpected error during audio generation.", null, null, null, ex);
+                message: "Unexpected error during audio generation.",
+                statusCode: null,
+                rawResponse: null,
+                providerDetails: null,
+                innerException: ex);
         }
     }
 }
