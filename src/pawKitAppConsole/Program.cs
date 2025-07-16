@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using pawKitLib.Ai.OpenAi.Models;
 using pawKitLib.Ai.OpenAi.Services;
 using pawKitLib.Models;
+using System.Text.Json;
 
 namespace pawKitAppConsole
 {
@@ -124,11 +125,20 @@ namespace pawKitAppConsole
                     File = new FilePathReferenceDto { FilePath = audioFilePath },
                     // The model is set as a literal here to ensure explicit user control.
                     // See the DTO's comment for why there is no fallback to config or default.
-                    // As of 2025-07-16, this is the latest OpenAI transcription model.
-                    Model = "gpt-4o-transcribe"
+                    // Note: As of 2025-07-16, "gpt-4o-transcribe" is the latest OpenAI transcription model.
+                    // However, only "whisper-1" currently supports the "verbose_json" response format, which is required for this test.
+                    Model = "whisper-1"
                 };
+                // Explicitly request the "verbose_json" response format to test detailed output parsing.
+                // Only the "whisper-1" model currently supports this format, which includes additional metadata in the response.
+                request.SetString("response_format", "verbose_json");
                 var response = await transcriber.TranscribeAsync(request);
                 Console.WriteLine($"Transcribed text: {response.Text}");
+
+                // Display the full response DTO to verify correct parsing of the verbose_json format.
+                // This outputs all properties, including those in ExtraProperties, in a structured, indented format using [JsonExtensionData].
+                var jsonOptions = new JsonSerializerOptions { WriteIndented = true };
+                Console.WriteLine($"Full Response DTO: {JsonSerializer.Serialize(response, jsonOptions)}");
             }
             catch (Exception ex)
             {
