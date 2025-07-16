@@ -129,6 +129,10 @@ public static class OpenAiHttpClientHelper
     {
         try
         {
+            // In this method, we must check IsSuccessStatusCode before reading the response content.
+            // A successful response returns a binary payload (such as audio), while an error response returns JSON.
+            // Attempting to read the content as bytes when the response is actually an error (JSON) would result in incorrect handling.
+            // By contrast, SendAsync can always read the content as JSON, since both success and error responses are expected to be JSON.
             var response = await client.SendAsync(request, cancellationToken);
 
             if (response.IsSuccessStatusCode)
