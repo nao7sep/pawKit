@@ -198,14 +198,3 @@ public static class OpenAiToolDefinitionBuilder
                 type.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IList<>)));
     }
 }
-
-/// <summary>
-/// Attribute for marking methods as OpenAI tools with descriptions.
-/// </summary>
-[AttributeUsage(AttributeTargets.Method | AttributeTargets.Parameter)]
-public class OpenAiToolAttribute : DescriptionAttribute
-{
-    public OpenAiToolAttribute(string description) : base(description)
-    {
-    }
-}
