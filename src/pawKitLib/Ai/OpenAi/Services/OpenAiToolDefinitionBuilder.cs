@@ -101,7 +101,7 @@ public static class OpenAiToolDefinitionBuilder
         {
             var paramName = param.Name ?? "unknown";
             var paramType = param.ParameterType;
-            var description = param.GetCustomAttribute<DescriptionAttribute>()?.Description ?? "";
+            var description = param.GetCustomAttribute<DescriptionAttribute>()?.Description ?? string.Empty;
 
             // Determine if parameter is required (not nullable and no default value)
             var isRequired = !param.HasDefaultValue && !IsNullableType(paramType);
@@ -162,13 +162,13 @@ public static class OpenAiToolDefinitionBuilder
             Type t when t.IsArray => new
             {
                 type = "array",
-                items = CreatePropertySchema(t.GetElementType()!, ""),
+                items = CreatePropertySchema(t.GetElementType()!, string.Empty),
                 description = description
             },
             Type t when IsListType(t) => new
             {
                 type = "array",
-                items = CreatePropertySchema(t.GetGenericArguments()[0], ""),
+                items = CreatePropertySchema(t.GetGenericArguments()[0], string.Empty),
                 description = description
             },
             _ => new
