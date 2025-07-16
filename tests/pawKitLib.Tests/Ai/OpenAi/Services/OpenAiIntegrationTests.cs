@@ -38,12 +38,6 @@ public class OpenAiIntegrationTests
         _config = new OpenAiConfigDto();
         configuration.GetSection("pawKit:Ai:OpenAi:Config").Bind(_config);
 
-        // Fallback to environment variable if not in user secrets
-        if (string.IsNullOrEmpty(_config.ApiKey))
-        {
-            _config.ApiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY") ?? string.Empty;
-        }
-
         // Set default base URL if not configured
         if (string.IsNullOrEmpty(_config.BaseUrl))
         {
@@ -66,18 +60,33 @@ public class OpenAiIntegrationTests
     }
 
     /// <summary>
+    /// Tests that the API key is properly retrieved from user secrets and contains meaningful content.
+    /// This should be the first test to ensure basic configuration is working.
+    /// </summary>
+    [Fact]
+    public void ApiKey_WhenRetrievedFromUserSecrets_HasMeaningfulContent()
+    {
+        // Assert - API key should not be null or empty
+        Assert.False(string.IsNullOrEmpty(_config.ApiKey), "API key should be configured in user secrets");
+
+        // Assert - API key should have reasonable length (OpenAI API keys are typically 51+ characters)
+        Assert.True(_config.ApiKey.Length >= 20, $"API key should have meaningful length, but was {_config.ApiKey.Length} characters");
+
+        // Assert - API key should contain alphanumeric characters (basic sanity check)
+        Assert.True(_config.ApiKey.Any(char.IsLetterOrDigit), "API key should contain alphanumeric characters");
+
+        // Assert - API key should not be a placeholder value
+        Assert.False(_config.ApiKey.Equals("your-api-key-here", StringComparison.OrdinalIgnoreCase), "API key should not be a placeholder value");
+        Assert.False(_config.ApiKey.Equals("sk-placeholder", StringComparison.OrdinalIgnoreCase), "API key should not be a placeholder value");
+    }
+
+    /// <summary>
     /// Tests multi-modal chat with text, image, audio, file inputs and JSON response format.
     /// This is the "kitchen sink" test that exercises multiple capabilities in one request.
     /// </summary>
     [Fact]
     public async Task MultiModalChat_WithAllInputTypes_ReturnsStructuredResponse()
     {
-        // Skip if no API key
-        if (string.IsNullOrEmpty(_config.ApiKey))
-        {
-            return;
-        }
-
         // Arrange - Create test assets
         var testImageBytes = CreateTestImageBytes();
         var testAudioBytes = CreateTestAudioBytes();
@@ -142,11 +151,6 @@ public class OpenAiIntegrationTests
     [Fact]
     public async Task ToolCalling_WithWeatherFunction_ExecutesAndReturnsResult()
     {
-        if (string.IsNullOrEmpty(_config.ApiKey))
-        {
-            return;
-        }
-
         // Arrange - Register weather tool with the existing orchestrator
         var functionDef = OpenAiToolDefinitionBuilder.CreateFromMethod(typeof(OpenAiIntegrationTests).GetMethod(nameof(GetWeather))!);
 
@@ -188,11 +192,6 @@ public class OpenAiIntegrationTests
     [Fact]
     public async Task StreamingChat_WithSimpleMessage_ReturnsCompleteResponse()
     {
-        if (string.IsNullOrEmpty(_config.ApiKey))
-        {
-            return;
-        }
-
         // Arrange
         var request = new OpenAiChatCompletionRequestDto
         {
@@ -223,11 +222,6 @@ public class OpenAiIntegrationTests
     [Fact]
     public async Task AudioRoundTrip_GenerateAndTranscribe_ReturnsOriginalText()
     {
-        if (string.IsNullOrEmpty(_config.ApiKey))
-        {
-            return;
-        }
-
         // Arrange
         var originalText = "The quick brown fox jumps over the lazy dog.";
         var speechRequest = new OpenAiAudioSpeechRequestDto
@@ -260,11 +254,6 @@ public class OpenAiIntegrationTests
     [Fact]
     public async Task ImageRoundTrip_GenerateAndAnalyze_RecognizesContent()
     {
-        if (string.IsNullOrEmpty(_config.ApiKey))
-        {
-            return;
-        }
-
         // Arrange - Generate image
         var imageRequest = new OpenAiImageGenerationRequestDto
         {
@@ -306,11 +295,6 @@ public class OpenAiIntegrationTests
     [Fact]
     public async Task FileManagement_FullCrudLifecycle_WorksCorrectly()
     {
-        if (string.IsNullOrEmpty(_config.ApiKey))
-        {
-            return;
-        }
-
         var testContent = "Test file content for CRUD operations.";
         var tempFile = Path.GetTempFileName();
 
@@ -358,11 +342,6 @@ public class OpenAiIntegrationTests
     [Fact]
     public async Task Embeddings_WithSemanticallySimilarTexts_RanksCorrectly()
     {
-        if (string.IsNullOrEmpty(_config.ApiKey))
-        {
-            return;
-        }
-
         // Arrange
         var texts = new List<string>
         {
