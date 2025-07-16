@@ -115,4 +115,83 @@ public static class OpenAiHttpClientHelper
                 innerException: ex);
         }
     }
+
+    /// <summary>
+    /// Sends an HTTP request to the OpenAI API that returns a binary response (e.g., audio file).
+    /// Handles error classification but does not attempt to deserialize the response.
+    /// Returns the raw byte array of the response content.
+    /// </summary>
+    public static async Task<byte[]> SendForBinaryResponseAsync<TService>(
+        ILogger<TService> logger,
+        HttpClient client,
+        HttpRequestMessage request,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var response = await client.SendAsync(request, cancellationToken);
+
+            if (response.IsSuccessStatusCode)
+            {
+                // May throw HttpRequestException, InvalidOperationException
+                var contentBytes = await response.Content.ReadAsByteArrayAsync(cancellationToken);
+                return contentBytes;
+            }
+
+            // Handle errors as before
+            var json = await response.Content.ReadAsStringAsync(cancellationToken);
+            logger.LogDebug("Received JSON response from OpenAI API: {@Json}", json);
+
+            var container = JsonSerializer.Deserialize<OpenAiErrorContainerDto>(json);
+            if (container == null)
+            {
+                throw new AiServiceException(
+                    message: "Response could not be deserialized to error container.",
+                    statusCode: ValueTypeConverter.ToString(response.StatusCode),
+                    rawResponse: json,
+                    providerDetails: null,
+                    innerException: null
+                );
+            }
+
+            throw new AiServiceException(
+                message: "Request failed.",
+                statusCode: ValueTypeConverter.ToString(response.StatusCode),
+                rawResponse: json,
+                providerDetails: container,
+                innerException: null
+            );
+        }
+        catch (AiServiceException)
+        {
+            throw;
+        }
+        catch (HttpRequestException ex)
+        {
+            throw new AiServiceException(
+                message: "Network error during OpenAI API call.",
+                statusCode: null,
+                rawResponse: null,
+                providerDetails: null,
+                innerException: ex);
+        }
+        catch (JsonException ex)
+        {
+            throw new AiServiceException(
+                message: "Failed to parse OpenAI API response.",
+                statusCode: null,
+                rawResponse: null,
+                providerDetails: null,
+                innerException: ex);
+        }
+        catch (Exception ex)
+        {
+            throw new AiServiceException(
+                message: "Unexpected error during OpenAI API call.",
+                statusCode: null,
+                rawResponse: null,
+                providerDetails: null,
+                innerException: ex);
+        }
+    }
 }
