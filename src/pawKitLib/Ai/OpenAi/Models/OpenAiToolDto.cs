@@ -9,7 +9,7 @@ namespace pawKitLib.Ai.OpenAi.Models;
 public class OpenAiToolDto : DynamicDto
 {
     [JsonPropertyName("type")]
-    public string Type { get; set; } = "function";
+    public string Type { get; set; } = string.Empty;
 
     [JsonPropertyName("function")]
     public OpenAiFunctionDto Function { get; set; } = new();

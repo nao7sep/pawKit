@@ -12,7 +12,7 @@ public class OpenAiToolCallDto : DynamicDto
     public string Id { get; set; } = string.Empty;
 
     [JsonPropertyName("type")]
-    public string Type { get; set; } = "function";
+    public string Type { get; set; } = string.Empty;
 
     [JsonPropertyName("function")]
     public OpenAiFunctionCallDto Function { get; set; } = new();

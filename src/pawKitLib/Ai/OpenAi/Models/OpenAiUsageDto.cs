@@ -25,5 +25,4 @@ public class OpenAiUsageDto : DynamicDto
     [JsonPropertyName("prompt_tokens_details")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public OpenAiPromptTokensDetailsDto? PromptTokensDetails { get; set; }
-
 }

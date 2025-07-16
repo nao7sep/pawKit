@@ -6,7 +6,7 @@ namespace pawKitLib.Ai.OpenAi.Models;
 public class OpenAiEmbeddingResponseDto : DynamicDto
 {
     [JsonPropertyName("object")]
-    public string Object { get; set; } = "list";
+    public string Object { get; set; } = string.Empty;
 
     [JsonPropertyName("model")]
     public string Model { get; set; } = string.Empty;

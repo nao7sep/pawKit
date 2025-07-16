@@ -9,5 +9,5 @@ namespace pawKitLib.Ai.OpenAi.Models;
 public class OpenAiApproximateLocationDto : DynamicDto
 {
     [JsonPropertyName("type")]
-    public string Type { get; set; } = "approximate";
+    public string Type { get; set; } = string.Empty;
 }

@@ -6,7 +6,7 @@ namespace pawKitLib.Ai.OpenAi.Models;
 public class OpenAiImageGenerationResponseDto : DynamicDto
 {
     [JsonPropertyName("object")]
-    public string Object { get; set; } = "list";
+    public string Object { get; set; } = string.Empty;
 
     [JsonPropertyName("created")]
     public long Created { get; set; }
