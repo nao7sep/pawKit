@@ -44,7 +44,7 @@ public enum AiCapability
     /// </summary>
     ImageEditing,
     /// <summary>
-    /// Accept images as input to reason about or describe their content
+    /// Accept images as input to reason about or describe their content (now fully supported with multi-modal chat)
     /// </summary>
     VisualUnderstanding,
     /// <summary>
@@ -80,6 +80,10 @@ public enum AiCapability
 
     // Infrastructure & Advanced Access
 
+    /// <summary>
+    /// Upload, list, retrieve, and delete files via the provider's file management API
+    /// </summary>
+    FileManagement,
     /// <summary>
     /// Submit large batches of inputs for asynchronous processing via job APIs
     /// </summary>
