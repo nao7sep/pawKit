@@ -10,6 +10,8 @@ namespace pawKitLib.Ai.OpenAi.Services;
 /// </summary>
 public class OpenAiToolCallOrchestrator
 {
+    private const int DefaultMaxToolCallRounds = 5;
+
     private readonly ILogger<OpenAiToolCallOrchestrator> _logger;
     private readonly OpenAiChatCompleter _chatCompleter;
     private readonly OpenAiToolCallHandler _toolCallHandler;
@@ -25,30 +27,30 @@ public class OpenAiToolCallOrchestrator
     }
 
     /// <summary>
+    /// Ensures tools are included in the request, adding default tools if none are present.
+    /// </summary>
+    private void EnsureToolsInRequest(OpenAiChatCompletionRequestDto request)
+    {
+        if (request.Tools == null || request.Tools.Count == 0)
+        {
+            request.Tools = _toolCallHandler.GetToolDefinitions();
+        }
+    }
+
+    /// <summary>
     /// Executes a complete tool calling conversation, handling multiple rounds of tool calls automatically.
     /// Returns the final assistant response after all tool calls are resolved.
     /// </summary>
     public async Task<OpenAiChatCompletionResponseDto> CompleteWithToolsAsync(
         OpenAiChatCompletionRequestDto request,
-        int maxToolCallRounds = 5,
+        int maxToolCallRounds = DefaultMaxToolCallRounds,
         CancellationToken cancellationToken = default)
     {
         try
         {
-            // Ensure tools are included in the request
-            if (request.Tools == null || request.Tools.Count == 0)
-            {
-                request.Tools = _toolCallHandler.GetToolDefinitions();
-            }
-
+            EnsureToolsInRequest(request);
             var conversationMessages = request.Messages.ToList();
-
-            // Update the original request to include tools and current messages
             request.Messages = conversationMessages;
-            if (request.Tools == null || request.Tools.Count == 0)
-            {
-                request.Tools = _toolCallHandler.GetToolDefinitions();
-            }
 
             for (int round = 0; round < maxToolCallRounds; round++)
             {
@@ -66,7 +68,17 @@ public class OpenAiToolCallOrchestrator
                 var toolResults = await _toolCallHandler.ExecuteToolCallsAsync(toolCalls);
 
                 // Add assistant message with tool calls to conversation
-                var assistantMessage = response.Choices.First().Message!;
+                var firstChoice = response.Choices.FirstOrDefault();
+                if (firstChoice?.Message == null)
+                {
+                    throw new AiServiceException(
+                        message: "Response contains no valid message with tool calls",
+                        statusCode: null,
+                        rawResponse: null,
+                        providerDetails: null,
+                        innerException: null);
+                }
+                var assistantMessage = firstChoice.Message;
                 conversationMessages.Add(assistantMessage);
 
                 // Add tool result messages to conversation
@@ -105,30 +117,26 @@ public class OpenAiToolCallOrchestrator
     /// </summary>
     public async IAsyncEnumerable<OpenAiChatCompletionStreamChunkDto> CompleteStreamWithToolsAsync(
         OpenAiChatCompletionRequestDto request,
-        int maxToolCallRounds = 5,
+        int maxToolCallRounds = DefaultMaxToolCallRounds,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        // Ensure tools are included in the request
-        if (request.Tools == null || request.Tools.Count == 0)
-        {
-            request.Tools = _toolCallHandler.GetToolDefinitions();
-        }
+        EnsureToolsInRequest(request);
 
         var conversationMessages = request.Messages.ToList();
         request.Messages = conversationMessages;
 
         for (int round = 0; round < maxToolCallRounds; round++)
         {
+            var toolCallMap = new Dictionary<string, OpenAiToolCallDto>();
             var toolCalls = new List<OpenAiToolCallDto>();
             var assistantMessage = new OpenAiChatMessageDto { Role = "assistant" };
             var hasToolCalls = false;
 
-            // Stream the response and collect tool calls
+            // Stream the response and collect tool calls (with fragment merging)
             await foreach (var chunk in _chatCompleter.CompleteStreamAsync(request, cancellationToken))
             {
                 yield return chunk;
 
-                // Collect tool calls from streaming chunks
                 if (chunk.Choices != null)
                 {
                     foreach (var choice in chunk.Choices)
@@ -136,19 +144,56 @@ public class OpenAiToolCallOrchestrator
                         if (choice.Delta?.ToolCalls != null)
                         {
                             hasToolCalls = true;
-                            // Note: In streaming, tool calls may come in fragments
-                            // This is a simplified implementation - production code might need more sophisticated merging
-                            toolCalls.AddRange(choice.Delta.ToolCalls);
+                            foreach (var incoming in choice.Delta.ToolCalls)
+                            {
+                                if (!string.IsNullOrEmpty(incoming.Id))
+                                {
+                                    if (!toolCallMap.TryGetValue(incoming.Id, out var existing))
+                                    {
+                                        // First fragment for this tool call
+                                        toolCallMap[incoming.Id] = incoming;
+                                    }
+                                    else
+                                    {
+                                        // Merge fragments: update only missing fields
+                                        existing.Type ??= incoming.Type;
+                                        if (incoming.Function != null)
+                                        {
+                                            if (existing.Function == null)
+                                            {
+                                                existing.Function = incoming.Function;
+                                            }
+                                            else
+                                            {
+                                                // Merge function fields if needed
+                                                existing.Function.Name ??= incoming.Function.Name;
+                                                // More sophisticated merging for Arguments (string): concatenate fragments
+                                                if (!string.IsNullOrEmpty(incoming.Function.Arguments))
+                                                {
+                                                    if (string.IsNullOrEmpty(existing.Function.Arguments))
+                                                    {
+                                                        existing.Function.Arguments = incoming.Function.Arguments;
+                                                    }
+                                                    else
+                                                    {
+                                                        existing.Function.Arguments += incoming.Function.Arguments;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
 
-                        // Collect assistant message content
                         if (choice.Delta?.Content != null)
                         {
-                            assistantMessage.Content = (assistantMessage.Content?.ToString() ?? "") + choice.Delta.Content;
+                            assistantMessage.Content = (assistantMessage.Content?.ToString() ?? string.Empty) + choice.Delta.Content;
                         }
                     }
                 }
             }
+            toolCalls.AddRange(toolCallMap.Values);
 
             // If no tool calls, we're done
             if (!hasToolCalls || toolCalls.Count == 0)
@@ -188,11 +233,7 @@ public class OpenAiToolCallOrchestrator
     {
         try
         {
-            // Ensure tools are included in the request
-            if (request.Tools == null || request.Tools.Count == 0)
-            {
-                request.Tools = _toolCallHandler.GetToolDefinitions();
-            }
+            EnsureToolsInRequest(request);
 
             var response = await _chatCompleter.CompleteAsync(request, cancellationToken);
 

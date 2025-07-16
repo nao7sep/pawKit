@@ -104,9 +104,7 @@ public static class OpenAiToolDefinitionBuilder
             var description = param.GetCustomAttribute<DescriptionAttribute>()?.Description ?? "";
 
             // Determine if parameter is required (not nullable and no default value)
-            var isRequired = !param.HasDefaultValue &&
-                           !IsNullableType(paramType) &&
-                           paramType != typeof(string); // strings are nullable by default
+            var isRequired = !param.HasDefaultValue && !IsNullableType(paramType);
 
             if (isRequired)
             {

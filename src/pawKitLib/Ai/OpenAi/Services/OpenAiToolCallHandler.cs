@@ -44,7 +44,7 @@ public class OpenAiToolCallHandler
                 catch (Exception ex)
                 {
                     throw new AiServiceException(
-                        message: $"Tool execution failed for '{name}': {ex.Message}",
+                        message: $"Tool execution failed for '{name}'",
                         statusCode: null,
                         rawResponse: null,
                         providerDetails: null,
@@ -81,7 +81,7 @@ public class OpenAiToolCallHandler
                 catch (Exception ex)
                 {
                     throw new AiServiceException(
-                        message: $"Async tool execution failed for '{name}': {ex.Message}",
+                        message: $"Async tool execution failed for '{name}'",
                         statusCode: null,
                         rawResponse: null,
                         providerDetails: null,
