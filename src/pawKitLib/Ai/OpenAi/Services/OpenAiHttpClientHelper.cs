@@ -29,7 +29,6 @@ public static class OpenAiHttpClientHelper
 
             // May throw ObjectDisposedException, IOException
             var json = await response.Content.ReadAsStringAsync(cancellationToken);
-
             logger.LogDebug("Received JSON response from OpenAI API: {@Json}", json);
 
             if (response.IsSuccessStatusCode)

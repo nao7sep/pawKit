@@ -43,7 +43,6 @@ public class OpenAiToolCallHandler
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Error executing tool {ToolName} with arguments {Arguments}", name, argsJson);
                     throw new AiServiceException(
                         message: $"Tool execution failed for '{name}': {ex.Message}",
                         statusCode: null,
@@ -55,7 +54,6 @@ public class OpenAiToolCallHandler
         };
 
         _registeredTools[name] = registeredTool;
-        _logger.LogDebug("Registered tool {ToolName}", name);
     }
 
     /// <summary>
@@ -82,7 +80,6 @@ public class OpenAiToolCallHandler
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Error executing async tool {ToolName} with arguments {Arguments}", name, argsJson);
                     throw new AiServiceException(
                         message: $"Async tool execution failed for '{name}': {ex.Message}",
                         statusCode: null,
@@ -94,7 +91,6 @@ public class OpenAiToolCallHandler
         };
 
         _registeredTools[name] = registeredTool;
-        _logger.LogDebug("Registered async tool {ToolName}", name);
     }
 
     /// <summary>
@@ -127,11 +123,7 @@ public class OpenAiToolCallHandler
             throw new ArgumentException($"Tool '{functionName}' is not registered");
         }
 
-        _logger.LogDebug("Executing tool call {ToolCallId} for function {FunctionName}", toolCall.Id, functionName);
-
         var result = await registeredTool.Handler(toolCall.Function.Arguments);
-
-        _logger.LogDebug("Tool call {ToolCallId} completed successfully", toolCall.Id);
         return result;
     }
 
@@ -212,10 +204,6 @@ public class OpenAiToolCallHandler
     public bool UnregisterTool(string toolName)
     {
         var removed = _registeredTools.Remove(toolName);
-        if (removed)
-        {
-            _logger.LogDebug("Unregistered tool {ToolName}", toolName);
-        }
         return removed;
     }
 
@@ -226,7 +214,6 @@ public class OpenAiToolCallHandler
     {
         var count = _registeredTools.Count;
         _registeredTools.Clear();
-        _logger.LogDebug("Cleared all {ToolCount} registered tools", count);
     }
 
     private class RegisteredTool

@@ -52,22 +52,17 @@ public class OpenAiToolCallOrchestrator
 
             for (int round = 0; round < maxToolCallRounds; round++)
             {
-                _logger.LogDebug("Starting tool call round {Round}", round + 1);
-
                 // Get response from OpenAI
                 var response = await _chatCompleter.CompleteAsync(request, cancellationToken);
 
                 // Check if the response contains tool calls
                 if (!_toolCallHandler.HasToolCalls(response))
                 {
-                    _logger.LogDebug("No tool calls found, conversation complete after {Round} rounds", round + 1);
                     return response;
                 }
 
                 // Extract and execute tool calls
                 var toolCalls = _toolCallHandler.ExtractToolCalls(response);
-                _logger.LogDebug("Executing {ToolCallCount} tool calls in round {Round}", toolCalls.Count, round + 1);
-
                 var toolResults = await _toolCallHandler.ExecuteToolCallsAsync(toolCalls);
 
                 // Add assistant message with tool calls to conversation
@@ -80,8 +75,6 @@ public class OpenAiToolCallOrchestrator
 
                 // Update request messages for next round
                 request.Messages = conversationMessages;
-
-                _logger.LogDebug("Completed tool call round {Round}, continuing conversation", round + 1);
             }
 
             throw new AiServiceException(
@@ -126,8 +119,6 @@ public class OpenAiToolCallOrchestrator
 
         for (int round = 0; round < maxToolCallRounds; round++)
         {
-            _logger.LogDebug("Starting streaming tool call round {Round}", round + 1);
-
             var toolCalls = new List<OpenAiToolCallDto>();
             var assistantMessage = new OpenAiChatMessageDto { Role = "assistant" };
             var hasToolCalls = false;
@@ -162,12 +153,8 @@ public class OpenAiToolCallOrchestrator
             // If no tool calls, we're done
             if (!hasToolCalls || toolCalls.Count == 0)
             {
-                _logger.LogDebug("No tool calls found in streaming, conversation complete after {Round} rounds", round + 1);
                 yield break;
             }
-
-            // Execute tool calls
-            _logger.LogDebug("Executing {ToolCallCount} tool calls from streaming round {Round}", toolCalls.Count, round + 1);
 
             var toolResults = await _toolCallHandler.ExecuteToolCallsAsync(toolCalls);
 
@@ -180,8 +167,6 @@ public class OpenAiToolCallOrchestrator
 
             // Update request messages for next round
             request.Messages = conversationMessages;
-
-            _logger.LogDebug("Completed streaming tool call round {Round}, continuing", round + 1);
         }
 
         throw new AiServiceException(

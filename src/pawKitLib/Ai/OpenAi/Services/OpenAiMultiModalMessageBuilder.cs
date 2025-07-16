@@ -88,8 +88,8 @@ public static class OpenAiMultiModalMessageBuilder
     public static OpenAiChatMessageContentPartDto CreateImageFromFileContent(FileContentDto file, string? detail = null)
     {
         // Use MimeTypeHelper to determine MIME type from file extension
-        var mimeType = MimeTypeHelper.GetMimeType(file.FileName, fallbackToDefault: true)!;
-        return CreateImageBase64Part(file.Bytes, mimeType, detail);
+        var mimeType = MimeTypeHelper.GetMimeType(file.FileName, fallbackToDefault: true);
+        return CreateImageBase64Part(file.Bytes, mimeType!, detail);
     }
 
     /// <summary>
@@ -104,6 +104,7 @@ public static class OpenAiMultiModalMessageBuilder
             Type = "input_audio",
             InputAudio = new OpenAiInputAudioDto
             {
+                // For audio, OpenAI expects base64-encoded data only (not a data URL as with images)
                 Data = base64Data,
                 Format = format
             }
