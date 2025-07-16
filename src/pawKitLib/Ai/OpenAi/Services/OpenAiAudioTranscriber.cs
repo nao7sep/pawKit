@@ -1,5 +1,6 @@
 using System.Net.Http.Headers;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using pawKitLib.Ai.OpenAi.Models;
 
 namespace pawKitLib.Ai.OpenAi.Services;
@@ -18,11 +19,11 @@ public class OpenAiAudioTranscriber
 
     public OpenAiAudioTranscriber(
         ILogger<OpenAiAudioTranscriber> logger,
-        OpenAiConfigDto config,
+        IOptions<OpenAiConfigDto> options,
         HttpClient client)
     {
         _logger = logger;
-        _config = config;
+        _config = options.Value;
         _client = client;
     }
 
