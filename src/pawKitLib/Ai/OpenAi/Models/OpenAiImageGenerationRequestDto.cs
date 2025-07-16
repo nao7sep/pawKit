@@ -8,13 +8,31 @@ public class OpenAiImageGenerationRequestDto : DynamicDto
     [JsonPropertyName("prompt")]
     public string Prompt { get; set; } = string.Empty;
 
+    [JsonPropertyName("model")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? Model { get; set; }
+
     [JsonPropertyName("n")]
-    public int N { get; set; } = 1;
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? N { get; set; }
 
     [JsonPropertyName("size")]
-    public string Size { get; set; } = string.Empty;
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? Size { get; set; }
 
-    // Optional: 'url' or 'b64_json'
+    [JsonPropertyName("quality")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? Quality { get; set; }
+
+    [JsonPropertyName("style")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? Style { get; set; }
+
     [JsonPropertyName("response_format")]
-    public string ResponseFormat { get; set; } = string.Empty;
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? ResponseFormat { get; set; }
+
+    [JsonPropertyName("user")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? User { get; set; }
 }

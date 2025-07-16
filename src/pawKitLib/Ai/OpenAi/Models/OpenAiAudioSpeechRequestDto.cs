@@ -16,5 +16,10 @@ public class OpenAiAudioSpeechRequestDto : DynamicDto
 
     // Optional: 'text' or 'json'
     [JsonPropertyName("response_format")]
-    public string ResponseFormat { get; set; } = string.Empty;
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? ResponseFormat { get; set; }
+
+    [JsonPropertyName("speed")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public double? Speed { get; set; }
 }

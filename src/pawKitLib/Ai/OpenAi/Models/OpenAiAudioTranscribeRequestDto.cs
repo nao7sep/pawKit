@@ -31,4 +31,24 @@ public class OpenAiAudioTranscribeRequestDto : DynamicDto
     /// </summary>
     [JsonPropertyName("model")]
     public string Model { get; set; } = string.Empty;
+
+    [JsonPropertyName("language")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? Language { get; set; }
+
+    [JsonPropertyName("prompt")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? Prompt { get; set; }
+
+    [JsonPropertyName("response_format")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? ResponseFormat { get; set; }
+
+    [JsonPropertyName("temperature")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public double? Temperature { get; set; }
+
+    [JsonPropertyName("timestamp_granularities")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public List<string>? TimestampGranularities { get; set; }
 }
