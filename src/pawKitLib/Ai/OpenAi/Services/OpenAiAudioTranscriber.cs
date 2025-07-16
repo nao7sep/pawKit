@@ -41,6 +41,7 @@ public class OpenAiAudioTranscriber
             {
                 Content = form
             };
+
             // Set the Authorization header only for this request
             httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _config.ApiKey);
 

@@ -1,4 +1,5 @@
 ﻿using System.Net.Http.Headers;
+using System.Net.Http.Json;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
@@ -30,13 +31,11 @@ public class OpenAiChatCompleter
         {
             var endpoint = $"{_config.BaseUrl}/chat/completions";
 
-            var jsonRequest = JsonSerializer.Serialize(request);
-            using var httpContent = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
-
             using var httpRequest = new HttpRequestMessage(HttpMethod.Post, endpoint)
             {
-                Content = httpContent
+                Content = JsonContent.Create(request)
             };
+
             httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _config.ApiKey);
 
             return await OpenAiHttpClientHelper.SendAsync<OpenAiChatCompletionResponseDto, OpenAiChatCompleter>(
@@ -65,17 +64,13 @@ public class OpenAiChatCompleter
         OpenAiChatCompletionRequestDto request,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        // Add streaming parameter to request
-        request.ExtraProperties["stream"] = JsonSerializer.SerializeToElement(true);
-
         var endpoint = $"{_config.BaseUrl}/chat/completions";
-        var jsonRequest = JsonSerializer.Serialize(request);
 
-        using var httpContent = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
         using var httpRequest = new HttpRequestMessage(HttpMethod.Post, endpoint)
         {
-            Content = httpContent
+            Content = JsonContent.Create(request)
         };
+
         httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _config.ApiKey);
 
         using var response = await _client.SendAsync(httpRequest, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
