@@ -16,6 +16,7 @@ namespace pawKitAppConsole
                 var config = new ConfigurationBuilder()
                     .SetBasePath(AppContext.BaseDirectory)
                     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                    .AddUserSecrets<Program>()
                     .Build();
 
                 var services = new ServiceCollection()
@@ -27,12 +28,13 @@ namespace pawKitAppConsole
                     })
                     .AddHttpClient();
 
-                // For security, the ApiKey property in OpenAiConfigDto should NOT be stored in appsettings.json or any source-controlled file.
-                // During development, you should inject the ApiKey using the .NET user secrets mechanism.
-                // To set the user secret for your project, run the following command in your project directory:
+                // For security, never store the ApiKey property in appsettings.json or any file under source control.
+                // Instead, use the .NET user secrets feature during development to keep your API key safe.
+                // If you haven't already, initialize user secrets for your project with:
+                //   dotnet user-secrets init
+                // Then set your API key with:
                 //   dotnet user-secrets set "pawKit:Ai:OpenAi:Config:ApiKey" "your-api-key-here"
-                // The user secret with the matching key will be loaded at runtime just as if it were present in appsettings.json,
-                // but it remains local to your development environment and is not checked into source control.
+                // This keeps your secret local and ensures it is loaded at runtime just like a config value, but never checked into source control.
 
                 // The following is the recommended built-in way to bind and validate OpenAiConfigDto:
                 // This approach does everything the previous Configure did, and also ensures that ApiKey is validated at startup.
@@ -120,7 +122,9 @@ namespace pawKitAppConsole
                 var request = new OpenAiAudioTranscribeRequestDto
                 {
                     File = new FilePathReferenceDto { FilePath = audioFilePath },
-                    // As of 2025-07-16, this is the latest OpenAI transcription model
+                    // The model is set as a literal here to ensure explicit user control.
+                    // See the DTO's comment for why there is no fallback to config or default.
+                    // As of 2025-07-16, this is the latest OpenAI transcription model.
                     Model = "gpt-4o-transcribe"
                 };
                 var response = await transcriber.TranscribeAsync(request);

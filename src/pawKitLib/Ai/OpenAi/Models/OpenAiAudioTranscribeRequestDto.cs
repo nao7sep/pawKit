@@ -19,6 +19,15 @@ public class OpenAiAudioTranscribeRequestDto : DynamicDto
 
     /// <summary>
     /// Model ID to use for transcription.
+    ///
+    /// Note: This property does not fall back to a configuration value such as OpenAiConfigDto.TranscriptionModel.
+    /// The model parameter is intended to be explicitly set by the user, rather than treated as a system-wide configuration.
+    /// While some systems use configuration for model selection, this approach maintains user control and avoids hidden defaults.
+    ///
+    /// Implementing fallback logic would add complexity, as MultipartFormDataContent does not support direct updates or deletions of existing parts.
+    /// Determining whether to overwrite a value would require inspecting the content before adding it, likely necessitating additional parameters and logic.
+    ///
+    /// For clarity and maintainability, this DTO prioritizes simplicity and explicitness over implicit fallback behavior.
     /// </summary>
     [JsonPropertyName("model")]
     public string Model { get; set; } = string.Empty;
