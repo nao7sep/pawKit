@@ -38,10 +38,12 @@ public class OpenAiToolCallOrchestrator
         try
         {
             // Ensure tools are included in the request, adding default tools if none are present.
-            if (request.Tools == null || request.Tools.Count == 0)
+            request.Tools ??= _toolCallHandler.GetToolDefinitions();
+            if (request.Tools.Count == 0)
             {
                 request.Tools = _toolCallHandler.GetToolDefinitions();
             }
+
             var conversationMessages = request.Messages.ToList();
             request.Messages = conversationMessages;
 

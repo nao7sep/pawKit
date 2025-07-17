@@ -187,7 +187,7 @@ public class OpenAiToolCallHandler
     /// </summary>
     public IReadOnlyList<string> GetRegisteredToolNames()
     {
-        return _registeredTools.Keys.ToList().AsReadOnly();
+        return _registeredTools.Keys.ToArray();
     }
 
     /// <summary>
@@ -203,8 +203,7 @@ public class OpenAiToolCallHandler
     /// </summary>
     public bool UnregisterTool(string toolName)
     {
-        var removed = _registeredTools.Remove(toolName);
-        return removed;
+        return _registeredTools.Remove(toolName);
     }
 
     /// <summary>
@@ -212,7 +211,6 @@ public class OpenAiToolCallHandler
     /// </summary>
     public void ClearAllTools()
     {
-        var count = _registeredTools.Count;
         _registeredTools.Clear();
     }
 

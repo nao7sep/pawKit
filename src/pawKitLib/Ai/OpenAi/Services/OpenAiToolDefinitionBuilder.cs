@@ -77,7 +77,7 @@ public static class OpenAiToolDefinitionBuilder
         {
             type = "object",
             properties = properties,
-            required = required.Count > 0 ? required : null
+            required = required.Count > 0 ? required.ToArray() : null
         };
 
         return new OpenAiFunctionDto
@@ -119,7 +119,7 @@ public static class OpenAiToolDefinitionBuilder
         {
             type = "object",
             properties = properties,
-            required = required.Count > 0 ? required : null
+            required = required.Count > 0 ? required.ToArray() : null
         };
     }
 
@@ -131,52 +131,54 @@ public static class OpenAiToolDefinitionBuilder
         // Handle nullable types
         var underlyingType = Nullable.GetUnderlyingType(type) ?? type;
 
-        return underlyingType switch
+        if (underlyingType == typeof(string))
         {
-            Type t when t == typeof(string) => new
-            {
-                type = "string",
-                description = description
-            },
-            Type t when t == typeof(int) || t == typeof(long) || t == typeof(short) || t == typeof(byte) => new
-            {
-                type = "integer",
-                description = description
-            },
-            Type t when t == typeof(double) || t == typeof(float) || t == typeof(decimal) => new
-            {
-                type = "number",
-                description = description
-            },
-            Type t when t == typeof(bool) => new
-            {
-                type = "boolean",
-                description = description
-            },
-            Type t when t.IsEnum => new
-            {
-                type = "string",
-                @enum = Enum.GetNames(t),
-                description = description
-            },
-            Type t when t.IsArray => new
-            {
-                type = "array",
-                items = CreatePropertySchema(t.GetElementType()!, string.Empty),
-                description = description
-            },
-            Type t when IsListType(t) => new
+            return new { type = "string", description };
+        }
+
+        if (underlyingType == typeof(int) || underlyingType == typeof(long) ||
+            underlyingType == typeof(short) || underlyingType == typeof(byte))
+        {
+            return new { type = "integer", description };
+        }
+
+        if (underlyingType == typeof(double) || underlyingType == typeof(float) ||
+            underlyingType == typeof(decimal))
+        {
+            return new { type = "number", description };
+        }
+
+        if (underlyingType == typeof(bool))
+        {
+            return new { type = "boolean", description };
+        }
+
+        if (underlyingType.IsEnum)
+        {
+            return new { type = "string", @enum = Enum.GetNames(underlyingType), description };
+        }
+
+        if (underlyingType.IsArray)
+        {
+            return new
             {
                 type = "array",
-                items = CreatePropertySchema(t.GetGenericArguments()[0], string.Empty),
-                description = description
-            },
-            _ => new
+                items = CreatePropertySchema(underlyingType.GetElementType()!, string.Empty),
+                description
+            };
+        }
+
+        if (IsListType(underlyingType))
+        {
+            return new
             {
-                type = "object",
-                description = description
-            }
-        };
+                type = "array",
+                items = CreatePropertySchema(underlyingType.GetGenericArguments()[0], string.Empty),
+                description
+            };
+        }
+
+        return new { type = "object", description };
     }
 
     /// <summary>
@@ -192,9 +194,11 @@ public static class OpenAiToolDefinitionBuilder
     /// </summary>
     private static bool IsListType(Type type)
     {
-        return type.IsGenericType &&
-               (type.GetGenericTypeDefinition() == typeof(List<>) ||
-                type.GetGenericTypeDefinition() == typeof(IList<>) ||
-                type.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IList<>)));
+        if (!type.IsGenericType) return false;
+
+        var genericTypeDefinition = type.GetGenericTypeDefinition();
+        return genericTypeDefinition == typeof(List<>) ||
+               genericTypeDefinition == typeof(IList<>) ||
+               type.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IList<>));
     }
 }
