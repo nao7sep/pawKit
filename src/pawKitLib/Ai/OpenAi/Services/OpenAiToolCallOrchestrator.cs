@@ -38,13 +38,12 @@ public class OpenAiToolCallOrchestrator
         try
         {
             // Ensure tools are included in the request, adding default tools if none are present.
-            request.Tools ??= _toolCallHandler.GetToolDefinitions();
-            if (request.Tools.Count == 0)
+            if (request.Tools == null || request.Tools.Count == 0)
             {
                 request.Tools = _toolCallHandler.GetToolDefinitions();
             }
 
-            var conversationMessages = request.Messages.ToList();
+            var conversationMessages = request.Messages?.ToList() ?? new List<OpenAiChatMessageDto>();
             request.Messages = conversationMessages;
 
             for (int round = 0; round < maxToolCallRounds; round++)
@@ -63,7 +62,7 @@ public class OpenAiToolCallOrchestrator
                 var toolResults = await _toolCallHandler.ExecuteToolCallsAsync(toolCalls);
 
                 // Add assistant message with tool calls to conversation
-                var firstChoice = response.Choices.FirstOrDefault();
+                var firstChoice = response.Choices?.FirstOrDefault();
                 if (firstChoice?.Message == null)
                 {
                     throw new AiServiceException(

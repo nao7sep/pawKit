@@ -112,9 +112,14 @@ public class OpenAiToolCallHandler
     /// </summary>
     public async Task<string> ExecuteToolCallAsync(OpenAiToolCallDto toolCall)
     {
-        if (toolCall.Type != "function")
+        if (toolCall?.Type != "function")
         {
-            throw new ArgumentException($"Unsupported tool call type: {toolCall.Type}");
+            throw new ArgumentException($"Unsupported tool call type: {toolCall?.Type ?? "null"}");
+        }
+
+        if (toolCall.Function?.Name == null)
+        {
+            throw new ArgumentException("Tool call function name cannot be null");
         }
 
         var functionName = toolCall.Function.Name;
@@ -123,7 +128,7 @@ public class OpenAiToolCallHandler
             throw new ArgumentException($"Tool '{functionName}' is not registered");
         }
 
-        var result = await registeredTool.Handler(toolCall.Function.Arguments);
+        var result = await registeredTool.Handler(toolCall.Function.Arguments ?? string.Empty);
         return result;
     }
 
@@ -160,8 +165,8 @@ public class OpenAiToolCallHandler
     /// </summary>
     public bool HasToolCalls(OpenAiChatCompletionResponseDto response)
     {
-        return response.Choices.Any(choice =>
-            choice.Message?.ToolCalls != null && choice.Message.ToolCalls.Count > 0);
+        return response?.Choices?.Any(choice =>
+            choice.Message?.ToolCalls != null && choice.Message.ToolCalls.Count > 0) == true;
     }
 
     /// <summary>
@@ -170,6 +175,8 @@ public class OpenAiToolCallHandler
     public List<OpenAiToolCallDto> ExtractToolCalls(OpenAiChatCompletionResponseDto response)
     {
         var toolCalls = new List<OpenAiToolCallDto>();
+
+        if (response?.Choices == null) return toolCalls;
 
         foreach (var choice in response.Choices)
         {

@@ -17,6 +17,9 @@ public static class OpenAiToolDefinitionBuilder
     /// </summary>
     public static OpenAiFunctionDto CreateFromMethod(MethodInfo method, string? customName = null)
     {
+        if (method == null)
+            throw new ArgumentNullException(nameof(method));
+
         var functionName = customName ?? method.Name;
         var description = method.GetCustomAttribute<DescriptionAttribute>()?.Description;
 
@@ -39,6 +42,9 @@ public static class OpenAiToolDefinitionBuilder
         object? parameters = null,
         bool? strict = null)
     {
+        if (string.IsNullOrWhiteSpace(name))
+            throw new ArgumentException("Function name cannot be null or empty", nameof(name));
+
         return new OpenAiFunctionDto
         {
             Name = name,
@@ -56,20 +62,29 @@ public static class OpenAiToolDefinitionBuilder
         string? description = null,
         params (string name, string description, bool required)[] parameters)
     {
+        if (string.IsNullOrWhiteSpace(name))
+            throw new ArgumentException("Function name cannot be null or empty", nameof(name));
+
         var properties = new Dictionary<string, object>();
         var required = new List<string>();
 
-        foreach (var (paramName, paramDesc, isRequired) in parameters)
+        if (parameters != null)
         {
-            properties[paramName] = new
+            foreach (var (paramName, paramDesc, isRequired) in parameters)
             {
-                type = "string",
-                description = paramDesc
-            };
+                if (string.IsNullOrWhiteSpace(paramName))
+                    continue; // Skip invalid parameter names
 
-            if (isRequired)
-            {
-                required.Add(paramName);
+                properties[paramName] = new
+                {
+                    type = "string",
+                    description = paramDesc ?? string.Empty
+                };
+
+                if (isRequired)
+                {
+                    required.Add(paramName);
+                }
             }
         }
 
@@ -160,10 +175,16 @@ public static class OpenAiToolDefinitionBuilder
 
         if (underlyingType.IsArray)
         {
+            var elementType = underlyingType.GetElementType();
+            if (elementType == null)
+            {
+                return new { type = "array", description };
+            }
+
             return new
             {
                 type = "array",
-                items = CreatePropertySchema(underlyingType.GetElementType()!, string.Empty),
+                items = CreatePropertySchema(elementType, string.Empty),
                 description
             };
         }
