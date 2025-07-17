@@ -448,7 +448,7 @@ public class OpenAiIntegrationTests
     public async Task MultiModalChat_QuestionAnswer_InteractionTest()
     {
         // Generate a creative image prompt and speech text using the AI
-        var creativePrompt = "Generate a JSON object with two fields: 'image_prompt' and 'speech_text'. 'image_prompt' should describe a peaceful, everyday scene with interesting visual details. 'speech_text' should be a thoughtful question about what might be happening in the scene or what the person might be thinking about. Keep both content family-friendly and positive.";
+        var creativePrompt = "Generate a JSON object with two fields: 'image_prompt' and 'speech_text'. 'image_prompt' should describe a specific, detailed scene that could be interpreted in multiple creative ways (like a person looking at something, holding an object, or in a particular setting). 'speech_text' should be an intriguing, imaginative statement or question that could lead to a completely different visual interpretation - like 'What if this was actually...', 'Imagine if instead...', or 'This reminds me of...' The audio should serve as a creative bridge to transform the first image concept into something entirely different but thematically connected.";
         var genRequest = new OpenAiChatCompletionRequestDto
         {
             Model = "gpt-4o",
@@ -504,7 +504,7 @@ public class OpenAiIntegrationTests
 
         // Use gpt-4o to analyze the image
         var imageAnalysisTextPart = OpenAiMultiModalMessageBuilder.CreateTextPart(
-            "Analyze this image in detail. Describe what you see, the setting, any people or objects present, the mood or atmosphere, and any interesting details that stand out.");
+            "Analyze this image in detail. Focus on the key elements, composition, mood, and any symbolic or metaphorical potential. What story does this image tell? What emotions or ideas does it evoke?");
         var imagePart = OpenAiMultiModalMessageBuilder.CreateImageBase64Part(imageBytes, "image/png");
         var imageAnalysisMessage = OpenAiMultiModalMessageBuilder.CreateMultiModalMessage("user", imageAnalysisTextPart, imagePart);
 
@@ -520,9 +520,9 @@ public class OpenAiIntegrationTests
         Assert.NotNull(imageAnalysis);
         _output.WriteLine($"Image analysis: {imageAnalysis}");
 
-        // Use gpt-4o-audio-preview with both image analysis and audio question to generate an answer
+        // Use gpt-4o-audio-preview with both image analysis and audio to create a creative transformation
         var promptTextPart = OpenAiMultiModalMessageBuilder.CreateTextPart(
-            $"Based on this image analysis: '{imageAnalysis}', and the question you'll hear in the audio, provide a thoughtful and detailed answer. Consider what you learned from the image analysis when responding to the question.");
+            $"Based on this image analysis: '{imageAnalysis}', and the creative prompt you'll hear in the audio, create a detailed description for a completely different but thematically connected scene. The audio will suggest a creative transformation or reinterpretation. Describe this new scene vividly, focusing on how it relates to the original while being visually distinct. Be imaginative and creative in your transformation.");
         var audioPart = OpenAiMultiModalMessageBuilder.CreateAudioInputPart(audioBytes, "mp3");
         var questionAnswerMessage = OpenAiMultiModalMessageBuilder.CreateMultiModalMessage("user", promptTextPart, audioPart);
 
@@ -541,11 +541,11 @@ public class OpenAiIntegrationTests
         Assert.NotNull(answer);
         _output.WriteLine($"Answer: {answer}");
 
-        // Generate response image based on the answer
+        // Generate response image based on the creative transformation
         var responseImageRequest = new OpenAiImageGenerationRequestDto
         {
             Model = "dall-e-3",
-            Prompt = $"Create a visual representation of this concept: {answer}",
+            Prompt = $"Create a detailed, visually striking image based on this description: {answer}. Make it artistic and engaging, with rich visual details that clearly show the creative transformation from the original concept.",
             ResponseFormat = "b64_json",
             Size = "1024x1024"
         };
@@ -573,22 +573,22 @@ public class OpenAiIntegrationTests
         reportContent.AppendLine("**Scene Description:**");
         reportContent.AppendLine(imagePrompt);
         reportContent.AppendLine();
-        reportContent.AppendLine("**Question Asked:**");
+        reportContent.AppendLine("**Creative Transformation Prompt:**");
         reportContent.AppendLine(questionText);
         reportContent.AppendLine();
-        reportContent.AppendLine("## AI Analysis and Response");
+        reportContent.AppendLine("## AI Analysis and Creative Process");
         reportContent.AppendLine();
-        reportContent.AppendLine("**Image Analysis:**");
+        reportContent.AppendLine("**Original Image Analysis:**");
         reportContent.AppendLine(imageAnalysis);
         reportContent.AppendLine();
-        reportContent.AppendLine("**Answer to Question:**");
+        reportContent.AppendLine("**Creative Transformation Description:**");
         reportContent.AppendLine(answer);
         reportContent.AppendLine();
         reportContent.AppendLine("## Generated Files");
         reportContent.AppendLine();
         reportContent.AppendLine($"- Scene image: `{imageFilePath}`");
-        reportContent.AppendLine($"- Question audio: `{audioFilePath}`");
-        reportContent.AppendLine($"- Response image: `{responseImageFilePath}`");
+        reportContent.AppendLine($"- Transformation prompt audio: `{audioFilePath}`");
+        reportContent.AppendLine($"- Transformed scene image: `{responseImageFilePath}`");
         await File.WriteAllTextAsync(reportFilePath, reportContent.ToString());
         _output.WriteLine($"Markdown report saved to: {reportFilePath}");
     }
