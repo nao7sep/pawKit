@@ -445,7 +445,7 @@ public class OpenAiIntegrationTests
     public async Task MultiModalChat_MovieScenePrediction_FunTest()
     {
         // Generate a creative image prompt and speech text using the AI
-        var creativePrompt = "Generate a JSON object with two fields: 'image_prompt' and 'speech_text'. 'image_prompt' should describe a highly realistic, photographic everyday scene where someone is about to do something obviously wrong or risky (for example, about to put a metal fork in a toaster, or standing on a rolling chair to change a lightbulb). 'speech_text' should be a short, confident or clueless line from the person, making it clear they don't expect anything bad to happen. Make it clear this is a setup for a complete, funny disaster.";
+        var creativePrompt = "Generate a JSON object with two fields: 'image_prompt' and 'speech_text'. 'image_prompt' should describe an everyday scene where someone is about to do something obviously wrong or risky. 'speech_text' should be a short, confident or clueless line from the person, making it clear they don't expect anything bad to happen. The disaster should be exaggerated and clearly intended as a joke.";
         var genRequest = new OpenAiChatCompletionRequestDto
         {
             Model = "gpt-4o",
@@ -501,7 +501,7 @@ public class OpenAiIntegrationTests
 
         // Use gpt-4o to describe the image
         var imageDescriptionTextPart = OpenAiMultiModalMessageBuilder.CreateTextPart(
-            "Describe this photo-realistic image as if you are witnessing the moment just before a disaster. Focus on the details that make the situation funny and obviously risky.");
+            "Describe this image as if you are witnessing the moment just before a disaster. Focus on the details that make the situation funny, exaggerated, and obviously risky. This is for a joke test.");
         var imagePart = OpenAiMultiModalMessageBuilder.CreateImageBase64Part(imageBytes, "image/png");
         var imageDescriptionMessage = OpenAiMultiModalMessageBuilder.CreateMultiModalMessage("user", imageDescriptionTextPart, imagePart);
 
@@ -519,7 +519,7 @@ public class OpenAiIntegrationTests
 
         // Use gpt-4o-audio-preview with both text prompt and audio to generate story continuation
         var promptTextPart = OpenAiMultiModalMessageBuilder.CreateTextPart(
-            $"Based on this description: '{imageDescription}', and the dialogue you'll hear, describe the complete disaster that happens next. Make the outcome as funny and over-the-top as possible, and suitable for a realistic, photographic image.");
+            $"Based on this description: '{imageDescription}', and the dialogue you'll hear, describe the complete disaster that happens next. Make the outcome as funny, exaggerated, and over-the-top as possible. This is for a joke test and should not be taken seriously.");
         var audioPart = OpenAiMultiModalMessageBuilder.CreateAudioInputPart(audioBytes, "mp3");
         var audioAnalysisMessage = OpenAiMultiModalMessageBuilder.CreateMultiModalMessage("user", promptTextPart, audioPart);
 
