@@ -49,7 +49,11 @@ public class OpenAiImageGenerator
         catch (Exception ex)
         {
             throw new AiServiceException(
-                "Unexpected error during image generation.", null, null, null, ex);
+                message: "Unexpected error during image generation.",
+                statusCode: null,
+                rawResponse: null,
+                providerDetails: null,
+                innerException: ex);
         }
     }
 }

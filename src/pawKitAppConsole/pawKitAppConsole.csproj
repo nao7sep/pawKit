@@ -14,7 +14,7 @@
     <Company>Purrfect Code</Company>
     <Authors>nao7sep</Authors>
     <Copyright>Copyright © 2025</Copyright>
-    <Version>0.1.0</Version>
+    <Version>0.1.1</Version>
     <PackageLicenseExpression>GPL-3.0</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/nao7sep/pawKit</RepositoryUrl>
   </PropertyGroup>
