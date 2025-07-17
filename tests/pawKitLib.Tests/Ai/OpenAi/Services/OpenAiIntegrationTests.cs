@@ -326,6 +326,17 @@ public class OpenAiIntegrationTests
             Function = functionDef
         };
 
+        // Maintain a conversation history suitable for continuing with the AI
+        var conversationHistory = new List<object>();
+
+        // User message
+        var userMessage = new
+        {
+            role = "user",
+            content = "What's the weather like in Tokyo?"
+        };
+        conversationHistory.Add(userMessage);
+
         var request = new OpenAiChatCompletionRequestDto
         {
             Model = "gpt-4o",
@@ -341,10 +352,78 @@ public class OpenAiIntegrationTests
         Assert.NotEmpty(response.Choices);
         Assert.NotNull(response.Choices[0].Message);
 
+        // Add assistant/tool messages to conversation history
+        // If the response contains tool calls, add them as tool messages
+        var assistantMessage = response.Choices[0].Message;
+        if (assistantMessage != null && assistantMessage.ToolCalls != null && assistantMessage.ToolCalls.Count > 0)
+        {
+            foreach (var toolCall in assistantMessage.ToolCalls)
+            {
+                conversationHistory.Add(new
+                {
+                    role = "assistant",
+                    content = null as string,
+                    tool_calls = new[]
+                    {
+                        new {
+                            id = toolCall.Id,
+                            type = toolCall.Type,
+                            function = toolCall.Function
+                        }
+                    }
+                });
+
+                // Add the tool response as a tool message
+                conversationHistory.Add(new
+                {
+                    role = "tool",
+                    tool_call_id = toolCall.Id,
+                    name = toolCall.Function?.Name,
+                    content = JsonSerializer.Serialize(GetWeather(new WeatherArgs { Location = "Tokyo" }))
+                });
+            }
+        }
+
+        // Add the final assistant message
         var finalMessage = response.Choices[0].Message!.Content as string;
         Assert.NotNull(finalMessage);
         Assert.Contains("Tokyo", finalMessage!);
         Assert.Contains("22°C", finalMessage!);
+
+        conversationHistory.Add(new
+        {
+            role = "assistant",
+            content = finalMessage
+        });
+
+        // Output the final message for inspection
+        _output.WriteLine($"Final message: {finalMessage}");
+
+        // Save the conversation history as indented JSON on the desktop
+        var conversationJson = JsonSerializer.Serialize(conversationHistory, new JsonSerializerOptions { WriteIndented = true });
+        var desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
+        var ticks = DateTime.UtcNow.Ticks.ToString();
+        var jsonFileName = $"openai-{ticks}z-tools.json";
+        var jsonFilePath = Path.Combine(desktopPath, jsonFileName);
+        await File.WriteAllTextAsync(jsonFilePath, conversationJson);
+        _output.WriteLine($"Conversation JSON saved to: {jsonFilePath}");
+    }
+
+    /// <summary>
+    /// Mock weather function for tool calling tests.
+    /// </summary>
+    [Description("Gets the current weather for a specified location.")]
+    public static object GetWeather(WeatherArgs args)
+    {
+        return new { temperature = "22°C", condition = "Sunny", location = args.Location };
+    }
+
+    /// <summary>
+    /// Arguments for the weather tool function.
+    /// </summary>
+    public class WeatherArgs
+    {
+        public string Location { get; set; } = string.Empty;
     }
 
     /// <summary>
@@ -460,15 +539,6 @@ public class OpenAiIntegrationTests
     }
 
     /// <summary>
-    /// Mock weather function for tool calling tests.
-    /// </summary>
-    [Description("Gets the current weather for a specified location.")]
-    public static object GetWeather(WeatherArgs args)
-    {
-        return new { temperature = "22°C", condition = "Sunny", location = args.Location };
-    }
-
-    /// <summary>
     /// Creates test image bytes (simple PNG).
     /// </summary>
     private static byte[] CreateTestImageBytes()
@@ -487,12 +557,4 @@ public class OpenAiIntegrationTests
     }
 
 
-
-    /// <summary>
-    /// Arguments for the weather tool function.
-    /// </summary>
-    public class WeatherArgs
-    {
-        public string Location { get; set; } = string.Empty;
-    }
 }
