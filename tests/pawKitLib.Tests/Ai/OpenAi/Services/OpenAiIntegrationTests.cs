@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
+using pawKitLib.Ai;
 using pawKitLib.Ai.OpenAi.Models;
 using pawKitLib.Ai.OpenAi.Services;
 using pawKitLib.Models;
@@ -373,8 +374,10 @@ public class OpenAiIntegrationTests
     [Fact]
     public async Task FileManagement_FullCrudLifecycle_WorksCorrectly()
     {
-        var testContent = "Test file content for CRUD operations.";
-        var tempFile = Path.GetTempFileName();
+        // OpenAI API supports several file formats for upload, including .jsonl (JSON Lines), which is required for fine-tune files.
+        // Each line in a .jsonl file must be a valid JSON object.
+        var testContent = "{\"prompt\":\"Say this is a test!\",\"completion\":\"This is a test.\"}";
+        var tempFile = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N") + ".jsonl");
 
         try
         {
@@ -383,7 +386,10 @@ public class OpenAiIntegrationTests
             var uploadRequest = new OpenAiFileUploadRequestDto
             {
                 File = new FilePathReferenceDto { FilePath = tempFile },
-                Purpose = "vision"
+                // We tried different extensions, file contents, and Purpose values (e.g., "vision", "assistants").
+                // As of 2025-07, "fine-tune" just happened to be the first Purpose that passed for this test.
+                // This is solely for testing file CRUD, so any working purpose is acceptable.
+                Purpose = "fine-tune"
             };
             var uploadedFile = await _fileManager.UploadAsync(uploadRequest);
             Assert.NotNull(uploadedFile.Id);
@@ -394,6 +400,22 @@ public class OpenAiIntegrationTests
 
             // Read - List
             var fileList = await _fileManager.ListAsync();
+            _output.WriteLine($"File list ({fileList.Data.Count}):");
+            foreach (var f in fileList.Data)
+            {
+                // We've observed that .txt files with the "assistants" purpose also upload successfully and appear in the file list.
+                // Currently, this test uses "fine-tune" and sends a .jsonl file, but other extensions and purposes (such as .txt with "assistants") may also work.
+                _output.WriteLine($"  Id: {f.Id}, Filename: {f.Filename}, Purpose: {f.Purpose}, Status: {f.Status}");
+
+                // Delete all files in the list (for cleanup/demo purposes)
+                // This is solely for convenience, as there is currently no official page or interface to delete uploaded files.
+                // By setting this to true, we will indiscriminately attempt to delete all files, which may cause the rest of the code to break and the test to fail.
+                if (false)
+                {
+                    _output.WriteLine($"  Deleting file: {f.Id}");
+                    await _fileManager.DeleteAsync(f.Id);
+                }
+            }
             Assert.Contains(fileList.Data, f => f.Id == uploadedFile.Id);
 
             // Read - Download
@@ -406,7 +428,8 @@ public class OpenAiIntegrationTests
             Assert.True(deleteResponse.Deleted);
 
             // Verify deletion
-            await Assert.ThrowsAsync<Exception>(() => _fileManager.RetrieveAsync(uploadedFile.Id));
+            // The catch-all mechanism (e.g., using Exception or a base type) did not work here; by changing the type to AiServiceException, the test started passing.
+            await Assert.ThrowsAsync<AiServiceException>(() => _fileManager.RetrieveAsync(uploadedFile.Id));
         }
         finally
         {
