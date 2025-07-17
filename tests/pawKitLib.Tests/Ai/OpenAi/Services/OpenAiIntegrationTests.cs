@@ -438,12 +438,13 @@ public class OpenAiIntegrationTests
     }
 
     /// <summary>
-    /// Fun multi-modal test: generates an image prompt and speech text, creates the image and audio, then asks the AI to imagine what happens next as if it's a movie scene.
+    /// Multi-modal test: generates image and audio content, uses gpt-4o for image analysis,
+    /// gpt-4o-audio-preview for audio processing, then generates a continuation image.
     /// </summary>
     [Fact]
     public async Task MultiModalChat_MovieScenePrediction_FunTest()
     {
-        // Step 1: Generate a creative image prompt and speech text using the AI
+        // Generate a creative image prompt and speech text using the AI
         var creativePrompt = "Generate a JSON object with two fields: 'image_prompt' (a vivid, cinematic scene description for an image generator) and 'speech_text' (a line of dramatic dialogue that could be spoken in that scene). Make them related and interesting.";
         var genRequest = new OpenAiChatCompletionRequestDto
         {
@@ -463,7 +464,7 @@ public class OpenAiIntegrationTests
             speechText = doc.RootElement.GetProperty("speech_text").GetString()!;
         }
 
-        // Step 2: Generate the image
+        // Generate the image
         var imageRequest = new OpenAiImageGenerationRequestDto
         {
             Model = "dall-e-3",
@@ -475,7 +476,7 @@ public class OpenAiIntegrationTests
         Assert.NotEmpty(imageResponse.Data);
         var imageBytes = Convert.FromBase64String(imageResponse.Data[0].B64Json!);
 
-        // Step 3: Generate the audio
+        // Generate the audio
         var speechRequest = new OpenAiAudioSpeechRequestDto
         {
             Model = "tts-1",
@@ -486,42 +487,73 @@ public class OpenAiIntegrationTests
         var audioBytes = await _audioSpeaker.GenerateSpeechAsync(speechRequest);
         Assert.NotEmpty(audioBytes);
 
-        // Step 4: Save the files to Desktop
+        // Save the initial files to Desktop
         var desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
         var ticks = DateTime.UtcNow.Ticks.ToString();
-        var imageFileName = $"openai-movie-{ticks}.png";
-        var audioFileName = $"openai-movie-{ticks}.mp3";
+        var imageFileName = $"openai-movie-{ticks}-original.png";
+        var audioFileName = $"openai-movie-{ticks}-original.mp3";
         var imageFilePath = Path.Combine(desktopPath, imageFileName);
         var audioFilePath = Path.Combine(desktopPath, audioFileName);
         await File.WriteAllBytesAsync(imageFilePath, imageBytes);
         await File.WriteAllBytesAsync(audioFilePath, audioBytes);
-        _output.WriteLine($"Image saved to: {imageFilePath}");
-        _output.WriteLine($"Audio saved to: {audioFilePath}");
+        _output.WriteLine($"Original image saved to: {imageFilePath}");
+        _output.WriteLine($"Original audio saved to: {audioFilePath}");
 
-        // Step 5: Ask the AI to imagine what happens next in the movie scene
-        var textPart = OpenAiMultiModalMessageBuilder.CreateTextPart(
-            "See the image and hear the audio as if it's a scene from a movie. Imagine what will happen next. Respond with a short, creative continuation of the story.");
+        // Use gpt-4o to describe the image
+        var imageDescriptionTextPart = OpenAiMultiModalMessageBuilder.CreateTextPart(
+            "Describe this image in detail as if it's a scene from a movie. Focus on the visual elements, mood, and setting.");
         var imagePart = OpenAiMultiModalMessageBuilder.CreateImageBase64Part(imageBytes, "image/png");
-        // The string "mp3" here is not a MIME type, but matches the OpenAI API's expected value for audio input format in the DTO. This is per OpenAI's specification.
-        var audioPart = OpenAiMultiModalMessageBuilder.CreateAudioInputPart(audioBytes, "mp3");
-        var message = OpenAiMultiModalMessageBuilder.CreateMultiModalMessage("user", textPart, imagePart, audioPart);
+        var imageDescriptionMessage = OpenAiMultiModalMessageBuilder.CreateMultiModalMessage("user", imageDescriptionTextPart, imagePart);
 
-        var request = new OpenAiChatCompletionRequestDto
+        var imageDescriptionRequest = new OpenAiChatCompletionRequestDto
         {
+            // gpt-4o is a multi-modal model with advanced vision capabilities, but it does not support audio input or output as of now.
             Model = "gpt-4o",
-            Messages = [message]
+            Messages = [imageDescriptionMessage]
         };
 
-        // Act
-        var response = await _chatCompleter.CompleteAsync(request);
+        var imageDescriptionResponse = await _chatCompleter.CompleteAsync(imageDescriptionRequest);
+        var imageDescription = imageDescriptionResponse.Choices[0].Message!.Content as string;
+        Assert.NotNull(imageDescription);
+        _output.WriteLine($"Image description: {imageDescription}");
 
-        // Assert
-        Assert.NotNull(response);
-        Assert.NotEmpty(response.Choices);
-        Assert.NotNull(response.Choices[0].Message);
-        var content = response.Choices[0].Message!.Content as string;
-        Assert.NotNull(content);
+        // Use gpt-4o-audio-preview with both text prompt and audio to generate story continuation
+        var promptTextPart = OpenAiMultiModalMessageBuilder.CreateTextPart(
+            $"Based on this movie scene description: '{imageDescription}', and the audio dialogue you'll hear, imagine what happens next in the story. Respond with a creative continuation that could be used as a prompt for generating the next scene image.");
+        var audioPart = OpenAiMultiModalMessageBuilder.CreateAudioInputPart(audioBytes, "mp3");
+        var audioAnalysisMessage = OpenAiMultiModalMessageBuilder.CreateMultiModalMessage("user", promptTextPart, audioPart);
 
-        _output.WriteLine($"AI's continuation: {content}");
+        var audioAnalysisRequest = new OpenAiChatCompletionRequestDto
+        {
+            // gpt-4o-audio-preview does not support image input. Note: the 'modalities' parameter can be misleading—
+            // if you include "audio" in the list, the model expects to generate audio output, not just accept audio input.
+            // It is not a declaration of supported input types. If "audio" is specified, you must provide the required audio fields for generation.
+            // If 'modalities' is omitted, the model defaults to text responses.
+            Model = "gpt-4o-audio-preview",
+            Messages = [audioAnalysisMessage]
+        };
+
+        var audioAnalysisResponse = await _chatCompleter.CompleteAsync(audioAnalysisRequest);
+        var storyContinuation = audioAnalysisResponse.Choices[0].Message!.Content as string;
+        Assert.NotNull(storyContinuation);
+        _output.WriteLine($"Story continuation: {storyContinuation}");
+
+        // Generate continuation image based on the story
+        var continuationImageRequest = new OpenAiImageGenerationRequestDto
+        {
+            Model = "dall-e-3",
+            Prompt = storyContinuation!,
+            ResponseFormat = "b64_json",
+            Size = "1024x1024"
+        };
+        var continuationImageResponse = await _imageGenerator.GenerateImageAsync(continuationImageRequest);
+        Assert.NotEmpty(continuationImageResponse.Data);
+        var continuationImageBytes = Convert.FromBase64String(continuationImageResponse.Data[0].B64Json!);
+
+        // Save the continuation image
+        var continuationImageFileName = $"openai-movie-{ticks}-continuation.png";
+        var continuationImageFilePath = Path.Combine(desktopPath, continuationImageFileName);
+        await File.WriteAllBytesAsync(continuationImageFilePath, continuationImageBytes);
+        _output.WriteLine($"Continuation image saved to: {continuationImageFilePath}");
     }
 }
