@@ -368,6 +368,53 @@ public class OpenAiIntegrationTests
     }
 
     /// <summary>
+    /// Tests complete file management CRUD lifecycle.
+    /// </summary>
+    [Fact]
+    public async Task FileManagement_FullCrudLifecycle_WorksCorrectly()
+    {
+        var testContent = "Test file content for CRUD operations.";
+        var tempFile = Path.GetTempFileName();
+
+        try
+        {
+            // Create
+            await File.WriteAllTextAsync(tempFile, testContent);
+            var uploadRequest = new OpenAiFileUploadRequestDto
+            {
+                File = new FilePathReferenceDto { FilePath = tempFile },
+                Purpose = "vision"
+            };
+            var uploadedFile = await _fileManager.UploadAsync(uploadRequest);
+            Assert.NotNull(uploadedFile.Id);
+
+            // Read - Retrieve
+            var retrievedFile = await _fileManager.RetrieveAsync(uploadedFile.Id);
+            Assert.Equal(uploadedFile.Id, retrievedFile.Id);
+
+            // Read - List
+            var fileList = await _fileManager.ListAsync();
+            Assert.Contains(fileList.Data, f => f.Id == uploadedFile.Id);
+
+            // Read - Download
+            var downloadedBytes = await _fileManager.DownloadContentAsync(uploadedFile.Id);
+            var downloadedContent = Encoding.UTF8.GetString(downloadedBytes);
+            Assert.Equal(testContent, downloadedContent);
+
+            // Delete
+            var deleteResponse = await _fileManager.DeleteAsync(uploadedFile.Id);
+            Assert.True(deleteResponse.Deleted);
+
+            // Verify deletion
+            await Assert.ThrowsAsync<Exception>(() => _fileManager.RetrieveAsync(uploadedFile.Id));
+        }
+        finally
+        {
+            File.Delete(tempFile);
+        }
+    }
+
+    /// <summary>
     /// Tests multi-modal chat with text, image, audio, file inputs and JSON response format.
     /// This is the "kitchen sink" test that exercises multiple capabilities in one request.
     /// </summary>
@@ -429,53 +476,6 @@ public class OpenAiIntegrationTests
         {
             // Cleanup
             await _fileManager.DeleteAsync(uploadedFile.Id);
-        }
-    }
-
-    /// <summary>
-    /// Tests complete file management CRUD lifecycle.
-    /// </summary>
-    [Fact]
-    public async Task FileManagement_FullCrudLifecycle_WorksCorrectly()
-    {
-        var testContent = "Test file content for CRUD operations.";
-        var tempFile = Path.GetTempFileName();
-
-        try
-        {
-            // Create
-            await File.WriteAllTextAsync(tempFile, testContent);
-            var uploadRequest = new OpenAiFileUploadRequestDto
-            {
-                File = new FilePathReferenceDto { FilePath = tempFile },
-                Purpose = "vision"
-            };
-            var uploadedFile = await _fileManager.UploadAsync(uploadRequest);
-            Assert.NotNull(uploadedFile.Id);
-
-            // Read - Retrieve
-            var retrievedFile = await _fileManager.RetrieveAsync(uploadedFile.Id);
-            Assert.Equal(uploadedFile.Id, retrievedFile.Id);
-
-            // Read - List
-            var fileList = await _fileManager.ListAsync();
-            Assert.Contains(fileList.Data, f => f.Id == uploadedFile.Id);
-
-            // Read - Download
-            var downloadedBytes = await _fileManager.DownloadContentAsync(uploadedFile.Id);
-            var downloadedContent = Encoding.UTF8.GetString(downloadedBytes);
-            Assert.Equal(testContent, downloadedContent);
-
-            // Delete
-            var deleteResponse = await _fileManager.DeleteAsync(uploadedFile.Id);
-            Assert.True(deleteResponse.Deleted);
-
-            // Verify deletion
-            await Assert.ThrowsAsync<Exception>(() => _fileManager.RetrieveAsync(uploadedFile.Id));
-        }
-        finally
-        {
-            File.Delete(tempFile);
         }
     }
 
