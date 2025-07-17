@@ -445,7 +445,7 @@ public class OpenAiIntegrationTests
     public async Task MultiModalChat_MovieScenePrediction_FunTest()
     {
         // Generate a creative image prompt and speech text using the AI
-        var creativePrompt = "Generate a JSON object with two fields: 'image_prompt' (a vivid, cinematic scene description for an image generator) and 'speech_text' (a line of dramatic dialogue that could be spoken in that scene). Make them related and interesting.";
+        var creativePrompt = "Generate a JSON object with two fields: 'image_prompt' and 'speech_text'. 'image_prompt' should describe a highly realistic, photographic everyday scene where someone is about to do something obviously wrong or risky (for example, about to put a metal fork in a toaster, or standing on a rolling chair to change a lightbulb). 'speech_text' should be a short, confident or clueless line from the person, making it clear they don't expect anything bad to happen. Make it clear this is a setup for a complete, funny disaster.";
         var genRequest = new OpenAiChatCompletionRequestDto
         {
             Model = "gpt-4o",
@@ -490,18 +490,18 @@ public class OpenAiIntegrationTests
         // Save the initial files to Desktop
         var desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
         var ticks = DateTime.UtcNow.Ticks.ToString();
-        var imageFileName = $"openai-movie-{ticks}-original.png";
-        var audioFileName = $"openai-movie-{ticks}-original.mp3";
+        var imageFileName = $"openai-disaster-{ticks}-start.png";
+        var audioFileName = $"openai-disaster-{ticks}-dialog.mp3";
         var imageFilePath = Path.Combine(desktopPath, imageFileName);
         var audioFilePath = Path.Combine(desktopPath, audioFileName);
         await File.WriteAllBytesAsync(imageFilePath, imageBytes);
         await File.WriteAllBytesAsync(audioFilePath, audioBytes);
-        _output.WriteLine($"Original image saved to: {imageFilePath}");
-        _output.WriteLine($"Original audio saved to: {audioFilePath}");
+        _output.WriteLine($"Disaster starting image saved to: {imageFilePath}");
+        _output.WriteLine($"Disaster dialogue audio saved to: {audioFilePath}");
 
         // Use gpt-4o to describe the image
         var imageDescriptionTextPart = OpenAiMultiModalMessageBuilder.CreateTextPart(
-            "Describe this image in detail as if it's a scene from a movie. Focus on the visual elements, mood, and setting.");
+            "Describe this photo-realistic image as if you are witnessing the moment just before a disaster. Focus on the details that make the situation funny and obviously risky.");
         var imagePart = OpenAiMultiModalMessageBuilder.CreateImageBase64Part(imageBytes, "image/png");
         var imageDescriptionMessage = OpenAiMultiModalMessageBuilder.CreateMultiModalMessage("user", imageDescriptionTextPart, imagePart);
 
@@ -519,7 +519,7 @@ public class OpenAiIntegrationTests
 
         // Use gpt-4o-audio-preview with both text prompt and audio to generate story continuation
         var promptTextPart = OpenAiMultiModalMessageBuilder.CreateTextPart(
-            $"Based on this movie scene description: '{imageDescription}', and the audio dialogue you'll hear, imagine what happens next in the story. Respond with a creative continuation that could be used as a prompt for generating the next scene image.");
+            $"Based on this description: '{imageDescription}', and the dialogue you'll hear, describe the complete disaster that happens next. Make the outcome as funny and over-the-top as possible, and suitable for a realistic, photographic image.");
         var audioPart = OpenAiMultiModalMessageBuilder.CreateAudioInputPart(audioBytes, "mp3");
         var audioAnalysisMessage = OpenAiMultiModalMessageBuilder.CreateMultiModalMessage("user", promptTextPart, audioPart);
 
@@ -536,7 +536,7 @@ public class OpenAiIntegrationTests
         var audioAnalysisResponse = await _chatCompleter.CompleteAsync(audioAnalysisRequest);
         var storyContinuation = audioAnalysisResponse.Choices[0].Message!.Content as string;
         Assert.NotNull(storyContinuation);
-        _output.WriteLine($"Story continuation: {storyContinuation}");
+        _output.WriteLine($"Continuation description: {storyContinuation}");
 
         // Generate continuation image based on the story
         var continuationImageRequest = new OpenAiImageGenerationRequestDto
@@ -551,9 +551,41 @@ public class OpenAiIntegrationTests
         var continuationImageBytes = Convert.FromBase64String(continuationImageResponse.Data[0].B64Json!);
 
         // Save the continuation image
-        var continuationImageFileName = $"openai-movie-{ticks}-continuation.png";
+        var continuationImageFileName = $"openai-disaster-{ticks}-result.png";
         var continuationImageFilePath = Path.Combine(desktopPath, continuationImageFileName);
         await File.WriteAllBytesAsync(continuationImageFilePath, continuationImageBytes);
-        _output.WriteLine($"Continuation image saved to: {continuationImageFilePath}");
+        _output.WriteLine($"Disaster result image saved to: {continuationImageFilePath}");
+
+        // Save a markdown report summarizing the test
+        var reportFileName = $"openai-disaster-{ticks}-report.md";
+        var reportFilePath = Path.Combine(desktopPath, reportFileName);
+        var reportContent = new StringBuilder();
+        reportContent.AppendLine("# OpenAI Everyday Scene Disaster Test Report");
+        reportContent.AppendLine();
+        reportContent.AppendLine("## Initial Prompt");
+        reportContent.AppendLine();
+        reportContent.AppendLine(creativePrompt);
+        reportContent.AppendLine();
+        reportContent.AppendLine("**Scene Prompt:**");
+        reportContent.AppendLine(imagePrompt);
+        reportContent.AppendLine();
+        reportContent.AppendLine("**Dialogue Prompt:**");
+        reportContent.AppendLine(speechText);
+        reportContent.AppendLine();
+        reportContent.AppendLine("## Analysis and Prediction");
+        reportContent.AppendLine();
+        reportContent.AppendLine("**Image Analysis:**");
+        reportContent.AppendLine(imageDescription);
+        reportContent.AppendLine();
+        reportContent.AppendLine("**Predicted Outcome:**");
+        reportContent.AppendLine(storyContinuation);
+        reportContent.AppendLine();
+        reportContent.AppendLine("## Generated Files");
+        reportContent.AppendLine();
+        reportContent.AppendLine($"- Disaster starting image: `{imageFilePath}`");
+        reportContent.AppendLine($"- Disaster dialogue audio: `{audioFilePath}`");
+        reportContent.AppendLine($"- Disaster result image: `{continuationImageFilePath}`");
+        await File.WriteAllTextAsync(reportFilePath, reportContent.ToString());
+        _output.WriteLine($"Markdown report saved to: {reportFilePath}");
     }
 }
