@@ -2,6 +2,7 @@ using System.Text.Json;
 using pawKitLib.Ai.OpenAi.Models;
 using pawKitLib.Conversion;
 using Microsoft.Extensions.Logging;
+using System.Diagnostics;
 
 namespace pawKitLib.Ai.OpenAi.Services;
 
@@ -47,6 +48,12 @@ public static class OpenAiHttpClientHelper
                 }
                 return result;
             }
+
+#if DEBUG
+            // If the response is not successful, we immediately output the raw JSON to the debugger.
+            // This ensures the error details are visible during debugging as early as possible.
+            Debug.WriteLine(json);
+#endif
 
             // Any non-success HTTP response is always treated as an error, regardless of content.
             // This enforces strict API contract handling and avoids silent failures.
@@ -144,6 +151,12 @@ public static class OpenAiHttpClientHelper
             // Handle errors as before
             var json = await response.Content.ReadAsStringAsync(cancellationToken);
             logger.LogDebug("Received JSON response from OpenAI API: {@Json}", json);
+
+#if DEBUG
+            // If the response is not successful, we immediately output the raw JSON to the debugger.
+            // This ensures the error details are visible during debugging as early as possible.
+            Debug.WriteLine(json);
+#endif
 
             var container = JsonSerializer.Deserialize<OpenAiErrorContainerDto>(json);
             if (container == null)
