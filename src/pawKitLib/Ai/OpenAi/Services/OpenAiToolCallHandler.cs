@@ -24,36 +24,8 @@ public class OpenAiToolCallHandler
     /// </summary>
     public void RegisterTool<T>(string name, Func<T, object> handler, OpenAiFunctionDto functionDefinition)
     {
-        var registeredTool = new RegisteredTool
-        {
-            Name = name,
-            FunctionDefinition = functionDefinition,
-            Handler = (argsJson) =>
-            {
-                try
-                {
-                    var args = JsonSerializer.Deserialize<T>(argsJson);
-                    if (args == null)
-                    {
-                        throw new ArgumentException($"Failed to deserialize arguments for tool '{name}'");
-                    }
-
-                    var result = handler(args);
-                    return Task.FromResult(JsonSerializer.Serialize(result));
-                }
-                catch (Exception ex)
-                {
-                    throw new AiServiceException(
-                        message: $"Tool execution failed for '{name}'",
-                        statusCode: null,
-                        rawResponse: null,
-                        providerDetails: null,
-                        innerException: ex);
-                }
-            }
-        };
-
-        _registeredTools[name] = registeredTool;
+        _registeredTools[name] = CreateRegisteredTool(name, functionDefinition,
+            argsJson => Task.FromResult(ExecuteHandler(name, argsJson, handler)));
     }
 
     /// <summary>
@@ -61,36 +33,77 @@ public class OpenAiToolCallHandler
     /// </summary>
     public void RegisterAsyncTool<T>(string name, Func<T, Task<object>> handler, OpenAiFunctionDto functionDefinition)
     {
-        var registeredTool = new RegisteredTool
+        _registeredTools[name] = CreateRegisteredTool(name, functionDefinition,
+            argsJson => ExecuteAsyncHandler(name, argsJson, handler));
+    }
+
+    /// <summary>
+    /// Creates a registered tool with common configuration.
+    /// </summary>
+    private static RegisteredTool CreateRegisteredTool(string name, OpenAiFunctionDto functionDefinition, Func<string, Task<string>> handler)
+    {
+        return new RegisteredTool
         {
             Name = name,
             FunctionDefinition = functionDefinition,
-            Handler = async (argsJson) =>
-            {
-                try
-                {
-                    var args = JsonSerializer.Deserialize<T>(argsJson);
-                    if (args == null)
-                    {
-                        throw new ArgumentException($"Failed to deserialize arguments for tool '{name}'");
-                    }
-
-                    var result = await handler(args);
-                    return JsonSerializer.Serialize(result);
-                }
-                catch (Exception ex)
-                {
-                    throw new AiServiceException(
-                        message: $"Async tool execution failed for '{name}'",
-                        statusCode: null,
-                        rawResponse: null,
-                        providerDetails: null,
-                        innerException: ex);
-                }
-            }
+            Handler = handler
         };
+    }
 
-        _registeredTools[name] = registeredTool;
+    /// <summary>
+    /// Executes a synchronous handler with error handling.
+    /// </summary>
+    private static string ExecuteHandler<T>(string name, string argsJson, Func<T, object> handler)
+    {
+        try
+        {
+            var args = DeserializeArguments<T>(name, argsJson);
+            var result = handler(args);
+            return JsonSerializer.Serialize(result);
+        }
+        catch (Exception ex)
+        {
+            throw CreateToolExecutionException(name, "Tool execution failed", ex);
+        }
+    }
+
+    /// <summary>
+    /// Executes an asynchronous handler with error handling.
+    /// </summary>
+    private static async Task<string> ExecuteAsyncHandler<T>(string name, string argsJson, Func<T, Task<object>> handler)
+    {
+        try
+        {
+            var args = DeserializeArguments<T>(name, argsJson);
+            var result = await handler(args);
+            return JsonSerializer.Serialize(result);
+        }
+        catch (Exception ex)
+        {
+            throw CreateToolExecutionException(name, "Async tool execution failed", ex);
+        }
+    }
+
+    /// <summary>
+    /// Deserializes tool arguments with validation.
+    /// </summary>
+    private static T DeserializeArguments<T>(string toolName, string argsJson)
+    {
+        var args = JsonSerializer.Deserialize<T>(argsJson);
+        return args ?? throw new ArgumentException($"Failed to deserialize arguments for tool '{toolName}'");
+    }
+
+    /// <summary>
+    /// Creates a standardized tool execution exception.
+    /// </summary>
+    private static AiServiceException CreateToolExecutionException(string toolName, string message, Exception innerException)
+    {
+        return new AiServiceException(
+            message: $"{message} for '{toolName}'",
+            statusCode: null,
+            rawResponse: null,
+            providerDetails: null,
+            innerException: innerException);
     }
 
     /// <summary>
@@ -160,8 +173,7 @@ public class OpenAiToolCallHandler
     /// </summary>
     public bool HasToolCalls(OpenAiChatCompletionResponseDto response)
     {
-        return response.Choices.Any(choice =>
-            choice.Message?.ToolCalls != null && choice.Message.ToolCalls.Count > 0);
+        return response.Choices.Any(choice => choice.Message?.ToolCalls?.Count > 0);
     }
 
     /// <summary>
@@ -169,25 +181,18 @@ public class OpenAiToolCallHandler
     /// </summary>
     public List<OpenAiToolCallDto> ExtractToolCalls(OpenAiChatCompletionResponseDto response)
     {
-        var toolCalls = new List<OpenAiToolCallDto>();
-
-        foreach (var choice in response.Choices)
-        {
-            if (choice.Message?.ToolCalls != null)
-            {
-                toolCalls.AddRange(choice.Message.ToolCalls);
-            }
-        }
-
-        return toolCalls;
+        return response.Choices
+            .Where(choice => choice.Message?.ToolCalls != null)
+            .SelectMany(choice => choice.Message!.ToolCalls!)
+            .ToList();
     }
 
     /// <summary>
     /// Gets the names of all registered tools.
     /// </summary>
-    public IReadOnlyList<string> GetRegisteredToolNames()
+    public IReadOnlyCollection<string> GetRegisteredToolNames()
     {
-        return _registeredTools.Keys.ToList().AsReadOnly();
+        return _registeredTools.Keys;
     }
 
     /// <summary>
@@ -212,7 +217,6 @@ public class OpenAiToolCallHandler
     /// </summary>
     public void ClearAllTools()
     {
-        var count = _registeredTools.Count;
         _registeredTools.Clear();
     }
 

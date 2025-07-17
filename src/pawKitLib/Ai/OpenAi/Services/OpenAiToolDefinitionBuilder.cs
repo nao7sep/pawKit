@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.Reflection;
 using System.Text.Json;
@@ -11,6 +12,7 @@ namespace pawKitLib.Ai.OpenAi.Services;
 /// </summary>
 public static class OpenAiToolDefinitionBuilder
 {
+    private static readonly ConcurrentDictionary<Type, object> _typeSchemaCache = new();
     /// <summary>
     /// Creates a function definition from a method using reflection.
     /// Uses DescriptionAttribute for function and parameter descriptions.
@@ -56,8 +58,8 @@ public static class OpenAiToolDefinitionBuilder
         string? description = null,
         params (string name, string description, bool required)[] parameters)
     {
-        var properties = new Dictionary<string, object>();
-        var required = new List<string>();
+        var properties = new Dictionary<string, object>(parameters.Length);
+        List<string>? required = null;
 
         foreach (var (paramName, paramDesc, isRequired) in parameters)
         {
@@ -69,6 +71,7 @@ public static class OpenAiToolDefinitionBuilder
 
             if (isRequired)
             {
+                required ??= new List<string>();
                 required.Add(paramName);
             }
         }
@@ -76,8 +79,8 @@ public static class OpenAiToolDefinitionBuilder
         var schema = new
         {
             type = "object",
-            properties = properties,
-            required = required.Count > 0 ? required : null
+            properties,
+            required
         };
 
         return new OpenAiFunctionDto
@@ -94,8 +97,8 @@ public static class OpenAiToolDefinitionBuilder
     private static object CreateParametersSchema(MethodInfo method)
     {
         var parameters = method.GetParameters();
-        var properties = new Dictionary<string, object>();
-        var required = new List<string>();
+        var properties = new Dictionary<string, object>(parameters.Length);
+        List<string>? required = null;
 
         foreach (var param in parameters)
         {
@@ -108,6 +111,7 @@ public static class OpenAiToolDefinitionBuilder
 
             if (isRequired)
             {
+                required ??= new List<string>();
                 required.Add(paramName);
             }
 
@@ -118,8 +122,8 @@ public static class OpenAiToolDefinitionBuilder
         return new
         {
             type = "object",
-            properties = properties,
-            required = required.Count > 0 ? required : null
+            properties,
+            required
         };
     }
 
@@ -131,52 +135,79 @@ public static class OpenAiToolDefinitionBuilder
         // Handle nullable types
         var underlyingType = Nullable.GetUnderlyingType(type) ?? type;
 
+        // Use cached schema for base type, then add description
+        var baseSchema = _typeSchemaCache.GetOrAdd(underlyingType, CreateBaseTypeSchema);
+
+        // If description is empty, return cached schema directly
+        if (string.IsNullOrEmpty(description))
+        {
+            return baseSchema;
+        }
+
+        // Create new schema with description
         return underlyingType switch
         {
-            Type t when t == typeof(string) => new
-            {
-                type = "string",
-                description = description
-            },
-            Type t when t == typeof(int) || t == typeof(long) || t == typeof(short) || t == typeof(byte) => new
-            {
-                type = "integer",
-                description = description
-            },
-            Type t when t == typeof(double) || t == typeof(float) || t == typeof(decimal) => new
-            {
-                type = "number",
-                description = description
-            },
-            Type t when t == typeof(bool) => new
-            {
-                type = "boolean",
-                description = description
-            },
-            Type t when t.IsEnum => new
-            {
-                type = "string",
-                @enum = Enum.GetNames(t),
-                description = description
-            },
+            Type t when t == typeof(string) => new { type = "string", description },
+            Type t when IsIntegerType(t) => new { type = "integer", description },
+            Type t when IsNumberType(t) => new { type = "number", description },
+            Type t when t == typeof(bool) => new { type = "boolean", description },
+            Type t when t.IsEnum => new { type = "string", @enum = Enum.GetNames(t), description },
             Type t when t.IsArray => new
             {
                 type = "array",
                 items = CreatePropertySchema(t.GetElementType()!, string.Empty),
-                description = description
+                description
             },
             Type t when IsListType(t) => new
             {
                 type = "array",
                 items = CreatePropertySchema(t.GetGenericArguments()[0], string.Empty),
-                description = description
+                description
             },
-            _ => new
-            {
-                type = "object",
-                description = description
-            }
+            _ => new { type = "object", description }
         };
+    }
+
+    /// <summary>
+    /// Creates base type schema without description for caching.
+    /// </summary>
+    private static object CreateBaseTypeSchema(Type type)
+    {
+        return type switch
+        {
+            Type t when t == typeof(string) => new { type = "string" },
+            Type t when IsIntegerType(t) => new { type = "integer" },
+            Type t when IsNumberType(t) => new { type = "number" },
+            Type t when t == typeof(bool) => new { type = "boolean" },
+            Type t when t.IsEnum => new { type = "string", @enum = Enum.GetNames(t) },
+            Type t when t.IsArray => new
+            {
+                type = "array",
+                items = CreatePropertySchema(t.GetElementType()!, string.Empty)
+            },
+            Type t when IsListType(t) => new
+            {
+                type = "array",
+                items = CreatePropertySchema(t.GetGenericArguments()[0], string.Empty)
+            },
+            _ => new { type = "object" }
+        };
+    }
+
+    /// <summary>
+    /// Checks if a type is an integer type.
+    /// </summary>
+    private static bool IsIntegerType(Type type)
+    {
+        return type == typeof(int) || type == typeof(long) || type == typeof(short) || type == typeof(byte);
+    }
+
+    /// <summary>
+    /// Checks if a type is a number type.
+    /// </summary>
+    private static bool IsNumberType(Type type)
+    {
+        return type == typeof(double) || type == typeof(float) || type == typeof(decimal);
     }
 
     /// <summary>
