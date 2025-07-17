@@ -438,87 +438,90 @@ public class OpenAiIntegrationTests
     }
 
     /// <summary>
-    /// Tests multi-modal chat with text, image, audio, file inputs and JSON response format.
-    /// This is the "kitchen sink" test that exercises multiple capabilities in one request.
+    /// Fun multi-modal test: generates an image prompt and speech text, creates the image and audio, then asks the AI to imagine what happens next as if it's a movie scene.
     /// </summary>
     [Fact]
-    public async Task MultiModalChat_WithAllInputTypes_ReturnsStructuredResponse()
+    public async Task MultiModalChat_MovieScenePrediction_FunTest()
     {
-        // Arrange - Create test assets
-        var testImageBytes = CreateTestImageBytes();
-        var testAudioBytes = CreateTestAudioBytes();
-        var testFileContent = "Test analysis data: User engagement increased by 15% this quarter.";
-
-        // Upload test file
-        var tempFile = Path.GetTempFileName();
-        await File.WriteAllTextAsync(tempFile, testFileContent);
-
-        var uploadRequest = new OpenAiFileUploadRequestDto
+        // Step 1: Generate a creative image prompt and speech text using the AI
+        var creativePrompt = "Generate a JSON object with two fields: 'image_prompt' (a vivid, cinematic scene description for an image generator) and 'speech_text' (a line of dramatic dialogue that could be spoken in that scene). Make them related and interesting.";
+        var genRequest = new OpenAiChatCompletionRequestDto
         {
-            File = new FilePathReferenceDto { FilePath = tempFile },
-            Purpose = "vision"
+            Model = "gpt-4o",
+            Messages = [new OpenAiChatMessageDto { Role = "user", Content = creativePrompt }],
+            ResponseFormat = new OpenAiResponseFormatDto { Type = "json_object" }
         };
-        var uploadedFile = await _fileManager.UploadAsync(uploadRequest);
-        File.Delete(tempFile);
+        var genResponse = await _chatCompleter.CompleteAsync(genRequest);
+        var genJson = genResponse.Choices[0].Message!.Content as string;
+        Assert.NotNull(genJson);
+        _output.WriteLine($"Prompt/Dialogue JSON: {genJson}");
 
-        try
+        string imagePrompt, speechText;
+        using (var doc = JsonDocument.Parse(genJson!))
         {
-            // Build multi-modal message using static methods
-            var textPart = OpenAiMultiModalMessageBuilder.CreateTextPart("Analyze the provided image, audio, and file. Return your findings as JSON with 'image_analysis', 'audio_transcription', and 'file_summary' fields.");
-            var imagePart = OpenAiMultiModalMessageBuilder.CreateImageBase64Part(testImageBytes, "image/png");
-            var audioPart = OpenAiMultiModalMessageBuilder.CreateAudioInputPart(testAudioBytes, "mp3");
-            var filePart = OpenAiMultiModalMessageBuilder.CreateFilePart(uploadedFile.Id);
-
-            var message = OpenAiMultiModalMessageBuilder.CreateMultiModalMessage("user", textPart, imagePart, audioPart, filePart);
-
-            var request = new OpenAiChatCompletionRequestDto
-            {
-                Model = "gpt-4o",
-                Messages = [message],
-                ResponseFormat = new OpenAiResponseFormatDto { Type = "json_object" }
-            };
-
-            // Act
-            var response = await _chatCompleter.CompleteAsync(request);
-
-            // Assert
-            Assert.NotNull(response);
-            Assert.NotEmpty(response.Choices);
-            Assert.NotNull(response.Choices[0].Message);
-
-            var content = response.Choices[0].Message!.Content as string;
-            Assert.NotNull(content);
-
-            // Verify it's valid JSON
-            var jsonDoc = JsonDocument.Parse(content!);
-            Assert.True(jsonDoc.RootElement.TryGetProperty("image_analysis", out _));
-            Assert.True(jsonDoc.RootElement.TryGetProperty("audio_transcription", out _));
-            Assert.True(jsonDoc.RootElement.TryGetProperty("file_summary", out _));
+            imagePrompt = doc.RootElement.GetProperty("image_prompt").GetString()!;
+            speechText = doc.RootElement.GetProperty("speech_text").GetString()!;
         }
-        finally
+
+        // Step 2: Generate the image
+        var imageRequest = new OpenAiImageGenerationRequestDto
         {
-            // Cleanup
-            await _fileManager.DeleteAsync(uploadedFile.Id);
-        }
+            Model = "dall-e-3",
+            Prompt = imagePrompt,
+            ResponseFormat = "b64_json",
+            Size = "1024x1024"
+        };
+        var imageResponse = await _imageGenerator.GenerateImageAsync(imageRequest);
+        Assert.NotEmpty(imageResponse.Data);
+        var imageBytes = Convert.FromBase64String(imageResponse.Data[0].B64Json!);
+
+        // Step 3: Generate the audio
+        var speechRequest = new OpenAiAudioSpeechRequestDto
+        {
+            Model = "tts-1",
+            Input = speechText,
+            Voice = "alloy",
+            ResponseFormat = "mp3"
+        };
+        var audioBytes = await _audioSpeaker.GenerateSpeechAsync(speechRequest);
+        Assert.NotEmpty(audioBytes);
+
+        // Step 4: Save the files to Desktop
+        var desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
+        var ticks = DateTime.UtcNow.Ticks.ToString();
+        var imageFileName = $"openai-movie-{ticks}.png";
+        var audioFileName = $"openai-movie-{ticks}.mp3";
+        var imageFilePath = Path.Combine(desktopPath, imageFileName);
+        var audioFilePath = Path.Combine(desktopPath, audioFileName);
+        await File.WriteAllBytesAsync(imageFilePath, imageBytes);
+        await File.WriteAllBytesAsync(audioFilePath, audioBytes);
+        _output.WriteLine($"Image saved to: {imageFilePath}");
+        _output.WriteLine($"Audio saved to: {audioFilePath}");
+
+        // Step 5: Ask the AI to imagine what happens next in the movie scene
+        var textPart = OpenAiMultiModalMessageBuilder.CreateTextPart(
+            "See the image and hear the audio as if it's a scene from a movie. Imagine what will happen next. Respond with a short, creative continuation of the story.");
+        var imagePart = OpenAiMultiModalMessageBuilder.CreateImageBase64Part(imageBytes, "image/png");
+        // The string "mp3" here is not a MIME type, but matches the OpenAI API's expected value for audio input format in the DTO. This is per OpenAI's specification.
+        var audioPart = OpenAiMultiModalMessageBuilder.CreateAudioInputPart(audioBytes, "mp3");
+        var message = OpenAiMultiModalMessageBuilder.CreateMultiModalMessage("user", textPart, imagePart, audioPart);
+
+        var request = new OpenAiChatCompletionRequestDto
+        {
+            Model = "gpt-4o",
+            Messages = [message]
+        };
+
+        // Act
+        var response = await _chatCompleter.CompleteAsync(request);
+
+        // Assert
+        Assert.NotNull(response);
+        Assert.NotEmpty(response.Choices);
+        Assert.NotNull(response.Choices[0].Message);
+        var content = response.Choices[0].Message!.Content as string;
+        Assert.NotNull(content);
+
+        _output.WriteLine($"AI's continuation: {content}");
     }
-
-    /// <summary>
-    /// Creates test image bytes (simple PNG).
-    /// </summary>
-    private static byte[] CreateTestImageBytes()
-    {
-        // Simple 1x1 PNG - minimal valid PNG file
-        return Convert.FromBase64String("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==");
-    }
-
-    /// <summary>
-    /// Creates test audio bytes (minimal MP3).
-    /// </summary>
-    private static byte[] CreateTestAudioBytes()
-    {
-        // Minimal MP3 header - this won't play but will be accepted by the API
-        return new byte[] { 0xFF, 0xFB, 0x90, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-    }
-
-
 }
