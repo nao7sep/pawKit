@@ -275,6 +275,79 @@ public class OpenAiIntegrationTests
     }
 
     /// <summary>
+    /// Tests streaming chat completion.
+    /// </summary>
+    [Fact]
+    public async Task StreamingChat_WithSimpleMessage_ReturnsCompleteResponse()
+    {
+        // Arrange
+        var request = new OpenAiChatCompletionRequestDto
+        {
+            Model = "gpt-4o",
+            Messages = [new OpenAiChatMessageDto { Role = "user", Content = "Tell me a very short story in exactly 3 sentences." }],
+            Stream = true
+        };
+
+        // Act
+        var responseBuilder = new StringBuilder();
+        await foreach (var chunk in _chatCompleter.CompleteStreamAsync(request))
+        {
+            if (chunk.Choices?.Count > 0 && chunk.Choices[0].Delta?.Content != null)
+            {
+                responseBuilder.Append(chunk.Choices[0].Delta!.Content!);
+            }
+        }
+
+        // Assert
+        var fullResponse = responseBuilder.ToString();
+        Assert.NotEmpty(fullResponse);
+        Assert.True(fullResponse.Length > 10); // Should be a meaningful response
+
+        _output.WriteLine($"Full streaming response: {fullResponse}");
+    }
+
+    /// <summary>
+    /// Tests tool calling functionality with a simple weather function.
+    /// </summary>
+    [Fact]
+    public async Task ToolCalling_WithWeatherFunction_ExecutesAndReturnsResult()
+    {
+        // Arrange - Register weather tool with the existing orchestrator
+        var functionDef = OpenAiToolDefinitionBuilder.CreateFromMethod(typeof(OpenAiIntegrationTests).GetMethod(nameof(GetWeather))!);
+
+        // Create a new orchestrator with a fresh tool handler for this test
+        var toolCallHandler = new OpenAiToolCallHandler(new NullLogger<OpenAiToolCallHandler>());
+        toolCallHandler.RegisterTool<WeatherArgs>("GetWeather", GetWeather, functionDef);
+        var orchestrator = new OpenAiToolCallOrchestrator(new NullLogger<OpenAiToolCallOrchestrator>(), _chatCompleter, toolCallHandler);
+
+        var toolDto = new OpenAiToolDto
+        {
+            Type = "function",
+            Function = functionDef
+        };
+
+        var request = new OpenAiChatCompletionRequestDto
+        {
+            Model = "gpt-4o",
+            Messages = [new OpenAiChatMessageDto { Role = "user", Content = "What's the weather like in Tokyo?" }],
+            Tools = [toolDto]
+        };
+
+        // Act
+        var response = await orchestrator.CompleteWithToolsAsync(request);
+
+        // Assert
+        Assert.NotNull(response);
+        Assert.NotEmpty(response.Choices);
+        Assert.NotNull(response.Choices[0].Message);
+
+        var finalMessage = response.Choices[0].Message!.Content as string;
+        Assert.NotNull(finalMessage);
+        Assert.Contains("Tokyo", finalMessage!);
+        Assert.Contains("22°C", finalMessage!);
+    }
+
+    /// <summary>
     /// Tests multi-modal chat with text, image, audio, file inputs and JSON response format.
     /// This is the "kitchen sink" test that exercises multiple capabilities in one request.
     /// </summary>
@@ -337,77 +410,6 @@ public class OpenAiIntegrationTests
             // Cleanup
             await _fileManager.DeleteAsync(uploadedFile.Id);
         }
-    }
-
-    /// <summary>
-    /// Tests tool calling functionality with a simple weather function.
-    /// </summary>
-    [Fact]
-    public async Task ToolCalling_WithWeatherFunction_ExecutesAndReturnsResult()
-    {
-        // Arrange - Register weather tool with the existing orchestrator
-        var functionDef = OpenAiToolDefinitionBuilder.CreateFromMethod(typeof(OpenAiIntegrationTests).GetMethod(nameof(GetWeather))!);
-
-        // Create a new orchestrator with a fresh tool handler for this test
-        var toolCallHandler = new OpenAiToolCallHandler(new NullLogger<OpenAiToolCallHandler>());
-        toolCallHandler.RegisterTool<WeatherArgs>("GetWeather", GetWeather, functionDef);
-        var orchestrator = new OpenAiToolCallOrchestrator(new NullLogger<OpenAiToolCallOrchestrator>(), _chatCompleter, toolCallHandler);
-
-        var toolDto = new OpenAiToolDto
-        {
-            Type = "function",
-            Function = functionDef
-        };
-
-        var request = new OpenAiChatCompletionRequestDto
-        {
-            Model = "gpt-4o",
-            Messages = [new OpenAiChatMessageDto { Role = "user", Content = "What's the weather like in Tokyo?" }],
-            Tools = [toolDto]
-        };
-
-        // Act
-        var response = await orchestrator.CompleteWithToolsAsync(request);
-
-        // Assert
-        Assert.NotNull(response);
-        Assert.NotEmpty(response.Choices);
-        Assert.NotNull(response.Choices[0].Message);
-
-        var finalMessage = response.Choices[0].Message!.Content as string;
-        Assert.NotNull(finalMessage);
-        Assert.Contains("Tokyo", finalMessage!);
-        Assert.Contains("22°C", finalMessage!);
-    }
-
-    /// <summary>
-    /// Tests streaming chat completion.
-    /// </summary>
-    [Fact]
-    public async Task StreamingChat_WithSimpleMessage_ReturnsCompleteResponse()
-    {
-        // Arrange
-        var request = new OpenAiChatCompletionRequestDto
-        {
-            Model = "gpt-4o",
-            Messages = [new OpenAiChatMessageDto { Role = "user", Content = "Tell me a very short story in exactly 3 sentences." }],
-            Stream = true
-        };
-
-        // Act
-        var responseBuilder = new StringBuilder();
-        await foreach (var chunk in _chatCompleter.CompleteStreamAsync(request))
-        {
-            if (chunk.Choices?.Count > 0 && chunk.Choices[0].Delta?.Content != null)
-            {
-                responseBuilder.Append(chunk.Choices[0].Delta!.Content!);
-            }
-        }
-
-        // Assert
-        var fullResponse = responseBuilder.ToString();
-        Assert.NotEmpty(fullResponse);
-        Assert.True(fullResponse.Length > 10); // Should be a meaningful response
     }
 
     /// <summary>
