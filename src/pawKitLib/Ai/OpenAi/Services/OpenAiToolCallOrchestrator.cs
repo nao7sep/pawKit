@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Logging;
 using pawKitLib.Ai.OpenAi.Models;
 
@@ -37,12 +38,10 @@ public class OpenAiToolCallOrchestrator
         try
         {
             // Ensure tools are included in the request, adding default tools if none are present.
-            request.Tools ??= _toolCallHandler.GetToolDefinitions();
-            if (request.Tools.Count == 0)
+            if (request.Tools == null || request.Tools.Count == 0)
             {
                 request.Tools = _toolCallHandler.GetToolDefinitions();
             }
-
             var conversationMessages = request.Messages.ToList();
             request.Messages = conversationMessages;
 
@@ -57,11 +56,39 @@ public class OpenAiToolCallOrchestrator
                     return response;
                 }
 
-                // Process tool calls
-                await ProcessToolCallsAsync(response, conversationMessages);
+                // Extract and execute tool calls
+                var toolCalls = _toolCallHandler.ExtractToolCalls(response);
+                var toolResults = await _toolCallHandler.ExecuteToolCallsAsync(toolCalls);
+
+                // Add assistant message with tool calls to conversation
+                var firstChoice = response.Choices.FirstOrDefault();
+                if (firstChoice?.Message == null)
+                {
+                    throw new AiServiceException(
+                        message: "Response contains no valid message with tool calls",
+                        statusCode: null,
+                        rawResponse: null,
+                        providerDetails: null,
+                        innerException: null);
+                }
+
+                firstChoice.Message.ToolCalls = toolCalls;
+                conversationMessages.Add(firstChoice.Message);
+
+                // Add tool result messages
+                var toolResultMessages = _toolCallHandler.CreateToolResultMessages(toolResults);
+                conversationMessages.AddRange(toolResultMessages);
+
+                // Update request messages for next round
+                request.Messages = conversationMessages;
             }
 
-            throw CreateAiServiceException($"Maximum tool call rounds ({maxToolCallRounds}) exceeded without completion");
+            throw new AiServiceException(
+                message: $"Maximum tool call rounds ({maxToolCallRounds}) exceeded without completion",
+                statusCode: null,
+                rawResponse: null,
+                providerDetails: null,
+                innerException: null);
         }
         catch (AiServiceException)
         {
@@ -69,39 +96,12 @@ public class OpenAiToolCallOrchestrator
         }
         catch (Exception ex)
         {
-            throw CreateAiServiceException("Unexpected error during tool calling orchestration.", ex);
+            throw new AiServiceException(
+                message: "Unexpected error during tool calling orchestration.",
+                statusCode: null,
+                rawResponse: null,
+                providerDetails: null,
+                innerException: ex);
         }
-    }
-
-    /// <summary>
-    /// Processes tool calls and updates conversation messages.
-    /// </summary>
-    private async Task ProcessToolCallsAsync(OpenAiChatCompletionResponseDto response, List<OpenAiChatMessageDto> conversationMessages)
-    {
-        // Extract and execute tool calls
-        var toolCalls = _toolCallHandler.ExtractToolCalls(response);
-        var toolResults = await _toolCallHandler.ExecuteToolCallsAsync(toolCalls);
-
-        // Add assistant message with tool calls to conversation
-        var firstChoice = response.Choices.FirstOrDefault();
-        if (firstChoice?.Message == null)
-        {
-            throw CreateAiServiceException("Response contains no valid message with tool calls");
-        }
-
-        firstChoice.Message.ToolCalls = toolCalls;
-        conversationMessages.Add(firstChoice.Message);
-
-        // Add tool result messages
-        var toolResultMessages = _toolCallHandler.CreateToolResultMessages(toolResults);
-        conversationMessages.AddRange(toolResultMessages);
-    }
-
-    /// <summary>
-    /// Creates a standardized AiServiceException.
-    /// </summary>
-    private static AiServiceException CreateAiServiceException(string message, Exception? innerException = null)
-    {
-        return new AiServiceException(message, null, null, null, innerException);
     }
 }
