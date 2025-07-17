@@ -5,6 +5,18 @@ using pawKitLib.Ai.OpenAi.Models;
 
 namespace pawKitLib.Ai.OpenAi.Services;
 
+// OpenAiToolCallHandler: Core bridge between C# and OpenAI function calling
+// ---------------------------------------------------------------
+// This class manages the registration and execution of C# methods as "tools"
+// that can be called by OpenAI's function calling API. It allows you to:
+//   - Register synchronous or asynchronous C# methods as callable tools, each with a name and schema.
+//   - Provide OpenAI with a list of available tools and their parameter schemas.
+//   - Receive tool call requests from OpenAI, deserialize arguments, invoke the correct C# method, and serialize the result.
+//   - Package results as messages for OpenAI to use in ongoing chat conversations.
+//   - Manage the set of registered tools (list, check, unregister, clear).
+//
+// This class is typically used by higher-level orchestrators to automate multi-step tool-calling conversations with OpenAI.
+
 /// <summary>
 /// Handles registration and execution of C# functions as OpenAI tools.
 /// Provides runtime dispatch for tool calls and result injection back into chat flow.
@@ -24,6 +36,13 @@ public class OpenAiToolCallHandler
     /// </summary>
     public void RegisterTool<T>(string name, Func<T, object> handler, OpenAiFunctionDto functionDefinition)
     {
+        // Registers a synchronous C# function as a tool callable by OpenAI.
+        // The handler is a standard C# function that takes a deserialized argument of type T and returns an object.
+        // Arguments from OpenAI are always received as JSON strings and are deserialized to type T before invocation.
+        // The result is serialized back to JSON for OpenAI.
+        // Although the handler is synchronous, it is wrapped in a Task to fit the async handler signature.
+        // Any exceptions are caught and wrapped in an AiServiceException for consistent error handling.
+
         var registeredTool = new RegisteredTool
         {
             Name = name,
@@ -32,17 +51,21 @@ public class OpenAiToolCallHandler
             {
                 try
                 {
+                    // Deserialize arguments from JSON string to the expected C# type.
                     var args = JsonSerializer.Deserialize<T>(argsJson);
                     if (args == null)
                     {
                         throw new ArgumentException($"Failed to deserialize arguments for tool '{name}'");
                     }
 
+                    // Execute the provided handler function with the deserialized arguments.
                     var result = handler(args);
+                    // Serialize the result back to JSON for OpenAI.
                     return Task.FromResult(JsonSerializer.Serialize(result));
                 }
                 catch (Exception ex)
                 {
+                    // Wrap any error in a custom exception for consistent error handling.
                     throw new AiServiceException(
                         message: $"Tool execution failed for '{name}'",
                         statusCode: null,
@@ -61,6 +84,13 @@ public class OpenAiToolCallHandler
     /// </summary>
     public void RegisterAsyncTool<T>(string name, Func<T, Task<object>> handler, OpenAiFunctionDto functionDefinition)
     {
+        // Registers an asynchronous C# function as a tool callable by OpenAI.
+        // The handler is an async function that takes a deserialized argument of type T and returns a Task<object>.
+        // Arguments from OpenAI are always received as JSON strings and are deserialized to type T before invocation.
+        // The result is awaited and then serialized back to JSON for OpenAI.
+        // This method should be used for tool logic that is naturally asynchronous (e.g., I/O, network calls).
+        // Any exceptions are caught and wrapped in an AiServiceException for consistent error handling.
+
         var registeredTool = new RegisteredTool
         {
             Name = name,
@@ -101,6 +131,8 @@ public class OpenAiToolCallHandler
         return _registeredTools.Values
             .Select(tool => new OpenAiToolDto
             {
+                // OpenAI's API expects the type to be "function" for all registered tools.
+                // This informs OpenAI that this object represents a callable function/tool.
                 Type = "function",
                 Function = tool.FunctionDefinition
             })
@@ -150,6 +182,27 @@ public class OpenAiToolCallHandler
     /// <summary>
     /// Creates tool result messages for injection back into the chat conversation.
     /// </summary>
+    // This method is a key part of the OpenAI tool-calling workflow. It takes the results of executed tool calls
+    // (as a dictionary mapping tool call IDs to their result strings) and formats them as messages with role "tool".
+    // These messages are not instructions to execute a tool, but are instead sent back to OpenAI to report the
+    // outcome of tool executions. This enables OpenAI to use the results in subsequent assistant responses or
+    // to continue the function-calling loop if needed.
+    //
+    // Typical workflow:
+    //   1. You send a chat completion request to OpenAI, including available tool schemas.
+    //   2. OpenAI may respond with an assistant message that contains tool call requests (in the tool_calls field).
+    //   3. You extract these tool calls and execute the corresponding C# methods locally.
+    //   4. For each executed tool, you collect the result and associate it with the tool call ID.
+    //   5. You use this method to create messages with role "tool", each containing:
+    //        - Role: Always "tool", indicating this is a tool result (not a user or assistant message).
+    //        - Content: The serialized result of the tool execution.
+    //        - ToolCallId: The ID of the tool call this result corresponds to (so OpenAI can match results to requests).
+    //   6. You send these "tool" messages back to OpenAI as part of the conversation.
+    //   7. OpenAI uses these results to generate the next assistant message, which may continue the conversation
+    //      or request further tool calls.
+    //
+    // Note: You should never execute a message with role "tool". These are only for reporting results back to OpenAI.
+
     public List<OpenAiChatMessageDto> CreateToolResultMessages(Dictionary<string, string> toolResults)
     {
         return toolResults.Select(kvp => new OpenAiChatMessageDto
@@ -221,10 +274,20 @@ public class OpenAiToolCallHandler
         _registeredTools.Clear();
     }
 
+    // Internal class for storing metadata and handler for each registered tool.
+    // Each RegisteredTool contains:
+    //   - Name: The unique name of the tool (used for lookup).
+    //   - FunctionDefinition: The OpenAI-compatible schema describing the tool's parameters and usage.
+    //   - Handler: A delegate that takes a JSON string (the tool call arguments) and returns a Task<string> (the serialized result).
+    //     This delegate always matches the async signature, regardless of whether the original tool was synchronous or asynchronous.
+    //     The handler is responsible for deserializing arguments, invoking the C# method, and serializing the result.
     private class RegisteredTool
     {
         public required string Name { get; init; }
         public required OpenAiFunctionDto FunctionDefinition { get; init; }
         public required Func<string, Task<string>> Handler { get; init; }
     }
+
+    // Note: _registeredTools is not thread-safe. If you register/unregister tools from multiple threads,
+    // you must provide your own synchronization.
 }
